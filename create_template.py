@@ -7,11 +7,11 @@ htmlfile = """
 <head>
 <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
 <link rel="stylesheet" type="text/css" href="tyylit.css"/>
-<script src="presenter.js">
-</script>
 </head>
 <title>Majakkamessu</title>
 <body>
+<div id='test'>
+</div>
 """
 jsfile = "var songs = {"
 for songfile in glob.glob(songpath):
@@ -21,8 +21,10 @@ for songfile in glob.glob(songpath):
     prefix = "\n<div id='{}' class='songdata'>\n".format(wholetext[0])
     htmlfile += "{}{}\n</div>\n\n".format(prefix,text)
 
-htmlfile += "\n</body>\n</html>"
+htmlfile += """<script src="presenter.js"></script>
+</body>\n</html>"""
 jsfile += "};"
+
 with open("template.html","w") as f:
     f.write(htmlfile.strip())
 
