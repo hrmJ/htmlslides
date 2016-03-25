@@ -2,8 +2,15 @@
 //========================================
 //
 function Presentation(){
-    this.pointer = 0;
+    // The pointer is set to the id of the 
+    // songcontent object currently set as active
+    this.pointer = undefined;
+    // This might be unnecessary:
     this.currentcontent = undefined;
+    this.SetActiveContent = function(oid){
+        this.pointer = oid;
+        return 0;
+    };
 }
 
 // Screencontent is the class that contains the actual data to be shown
@@ -11,6 +18,7 @@ function Presentation(){
 
 function ScreenContent(){
     this.custombg="";
+    this.id = CreateUid();
     //The pointer property is important. It Tells which screenfull to show
     this.pointer = 0;
     // Screenfull here means the content blocks divided into 
@@ -18,9 +26,12 @@ function ScreenContent(){
     this.screenfulls = [];
     this.Show = 
         function(){
-        
-            console.log('Moro');
-        
+            //Print the content of this object to screen
+            //IF this is set as the active content object
+            //by the presentetion.pointer property.
+            if(pres.pointer==this.id){
+                screen1.innerText = this.screenfulls[this.pointer];
+            }
         };
 }
 
@@ -30,7 +41,19 @@ function ScreenContent(){
 function SongContent(title, songtexts){
     this.title = title;
     this.songtexts = songtexts;
-    this.screenfulls = this.songtexts.split(/(^\s*$)+/m);
+    this.screenfulls = 
+        function(content){
+            // split the song content to an array consisting of verses;
+            // This is a bit hacky: removing empty lines
+            // Should rather improve the regex!
+                arr1 = content.split(/(^\s*$\n)+/m);
+                for (var i = 0;i<arr1.length;i++){
+                    if (arr1[i] === "" || arr1[i].search(/^\s+$/g) != -1){
+                        arr1.splice(i,1);
+                    }
+                }
+                return arr1;
+            }(this.songtexts);
 }
 
 //Take care of inheritance
@@ -57,7 +80,7 @@ function SongData(){
 
 //########################################
 //
-//Fetch songs
+//Fetch the songs
 //
 function GetSongs(){
     var AllSongs = new SongData();
@@ -74,16 +97,25 @@ function GetSongs(){
     return AllSongs;
 }
 
-
+function CreateUid(){
+//Unique id generator
+//Creates a universal unique identifier to be used in making each 
+//credits go to  bufa @ http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
+//
+    var newuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+        return v.toString(16);
+    });
+    return newuid;
+}
 
 //The Global screen variables poin to the places on the
 //screen, where content is shown to the audience
-var screen1 = document.getElementById("test1");
+var screen1 = document.getElementById("screen1");
+//Two more global objects: all the songs and the actual presentation to run
+var allsongs = GetSongs();
+var pres = new Presentation();
 
-//RUN THE PROGRAM
-//========================================
-AllSongs = GetSongs();
-Pres = new Presentation();
 
 
 //
