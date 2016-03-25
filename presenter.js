@@ -11,6 +11,7 @@ function Presentation(){
 
 function ScreenContent(){
     this.custombg="";
+    //The pointer property is important. It Tells which screenfull to show
     this.pointer = 0;
     // Screenfull here means the content blocks divided into 
     // parts that will be shown at the time
@@ -74,9 +75,13 @@ function GetSongs(){
 }
 
 
+
+//The Global screen variables poin to the places on the
+//screen, where content is shown to the audience
+var screen1 = document.getElementById("test1");
+
 //RUN THE PROGRAM
 //========================================
-
 AllSongs = GetSongs();
 Pres = new Presentation();
 

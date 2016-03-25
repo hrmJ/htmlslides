@@ -11,7 +11,7 @@ htmlfile = """
 </head>
 <title>Majakkamessu</title>
 <body>
-<div id='test'>
+<div id='screen1'>
 </div>
 """
 jsfile = "var songs = {"
