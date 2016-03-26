@@ -11,6 +11,9 @@ function Presentation(){
         this.pointer = oid;
         return 0;
     };
+    //Move in the presentation
+    this.Forward = function(){};
+    this.Backwards = function(){};
 }
 
 // Screencontent is the class that contains the actual data to be shown
