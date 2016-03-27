@@ -16,7 +16,6 @@ class Song():
         prefix = "\n<div id='{}' class='songdata'>\n<span class='songtitle'>{}</span>\n".format(self.name,wholetext[0].strip())
         self.html = "{}\n<p class='songdatacontent'>{}</p></div>\n\n".format(prefix,text) 
 
-
 def CheckAvailability(songname, allnames):
     """Check if this song is in the db and try to guess if not"""
     songname = songname.lower()
@@ -42,60 +41,49 @@ def CheckAvailability(songname, allnames):
 
     return songname
 
+def StructureToHtml(songs):
+    """Create a html string containing the service structure"""
+    pass
+
+def AddToStructureList(thislist,structure,pattern, role, isList = False):
+    match = re.search(pattern,structure)
+    if isList:
+        #import ipdb; ipdb.set_trace()
+        thislist.append([role, match.group(1).splitlines()])
+    else:
+        thislist.append([role, match.group(1).strip()])
 
 def ExtractStructure(mailfile, allsongnames):
     """Use a txt file to get a standard structure of a predefined service"""
     with open(mailfile,'r') as f:
         structure = f.read()
 
-    songs = dict()
+    songs = list()
+    AddToStructureList(songs,structure,r'Alkulaulu: ?(.*)','Alkulaulu')
+    AddToStructureList(songs,structure,r'Päivän laulu: ?(.*)','Päivän laulu')
+    AddToStructureList(songs,structure,r'Ylistyslaulut.*\n ?--+\n(([a-öA-Ö].*\n)+)','Ylistys- ja rukouslauluja',True)
+    AddToStructureList(songs,structure,r'Pyhä-hymni: ?(.*)','Pyhä-hymni')
+    AddToStructureList(songs,structure,r'Jumalan karitsa: ?(.*)','Jumalan karitsa')
+    AddToStructureList(songs,structure,r'Ehtoollislaulut.*\n ?--+\n(([a-öA-Ö].*\n)+)','Ehtoollislauluja',True)
+    AddToStructureList(songs,structure,r'Loppulaulu: ?(.*)','Loppulaulu')
 
-    match = re.search(r'Alkulaulu: ?(.*)',structure)
-    songs['alkulaulu'] = match.group(1).strip()
 
-    match = re.search(r'Päivän laulu: ?(.*)',structure)
-    songs['paivanlaulu'] = match.group(1).strip()
-
-#    match = re.search(r'evankeliumi: ?(.*)',structure.lower())
-#    if match:
-#        address = match.group(1).strip()
-#        match = re.search(r'(\d?\w+) (\d+):([0-9,-]+)',structure.lower())
-#        book = match.group(1)
-#        chapter = match.group(2)
-#        verse = match.group(3)
-#        evankeliumi = BibleText(book,chapter,verse,address)
-#
-    match = re.search(r'Ylistyslaulut.*\n ?--+\n(([a-öA-Ö].*\n)+)',structure)
-    ylistyslaulut = match.group(1)
-    songs['ylistyslaulut'] = ylistyslaulut.splitlines()
-
-    match = re.search(r'Ehtoollislaulut.*\n ?--+\n(([a-öA-Ö].*\n)+)',structure)
-    ehtoollislaulut = match.group(1)
-    songs['ehtoollislaulut'] = ehtoollislaulut.splitlines()
-
-    match = re.search(r'Pyhä-hymni: ?(.*)',structure)
-    songs['pyha'] = match.group(1).strip()
-
-    match = re.search(r'Jumalan karitsa: ?(.*)',structure)
-    songs['jumalankaritsa'] = match.group(1).strip()
-
-    match = re.search(r'Loppulaulu: ?(.*)',structure)
-    songs['loppulaulu'] = match.group(1).strip()
-
-    for songrole, songname in songs.items():
-        if songrole not in ('ylistyslaulut','ehtoollislaulut'):
-            songs[songrole] = CheckAvailability(songname, allsongnames)
+    htmldata = "<div id='structure'>"
+    for song in songs:
+        if not isinstance(song[1],list):
+            song[1] = CheckAvailability(song[1], allsongnames)
+            htmldata += "\n<song role='{}'>{}</song>".format(song[0],song[1])
         else:
             #ylistslaulut, ehtoollislaulut are lists that contain many song names
             newsongnames = list()
-            for thissongname in songname:
-                newsongnames.append(CheckAvailability(thissongname, allsongnames))
-            songs[songrole] = newsongnames
+            for thissongname in song[1]:
+                thissongname = CheckAvailability(thissongname, allsongnames)
+                newsongnames.append(thissongname)
+                htmldata += "\n<song role='{}'>{}</song>".format(song[0],thissongname)
+            songs[1] = newsongnames
+    htmldata += "</div>"
 
-    cont = menus.multimenu({'y':'yes','n':'no'}, 'All songs found in the database. Create slides?')
-    if cont.answer == 'y':
-        pass
-        #LuoMessu(songs, evankeliumi)
+    return htmldata
 
 def CreateHtmlTemplate(songpath = '/home/juho/Dropbox/laulut/*.txt', servicestructure=None):
     """Go through a list of txt files containing songs and produce an output html 
@@ -122,8 +110,7 @@ def CreateHtmlTemplate(songpath = '/home/juho/Dropbox/laulut/*.txt', servicestru
         songhtml += songs[-1].html
 
     if servicestructure:
-        ExtractStructure(servicestructure, allsongnames)
-
+        htmlfile += "\n" + ExtractStructure(servicestructure, allsongnames) + "\n"
 
     htmlfile += songhtml + "\n<script src='presenter.js'></script>\n</body>\n</html>"
     #jsfile += "};"
