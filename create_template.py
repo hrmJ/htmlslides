@@ -97,7 +97,7 @@ def CreateHtmlTemplate(songpath = '/home/juho/Dropbox/laulut/*.txt', servicestru
     </head>
     <title>Majakkamessu</title>
     <body>
-    <div id='screen1'>
+    <div id='textcontent'>
     </div>
     """
     #jsfile = "var songs = {"
@@ -119,4 +119,4 @@ def CreateHtmlTemplate(songpath = '/home/juho/Dropbox/laulut/*.txt', servicestru
         f.write(htmlfile.strip())
 
 
-CreateHtmlTemplate(servicestructure="teststructure.txt")
+CreateHtmlTemplate(servicestructure="tests/teststructure.txt")

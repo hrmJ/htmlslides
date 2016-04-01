@@ -1,7 +1,6 @@
-// PRESENTATION is the class that wraps different content and decides what to show
-//========================================
-//
 function Presentation(){
+    // PRESENTATION is the class that wraps different content and decides what to show
+
     // The pointer is set to the id of the 
     // songcontent object currently set as active
     this.pointer = undefined;
@@ -85,7 +84,12 @@ function Presentation(){
                     //...
                     // If the type of content was a song, add it to the
                     // presentation from the allsongs global variable
-                    this.contents[this.contents.length] = allsongs[structure.childNodes[i].innerText];
+
+                    var song = allsongs[structure.childNodes[i].innerText.toLowerCase()];
+                    //First, add the title of the song to presentation as a separate item
+                    this.contents[this.contents.length] = song.titleslide;
+                    //Then, add the actual song
+                    this.contents[this.contents.length] = song;
                 }
                 else{
                     this.contents[this.contents.length] = structure.childNodes[i];
@@ -94,13 +98,11 @@ function Presentation(){
         }
         return 0;
     };
-
 }
 
-// Screencontent is the class that contains the actual data to be shown
-//========================================
-
 function ScreenContent(){
+    // Screencontent is the class that contains the actual data to be shown
+
     this.custombg="";
     this.id = CreateUid();
     //The pointer property is important. It Tells which screenfull to show
@@ -111,15 +113,14 @@ function ScreenContent(){
     this.Show = 
         function(){
             //Print the content of this object to screen
-            screen1.innerText = this.screenfulls[this.pointer];
+            Screen.textcontent.innerText = this.screenfulls[this.pointer];
         };
 }
 
-// Songcontent
-//------------------------------
-
 function SongContent(title, songtexts){
-    this.title = title;
+    // Songcontent is a class for the actual songs
+
+    this.titleslide = new SongTitleContent(title);
     this.songtexts = songtexts;
     this.screenfulls = 
         function(content){
@@ -134,6 +135,10 @@ function SongContent(title, songtexts){
                 }
                 return arr1;
             }(this.songtexts);
+    this.PrintTitleSlide = 
+        function(){
+        
+        };
 }
 
 //Take care of inheritance
@@ -141,6 +146,16 @@ function SongContent(title, songtexts){
 SongContent.prototype = new ScreenContent();
 SongContent.prototype.constructor = SongContent;
 
+function SongTitleContent(title){
+    //Notice, that the songs titles are not a part of the 
+    //songs "screenfulls" array, but rather a separate object,
+    //linked to the song by the songs "titleslide" porperty.
+    //The titles are printed ONLY as parts of a presentation
+    this.screenfulls = [title];
+}
+
+SongTitleContent.prototype = new ScreenContent();
+SongTitleContent.prototype.constructor = SongTitleContent;
 
 function BibleContent(){
 }
@@ -149,40 +164,30 @@ function InfoContent(){
 }
 
 
-function Service(){
-    this.name = "Majakkamessu";
-}
-//This is a container for all the actual song objects
-function SongData(){
-}
 
-
-
-//########################################
-//
-//Fetch the songs
-//
 function GetSongs(){
-    var AllSongs = new SongData();
+    //Fetch the songs from  the html file
+
+    var songs = [];
 
     var songdivs = document.getElementsByClassName("songdata");
     for(var i=0;i<songdivs.length;i++){
-        // Add a new songcontent object to the Allsongs container object
+        // Add a new songcontent object to the songs container object
+        // todo: composer, writer
 
         content = songdivs[i].getElementsByClassName("songdatacontent")[0].innerText;
         title = songdivs[i].getElementsByClassName("songtitle")[0].innerText;
-        AllSongs[songdivs[i].id] = new SongContent(title, content);
+        songs[songdivs[i].id.toLowerCase()] = new SongContent(title, content);
     }
 
-    return AllSongs;
+    return songs;
 }
 
-
 function CreateUid(){
-//Unique id generator
-//Creates a universal unique identifier to be used in making each 
-//credits go to  bufa @ http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
-//
+    //Unique id generator
+    //Creates a universal unique identifier to be used in making each 
+    //credits go to  bufa @ http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
+    //
     var newuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
         return v.toString(16);
@@ -190,17 +195,17 @@ function CreateUid(){
     return newuid;
 }
 
-//The Global screen variables point to the places on the
-//screen, where content is shown to the audience
-var screen1 = document.getElementById("screen1");
-//Two more global objects: all the songs and the actual presentation to run
+
+//========================================
+
+var Screen =  {};
+    //The Global screen variables point to the places on the
+    //screen, where content is shown to the audience
+    //this.textcontent = document.getElementById("textcontent");
 var allsongs = GetSongs();
 var pres = new Presentation();
-//Fetch a predefined structure
+
+Screen.textcontent = document.getElementById("textcontent");
 pres.GetStructure();
 
-
-
-//
-//
-//document.getElementById("test").innerText = songdivs[0].innerText;
+//========================================
