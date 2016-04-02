@@ -14,9 +14,6 @@ function Presentation(){
     };
 
     //Move in the presentation
-    //..............................
-
-
     this.Forward = function(){
         var started = true;
         if (this.pointer === undefined){
@@ -68,13 +65,12 @@ function Presentation(){
         currentcontent.Show();
     };
 
-    // Other methods
-    //..............................
 
     this.GetStructure= function (){
         //If there is a predefined structure for the presantation
         //this function extracts it
-        structure = document.getElementById("structure");
+        var structure = document.getElementById("structure");
+        this.songs = {};
         for (var i=0;i<structure.childNodes.length;i++){
             if (structure.childNodes[i].nodeName!=="#text"){
                 //If the structure div contains tags
@@ -90,6 +86,8 @@ function Presentation(){
                     this.contents[this.contents.length] = song.titleslide;
                     //Then, add the actual song
                     this.contents[this.contents.length] = song;
+                    //Add the song also to a structured list
+                    this.songs[role] = song;
                 }
                 else{
                     this.contents[this.contents.length] = structure.childNodes[i];
@@ -98,6 +96,40 @@ function Presentation(){
         }
         return 0;
     };
+
+
+    this.CreateMajakkaMessu = function(){
+        //Pre-defined services...
+        var johdanto = new Section('Johdanto');
+        this.contents = [];
+        johdanto.items = [new SectionItem('Alkulaulu',this.songs['Alkulaulu']),
+                          new SectionItem('Alkusanat ja seurakuntalaisen sana',false)];
+        this.sections = [johdanto];
+        for(var i in this.sections){
+            thissection = this.sections[i];
+            //add all the sections to the presentation
+            this.contents[this.contents.length] = new SongTitleContent(thissection.name);
+            for(var a in thissection.items){
+                //add all the items in the section
+                thisitem = thissection.items[a];
+                this.contents[this.contents.length] = new SongTitleContent(thisitem.name)
+            }
+        }
+    
+    }
+
+}
+
+
+function SectionItem(name,contentobject){
+    this.name = name;
+    this.content = contentobject;
+}
+
+function Section(name,items){
+    //The presentation may be divided into sections
+    this.name = name;
+    this.items = items;
 }
 
 function ScreenContent(){
@@ -164,6 +196,7 @@ function InfoContent(){
 }
 
 
+//========================================
 
 function GetSongs(){
     //Fetch the songs from  the html file
@@ -194,7 +227,6 @@ function CreateUid(){
     });
     return newuid;
 }
-
 
 //========================================
 
