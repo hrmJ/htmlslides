@@ -104,6 +104,7 @@ function Presentation(){
         this.contents = [];
         johdanto.items = [new SectionItem('Alkulaulu',this.songs['Alkulaulu']),
                           new SectionItem('Alkusanat ja seurakuntalaisen sana',false)];
+        //johdanto.CreateLeftbanner();
         this.sections = [johdanto];
         for(var i in this.sections){
             thissection = this.sections[i];
@@ -130,6 +131,20 @@ function Section(name,items){
     //The presentation may be divided into sections
     this.name = name;
     this.items = items;
+    this.CreateLeftbanner = function(highlighted){
+        leftbanner = document.createElement('ul');
+        for(var i in this.items){
+            thisitem = this.items[i];
+            this_li = document.createElement('li');
+            this_li.innerText = thisitem.name;
+            if (i==highlighted){
+                this_li.style = "";
+
+            }
+            leftbanner.appendChild(this_li);
+        }
+        return leftbanner;
+    };
 }
 
 function ScreenContent(){
@@ -145,6 +160,7 @@ function ScreenContent(){
     this.Show = 
         function(){
             //Print the content of this object to screen
+            //EDIT THIS >> instead of innerText, a DOM objetct
             Screen.textcontent.innerText = this.screenfulls[this.pointer];
         };
 }
