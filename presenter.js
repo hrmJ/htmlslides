@@ -25,8 +25,8 @@ function Presentation(){
         var currentcontent = this.contents[this.pointer]
 
         //Try to increment inner pointer of the current screencontent 
-        if(currentcontent.screenfulls.length - 1>currentcontent.pointer && started){
-            //if there are still screenfulls to be shown in this content object
+        if(currentcontent.items.length - 1>currentcontent.pointer && started){
+            //if there are still items to be shown in this content object
             //AND if this is not the first content of the presentation
             currentcontent.pointer++;
         }
@@ -50,7 +50,7 @@ function Presentation(){
 
         //Try to increment inner pointer of the current screencontent 
         if(currentcontent.pointer>0){
-            //if there are still screenfulls to be shown in this content object
+            //if there are still items to be shown in this content object
             //AND if this is not the first content of the presentation
             currentcontent.pointer--;
         }
@@ -98,29 +98,44 @@ function Presentation(){
     };
 
 
-    this.CreateMajakkaMessu = function(){
-        //Pre-defined services...
-        var johdanto = new Section('Johdanto');
-        this.contents = [];
-        johdanto.items = [new SectionItem('Alkulaulu',this.songs['Alkulaulu']),
-                          new SectionItem('Alkusanat ja seurakuntalaisen sana',false)];
-        //johdanto.CreateLeftbanner();
-        this.sections = [johdanto];
-        for(var i in this.sections){
-            thissection = this.sections[i];
-            //add all the sections to the presentation
-            this.contents[this.contents.length] = new SongTitleContent(thissection.name);
-            for(var a in thissection.items){
-                //add all the items in the section
-                thisitem = thissection.items[a];
-                this.contents[this.contents.length] = new SongTitleContent(thisitem.name)
-            }
-        }
-    
-    }
-
 }
 
+
+function MajakkaMessu(){
+    //Pre-defined services...
+    //These inherit from the general presentation class
+    this.GetStructure();
+    this.showtype = "majakka";
+    var johdanto = new Section('Johdanto');
+    johdanto.items = [new SectionItem('Alkulaulu',this.songs['Alkulaulu']),
+                      new SectionItem('Alkusanat ja seurakuntalaisen sana',false)];
+    //johdanto.CreateLeftbanner();
+    this.sections = [johdanto];
+
+    this.contents = [];
+    for(var i in this.sections){
+        thissection = this.sections[i];
+        //add all the sections to the presentation
+        this.contents[this.contents.length] = new SongTitleContent(thissection.name);
+        for(var a in thissection.items){
+            //add all the items in the section
+            thisitem = thissection.items[a];
+            thiscontent = false;
+            if (thisitem.content){
+                //If this SectionItem is a song etc. add the actual song
+                thiscontent = thisitem.content;
+            }
+            //Create the header and add it to contents
+            this.contents[this.contents.length] = new SectionTitleContent(thissection,a);
+            if(thiscontent){
+                this.contents[this.contents.length] = thiscontent;
+            }
+        }
+    }
+}
+
+MajakkaMessu.prototype = new Presentation();
+MajakkaMessu.prototype.constructor = MajakkaMessu;
 
 function SectionItem(name,contentobject){
     this.name = name;
@@ -138,13 +153,28 @@ function Section(name,items){
             this_li = document.createElement('li');
             this_li.innerText = thisitem.name;
             if (i==highlighted){
-                this_li.style = "";
-
+                this_li.className = "sectionitemhl";
             }
             leftbanner.appendChild(this_li);
         }
         return leftbanner;
     };
+    this.pointer = 0;
+    //Think about inheriting this from screencontent?
+    this.Show = 
+        function(){
+            //Print the content of this object to screen
+            currentitem = this.items[this.pointer];
+            ClearContent(Screen.textcontent);
+            if (currentitem.content){
+                //If this item is a song or some other object
+                currentitem.Show();
+            }
+            else{
+                //If this is just an empty section header
+                Screen.textcontent.appendChild(currentitem);
+            }
+        };
 }
 
 function ScreenContent(){
@@ -152,16 +182,16 @@ function ScreenContent(){
 
     this.custombg="";
     this.id = CreateUid();
-    //The pointer property is important. It Tells which screenfull to show
+    //The pointer property is important. It Tells which item to show
     this.pointer = 0;
-    // Screenfull here means the content blocks divided into 
+    // item here means the content blocks divided into 
     // parts that will be shown at the time
-    this.screenfulls = [];
+    this.items = [];
     this.Show = 
         function(){
             //Print the content of this object to screen
             ClearContent(Screen.textcontent);
-            Screen.textcontent.appendChild(this.screenfulls[this.pointer]);
+            Screen.textcontent.appendChild(this.items[this.pointer]);
         };
 }
 
@@ -170,7 +200,7 @@ function SongContent(title, songtexts){
 
     this.titleslide = new SongTitleContent(title);
     this.songtexts = songtexts;
-    this.screenfulls = 
+    this.items = 
         function(content){
             // split the song content to an array consisting of verses;
             // This is a bit hacky: removing empty lines
@@ -204,18 +234,27 @@ SongContent.prototype.constructor = SongContent;
 
 function SongTitleContent(title){
     //Notice, that the songs titles are not a part of the 
-    //songs "screenfulls" array, but rather a separate object,
+    //songs "items" array, but rather a separate object,
     //linked to the song by the songs "titleslide" porperty.
     //The titles are printed ONLY as parts of a presentation
     //
     el = document.createElement('p');
     el.className = 'songtitle';
     el.innerText = title;
-    this.screenfulls = [el];
+    this.items = [el];
 }
 
 SongTitleContent.prototype = new ScreenContent();
 SongTitleContent.prototype.constructor = SongTitleContent;
+
+function SectionTitleContent(section,curitem){
+    //
+    this.items = [section.CreateLeftbanner(curitem)];
+    return 0;
+}
+
+SectionTitleContent.prototype = new ScreenContent();
+SectionTitleContent.prototype.constructor = SectionTitleContent;
 
 function BibleContent(){
 }
@@ -267,13 +306,14 @@ function CreateUid(){
 //========================================
 
 var Screen =  {};
-    //The Global screen variables point to the places on the
-    //screen, where content is shown to the audience
-    //this.textcontent = document.getElementById("textcontent");
+//The Global screen variables point to the places on the
+//screen, where content is shown to the audience
+//this.textcontent = document.getElementById("textcontent");
+Screen.textcontent = document.getElementById("textcontent");
+
 var allsongs = GetSongs();
 var pres = new Presentation();
+var Majakka = new MajakkaMessu();
 
-Screen.textcontent = document.getElementById("textcontent");
-pres.GetStructure();
 
 //========================================
