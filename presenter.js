@@ -160,8 +160,8 @@ function ScreenContent(){
     this.Show = 
         function(){
             //Print the content of this object to screen
-            //EDIT THIS >> instead of innerText, a DOM objetct
-            Screen.textcontent.innerText = this.screenfulls[this.pointer];
+            ClearContent(Screen.textcontent);
+            Screen.textcontent.appendChild(this.screenfulls[this.pointer]);
         };
 }
 
@@ -175,13 +175,21 @@ function SongContent(title, songtexts){
             // split the song content to an array consisting of verses;
             // This is a bit hacky: removing empty lines
             // Should rather improve the regex!
-                arr1 = content.split(/(^\s*$\n)+/m);
-                for (var i = 0;i<arr1.length;i++){
-                    if (arr1[i] === "" || arr1[i].search(/^\s+$/g) != -1){
-                        arr1.splice(i,1);
+                rawcontents = content.split(/(^\s*$\n)+/m);
+                for (var i = 0;i<rawcontents.length;i++){
+                    if (rawcontents[i] === "" || rawcontents[i].search(/^\s+$/g) != -1){
+                        rawcontents.splice(i,1);
                     }
                 }
-                return arr1;
+                //Transform the verses to DOM elements
+                //These two loops should probably be combined 
+                domcontents = [];
+                for (verseid in rawcontents){
+                    domcontents[verseid] = document.createElement('p');
+                    domcontents[verseid].className = 'verse';
+                    domcontents[verseid].innerText = rawcontents[verseid];
+                }
+                return domcontents;
             }(this.songtexts);
     this.PrintTitleSlide = 
         function(){
@@ -199,7 +207,11 @@ function SongTitleContent(title){
     //songs "screenfulls" array, but rather a separate object,
     //linked to the song by the songs "titleslide" porperty.
     //The titles are printed ONLY as parts of a presentation
-    this.screenfulls = [title];
+    //
+    el = document.createElement('p');
+    el.className = 'songtitle';
+    el.innerText = title;
+    this.screenfulls = [el];
 }
 
 SongTitleContent.prototype = new ScreenContent();
@@ -213,6 +225,14 @@ function InfoContent(){
 
 
 //========================================
+//
+function ClearContent(myNode){
+    //Remove child nodes,
+    //see also http://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript
+while (myNode.firstChild) {
+    myNode.removeChild(myNode.firstChild);
+}
+}
 
 function GetSongs(){
     //Fetch the songs from  the html file
