@@ -182,6 +182,7 @@ function Section(name,items){
     this.PrintSectionName = function(){
         sectionbanner = document.createElement('h1');
         sectionbanner.innerText = this.name;
+        return sectionbanner;
     };
 }
 
