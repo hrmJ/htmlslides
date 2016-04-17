@@ -42,11 +42,11 @@ function Presentation(){
         //... depending of the type of the content, possibly also something else
         switch(currentcontent.content_type){
             case "song":
-                console.log("Laulu!");
                 break;
             case "sectiontitle":
-                console.log("Otsikko!");
-                currentcontent.mysection.sectionpointer++;
+                if(started){
+                    currentcontent.mysection.pointer++;
+                }
                 break;
             default:
                 break;
@@ -55,6 +55,7 @@ function Presentation(){
     };
 
     this.Backwards = function(){
+        //TODO combine the ff and bw functions as much as possible!
         if (this.pointer === undefined){
             //If the presentation has not started yet, stop the function
             return false;
@@ -74,6 +75,17 @@ function Presentation(){
                 this.pointer--;
                 currentcontent = this.contents[this.pointer]
             }
+        }
+        switch(currentcontent.content_type){
+            case "song":
+                break;
+            case "sectiontitle":
+                if(currentcontent.mysection.pointer>0){
+                    currentcontent.mysection.pointer--;
+                }
+                break;
+            default:
+                break;
         }
         currentcontent.Show();
     };
@@ -119,8 +131,10 @@ function MajakkaMessu(){
     this.GetStructure();
     this.showtype = "majakka";
     var johdanto = new Section('Johdanto');
-    johdanto.items = [new SectionItem('Alkulaulu',this.songs['Alkulaulu']),
-                      new SectionItem('Alkusanat ja seurakuntalaisen sana',false)];
+    johdanto.items = [new SectionItem('Alkulaulu',this.songs['Alkulaulu'],'song'),
+                      new SectionItem('Alkusanat ja seurakuntalaisen sana',false,'header')];
+                      //TODO ^^ liittyen ehkä mieti, että näkyviin tulisi sanailijan nimi siihen,
+                      //missä tavallisesti laulun nimi. Muista myös ajatella laulun tekijänoikeuksia.
     //johdanto.CreateLeftbanner();
     this.sections = [johdanto];
     this.sectionpointer = 0 ;
@@ -154,8 +168,9 @@ function MajakkaMessu(){
 MajakkaMessu.prototype = new Presentation();
 MajakkaMessu.prototype.constructor = MajakkaMessu;
 
-function SectionItem(name,contentobject){
+function SectionItem(name,contentobject,itemtype){
     this.name = name;
+    this.itemtype = itemtype;
     this.content = contentobject;
 }
 
@@ -211,10 +226,18 @@ function ScreenContent(){
                     CurrentScreen.UpdateContent('textcontent',this.items[this.pointer]);
                     break;
                 case "sectiontitle":
+                    sitem = this.mysection.items[this.mysection.pointer]
                     CurrentScreen.UpdateContent('sections',this.mysection.PrintSectionName());
                     CurrentScreen.UpdateContent('sitems',this.mysection.CreateLeftbanner(this.mysection.pointer));
+                    if (sitem.itemtype=='song'){
+                        //Consider removing the itemtype prop!
+                        //Insert the song's title as a content on the right of the screen
+                        CurrentScreen.UpdateContent('itemtitle',sitem.content.titleslide.items[0]);
+                        //TODO: lyrics by, music by...
+                    }
                     break;
                 case "songtitle":
+                    //Think about songtitles also as not part of a special sectioned service
                     CurrentScreen.UpdateContent('textcontent',this.items[this.pointer]);
                     break;
                 default:
@@ -347,13 +370,16 @@ function PresScreen(){
     this.textcontent = CreateTag("div", "textcontent");
     this.sections = CreateTag("nav", "sections");
     this.sitems = CreateTag("nav", "sitems");
+    this.itemtitle = CreateTag("div", "itemtitle");
     document.body.appendChild(this.prescont);
 
     this.Refresh = function(){
+        //TODO Make this a LOOP!
         ClearContent(this.prescont);
         ClearContent(this.textcontent);
         ClearContent(this.sections);
         ClearContent(this.sitems);
+        ClearContent(this.itemtitle);
     };
 
     this.UpdateContent = function(divname, contentitem){

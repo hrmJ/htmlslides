@@ -17,7 +17,7 @@ body {
     text-align:center;
 }
 .songtitle{
-    color:yellow;
+    color:white;
 }
 
 .sectionitemhl{
@@ -42,10 +42,17 @@ height:100%;
     float:left;
     border-right: 1px dashed yellow;
     color:white;
+    padding-right:12px;
 }
 
 #textcontent{
     color:white;
+}
+
+#itemtitle{
+    float:left;
+    margin-right: 12px;
+    padding-left: 5px;
 }
 
 
