@@ -4,7 +4,6 @@ html {
     background: black;
 }
 
-
 body {
     /*background: #FFFAFD;*/
     font-size:100%;
@@ -12,40 +11,11 @@ body {
     font-family: 'Merriweather', Georgia, 'Times New Roman', Times, serif;
 }
 
-header {
-    width:100%;
-    /*margin: auto;*/
-    text-align:center;
-    margin-left:auto;
-    margin-right:auto;
-    /*max-width:36em;*/
-    /*position:absolute;*/
-    clear:both;
-    /* top:-20px; */
-    margin-top: -150px;
-}
-
-section {
-    /*max-width:36em;*/
-    margin:auto;
-    padding:0 1em;
-}
-
-.content{
-    float:left;
-    margin-left:10%;
-    margin-top:3%;
-    margin-right:2%;
-}
-
-.side{
-    /*float:right;*/
-}
+/*  Verses etc */
 
 .verse{
     text-align:center;
 }
-
 .songtitle{
     color:yellow;
 }
@@ -54,36 +24,30 @@ section {
     color:yellow;
 }
 
-@media screen and (max-width: 25em) {
-    body {
-        font-size: 90%;
-    }
+/*  The actual contents */
+#prescont{
+width:100%;
+height:100%;
 }
 
+#sections{
+    float:left;
+    border-right: 1px dashed yellow;
+    padding-right: 12px;
+    color:white;
 
-.current{
-border-left:1px solid #ccc;
-border-right:1px solid #ccc;
 }
 
-.inline_list > li{
-margin-bottom:1.5em;
-padding-left:1em;
+#sitems{
+    float:left;
+    border-right: 1px dashed yellow;
+    color:white;
 }
 
-ul.inline_list{
- list-style: none;
- margin-left: 0;
- padding-left: 2.5em;
- text-indent: -3.9em;
+#textcontent{
+    color:white;
 }
 
-.date{
-color: #AD0000;
-}
-
-.event{
-}
 
 .songdata{
     display:none;
@@ -93,6 +57,3 @@ color: #AD0000;
     display:none;
 }
 
-#textcontent{
-    color:white;
-}

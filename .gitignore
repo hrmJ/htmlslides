@@ -2,3 +2,6 @@
 *.webm
 *.flv
 *.avi
+template.html
+.*swp
+__pyc*

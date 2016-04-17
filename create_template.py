@@ -89,6 +89,7 @@ def CreateHtmlTemplate(songpath = '/home/juho/Dropbox/laulut/*.txt', servicestru
     """Go through a list of txt files containing songs and produce an output html 
     Another alternative is to write the data as a js file"""
 
+    #Change this so that it uses real DOM instead of strings!
     htmlfile = """
     <html lang="fi">
     <head>
@@ -97,17 +98,17 @@ def CreateHtmlTemplate(songpath = '/home/juho/Dropbox/laulut/*.txt', servicestru
     </head>
     <title>Majakkamessu</title>
     <body>
-    <div id='textcontent'>
-    </div>
     """
     #jsfile = "var songs = {"
     songs = list()
     allsongnames = list()
-    songhtml=""
+    songhtml="<div id='songs'>"
     for songfile in glob.glob(songpath):
         songs.append(Song(songfile))
         allsongnames.append(songs[-1].name.lower())
         songhtml += songs[-1].html
+
+    songhtml += "</div>"
 
     if servicestructure:
         htmlfile += "\n" + ExtractStructure(servicestructure, allsongnames) + "\n"

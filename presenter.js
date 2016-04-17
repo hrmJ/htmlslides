@@ -7,7 +7,7 @@ function Presentation(){
     this.contents = [];
     // This might be unnecessary:
     this.currentcontent = undefined;
-    //Setting the pointer
+    //Setting the pointer.. Will probably be removed as unnecessary
     this.SetActiveContent = function(oid){
         this.pointer = oid;
         return 0;
@@ -37,6 +37,19 @@ function Presentation(){
                 this.pointer++;
                 currentcontent = this.contents[this.pointer]
             }
+        }
+        //Finally, print the output on the screen and...
+        //... depending of the type of the content, possibly also something else
+        switch(currentcontent.content_type){
+            case "song":
+                console.log("Laulu!");
+                break;
+            case "sectiontitle":
+                console.log("Otsikko!");
+                currentcontent.mysection.sectionpointer++;
+                break;
+            default:
+                break;
         }
         currentcontent.Show();
     };
@@ -94,12 +107,11 @@ function Presentation(){
                 }
             }
         }
+        //Remove the information from html
+        ClearContent(document.getElementById("structure"));
         return 0;
     };
-
-
 }
-
 
 function MajakkaMessu(){
     //Pre-defined services...
@@ -111,29 +123,34 @@ function MajakkaMessu(){
                       new SectionItem('Alkusanat ja seurakuntalaisen sana',false)];
     //johdanto.CreateLeftbanner();
     this.sections = [johdanto];
+    this.sectionpointer = 0 ;
 
     this.contents = [];
+    //Empty the contents array and replace it with sections
     for(var i in this.sections){
         thissection = this.sections[i];
-        //add all the sections to the presentation
-        this.contents[this.contents.length] = new SongTitleContent(thissection.name);
-        for(var a in thissection.items){
+        //First, create a header slide for this section
+
+        //this.contents[this.contents.length] = new SongTitleContent(thissection.name);
+
+        //Add the songs and other content in the section
+        for(var item_idx in thissection.items){
             //add all the items in the section
-            thisitem = thissection.items[a];
+            thisitem = thissection.items[item_idx];
             thiscontent = false;
             if (thisitem.content){
                 //If this SectionItem is a song etc. add the actual song
                 thiscontent = thisitem.content;
             }
             //Create the header and add it to contents
-            this.contents[this.contents.length] = new SectionTitleContent(thissection,a);
+            this.contents[this.contents.length] = new SectionTitleContent(thissection,item_idx);
             if(thiscontent){
+                //If this sectionitem is a song, add the song to the general content array as well
                 this.contents[this.contents.length] = thiscontent;
             }
         }
     }
 }
-
 MajakkaMessu.prototype = new Presentation();
 MajakkaMessu.prototype.constructor = MajakkaMessu;
 
@@ -146,6 +163,7 @@ function Section(name,items){
     //The presentation may be divided into sections
     this.name = name;
     this.items = items;
+
     this.CreateLeftbanner = function(highlighted){
         leftbanner = document.createElement('ul');
         for(var i in this.items){
@@ -159,20 +177,21 @@ function Section(name,items){
         }
         return leftbanner;
     };
+
     this.pointer = 0;
     //Think about inheriting this from screencontent?
     this.Show = 
         function(){
             //Print the content of this object to screen
             currentitem = this.items[this.pointer];
-            ClearContent(Screen.textcontent);
+            ClearContent(CurrentScreen.prescont.textcontent);
             if (currentitem.content){
                 //If this item is a song or some other object
                 currentitem.Show();
             }
             else{
                 //If this is just an empty section header
-                Screen.textcontent.appendChild(currentitem);
+                CurrentScreen.prescont.textcontent.appendChild(currentitem);
             }
         };
 }
@@ -182,6 +201,7 @@ function ScreenContent(){
 
     this.custombg="";
     this.id = CreateUid();
+    this.content_type = "";
     //The pointer property is important. It Tells which item to show
     this.pointer = 0;
     // item here means the content blocks divided into 
@@ -190,14 +210,34 @@ function ScreenContent(){
     this.Show = 
         function(){
             //Print the content of this object to screen
-            ClearContent(Screen.textcontent);
-            Screen.textcontent.appendChild(this.items[this.pointer]);
+
+            //1. Clear the layout of the screen
+            //TODO: only do this when necessary
+            CurrentScreen.Refresh();
+
+            //type-dependently populating the screen
+            switch (this.content_type){ 
+                case "song":
+                    CurrentScreen.UpdateContent('textcontent',this.items[this.pointer]);
+                    break;
+                case "sectiontitle":
+                    CurrentScreen.UpdateContent('sections',this.items[this.pointer]);
+                    CurrentScreen.UpdateContent('sitems',this.section.CreateLeftbanner(this.section.pointer));
+                    break;
+                case "songtitle":
+                    CurrentScreen.UpdateContent('textcontent',this.items[this.pointer]);
+                    break;
+                default:
+                    CurrentScreen.UpdateContent('textcontent',this.items[this.pointer]);
+                    break;
+            }
         };
 }
 
 function SongContent(title, songtexts){
     // Songcontent is a class for the actual songs
 
+    this.content_type = "song";
     this.titleslide = new SongTitleContent(title);
     this.songtexts = songtexts;
     this.items = 
@@ -226,9 +266,6 @@ function SongContent(title, songtexts){
         
         };
 }
-
-//Take care of inheritance
-
 SongContent.prototype = new ScreenContent();
 SongContent.prototype.constructor = SongContent;
 
@@ -238,21 +275,23 @@ function SongTitleContent(title){
     //linked to the song by the songs "titleslide" porperty.
     //The titles are printed ONLY as parts of a presentation
     //
+    this.content_type="songtitle";
     el = document.createElement('p');
     el.className = 'songtitle';
     el.innerText = title;
     this.items = [el];
 }
-
 SongTitleContent.prototype = new ScreenContent();
 SongTitleContent.prototype.constructor = SongTitleContent;
 
 function SectionTitleContent(section,curitem){
-    //
+    // Section Titles list the elements (songs, speeches etc) in the current section and 
+    // show the current item as highlighted
+    this.mysection = section;
+    this.content_type = "sectiontitle";
     this.items = [section.CreateLeftbanner(curitem)];
     return 0;
 }
-
 SectionTitleContent.prototype = new ScreenContent();
 SectionTitleContent.prototype.constructor = SectionTitleContent;
 
@@ -288,6 +327,8 @@ function GetSongs(){
         songs[songdivs[i].id.toLowerCase()] = new SongContent(title, content);
     }
 
+    //When finished, remove the songdata from the html document!
+    ClearContent(document.getElementById('songs'))
     return songs;
 }
 
@@ -303,17 +344,50 @@ function CreateUid(){
     return newuid;
 }
 
-//========================================
+CreateTag = function(tagname, barid){
+    //These elements are for displaying the structure of the presentation
+    bar = document.createElement(tagname);
+    bar.id = barid;
+    return bar;
+}
 
-var Screen =  {};
-//The Global screen variables point to the places on the
+function PresScreen(){
+
+    this.prescont = CreateTag("div", "prescont");
+    this.textcontent = CreateTag("div", "textcontent");
+    this.sections = CreateTag("nav", "sections");
+    this.sitems = CreateTag("nav", "sitems");
+    document.body.appendChild(this.prescont);
+
+    this.Refresh = function(){
+        ClearContent(this.prescont);
+        ClearContent(this.textcontent);
+        ClearContent(this.sections);
+        ClearContent(this.sitems);
+    };
+
+    this.UpdateContent = function(divname, contentitem){
+        //contentitem is a screencontent object
+        this[divname].appendChild(contentitem);
+        this.prescont.appendChild(this[divname]);
+    }
+
+}
+
+
+//========================================
+// //The Global screen variables point to the places on the
 //screen, where content is shown to the audience
-//this.textcontent = document.getElementById("textcontent");
-Screen.textcontent = document.getElementById("textcontent");
+
+
 
 var allsongs = GetSongs();
+
 var pres = new Presentation();
 var Majakka = new MajakkaMessu();
+//Now, remove all used data from html (structure, html)
+ClearContent(document.body);
+var CurrentScreen =  new PresScreen()
 
 
 //========================================
