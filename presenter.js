@@ -163,6 +163,7 @@ function Section(name,items){
     //The presentation may be divided into sections
     this.name = name;
     this.items = items;
+    this.pointer = 0;
 
     this.CreateLeftbanner = function(highlighted){
         leftbanner = document.createElement('ul');
@@ -178,22 +179,10 @@ function Section(name,items){
         return leftbanner;
     };
 
-    this.pointer = 0;
-    //Think about inheriting this from screencontent?
-    this.Show = 
-        function(){
-            //Print the content of this object to screen
-            currentitem = this.items[this.pointer];
-            ClearContent(CurrentScreen.prescont.textcontent);
-            if (currentitem.content){
-                //If this item is a song or some other object
-                currentitem.Show();
-            }
-            else{
-                //If this is just an empty section header
-                CurrentScreen.prescont.textcontent.appendChild(currentitem);
-            }
-        };
+    this.PrintSectionName = function(){
+        sectionbanner = document.createElement('h1');
+        sectionbanner.innerText = this.name;
+    };
 }
 
 function ScreenContent(){
@@ -221,8 +210,8 @@ function ScreenContent(){
                     CurrentScreen.UpdateContent('textcontent',this.items[this.pointer]);
                     break;
                 case "sectiontitle":
-                    CurrentScreen.UpdateContent('sections',this.items[this.pointer]);
-                    CurrentScreen.UpdateContent('sitems',this.section.CreateLeftbanner(this.section.pointer));
+                    CurrentScreen.UpdateContent('sections',this.mysection.PrintSectionName());
+                    CurrentScreen.UpdateContent('sitems',this.mysection.CreateLeftbanner(this.mysection.pointer));
                     break;
                 case "songtitle":
                     CurrentScreen.UpdateContent('textcontent',this.items[this.pointer]);
