@@ -130,13 +130,16 @@ function MajakkaMessu(){
     //These inherit from the general presentation class
     this.GetStructure();
     this.showtype = "majakka";
-    var johdanto = new Section('Johdanto');
-    johdanto.items = [new SectionItem('Alkulaulu',this.songs['Alkulaulu'],'song'),
-                      new SectionItem('Alkusanat ja seurakuntalaisen sana',false,'header')];
+    //TODO: make creating these sections simpler
+    this.sections = [new Section('Johdanto', [new SectionItem('Alkulaulu',this.songs['Alkulaulu'],'song'),
+                                              new SectionItem('Alkusanat ja seurakuntalaisen sana',false,'header')]),
+                     new Section('Sana',     [new SectionItem('Päivän laulu',this.songs['Päivän laulu'],'song'),
+                                              new SectionItem('Saarna','false','header'),
+                                              new SectionItem('Synnintunnustus','false','header'),
+                                              new SectionItem('Uskontunnustus','false','header')])
+                    ];
                       //TODO ^^ liittyen ehkä mieti, että näkyviin tulisi sanailijan nimi siihen,
                       //missä tavallisesti laulun nimi. Muista myös ajatella laulun tekijänoikeuksia.
-    //johdanto.CreateLeftbanner();
-    this.sections = [johdanto];
     this.sectionpointer = 0 ;
 
     this.contents = [];
