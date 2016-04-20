@@ -17,15 +17,14 @@ function Presentation(){
     this.Forward = function(){
         var started = true;
         if (this.pointer === undefined){
-            //If the presentation has not yet started
-            //Set the pointer to zero
+            //If the presentation has not yet started, set the pointer to zero
             this.pointer = 0;
             started = false;
         }
         var currentcontent = this.contents[this.pointer]
 
         //Try to increment inner pointer of the current screencontent 
-        if(currentcontent.items.length - 1>currentcontent.pointer && started){
+        if(currentcontent.items.length - 1 > currentcontent.pointer && started){
             //if there are still items to be shown in this content object
             //AND if this is not the first content of the presentation
             currentcontent.pointer++;
@@ -131,25 +130,22 @@ function MajakkaMessu(){
     this.GetStructure();
     this.showtype = "majakka";
     //TODO: make creating these sections simpler
-    this.sections = [new Section('Johdanto', [new SectionItem('Alkulaulu',this.songs['Alkulaulu'],'song'),
-                                              new SectionItem('Alkusanat ja seurakuntalaisen sana',false,'header')]),
-                     new Section('Sana',     [new SectionItem('Päivän laulu',this.songs['Päivän laulu'],'song'),
-                                              new SectionItem('Saarna','false','header'),
-                                              new SectionItem('Synnintunnustus','false','header'),
-                                              new SectionItem('Uskontunnustus','false','header')])
+    this.sections = [new Section('Johdanto', [['Alkulaulu',this.songs['Alkulaulu'],'song'],
+                                              ['Alkusanat ja seurakuntalaisen sana',false,'header']]),
+                     new Section('Sana',     [['Päivän laulu',this.songs['Päivän laulu'],'song'],
+                                              ['Saarna','false','header'],
+                                              ['Synnintunnustus','false','header'],
+                                              ['Uskontunnustus','false','header']])
                     ];
                       //TODO ^^ liittyen ehkä mieti, että näkyviin tulisi sanailijan nimi siihen,
                       //missä tavallisesti laulun nimi. Muista myös ajatella laulun tekijänoikeuksia.
-    this.sectionpointer = 0 ;
+    this.sectionpointer = 0;
+    this.currentsection = undefined;
 
     this.contents = [];
     //Empty the contents array and replace it with sections
     for(var i in this.sections){
         thissection = this.sections[i];
-        //First, create a header slide for this section
-
-        //this.contents[this.contents.length] = new SongTitleContent(thissection.name);
-
         //Add the songs and other content in the section
         for(var item_idx in thissection.items){
             //add all the items in the section
@@ -167,21 +163,45 @@ function MajakkaMessu(){
             }
         }
     }
+
+    this.Forward = function(){
+        var started = true;
+        if (this.pointer === undefined){
+            this.pointer = 0;
+            started = false;
+        }
+
+        this.currentsection = this.sections[this.pointer]
+        if(this.currentsection.items.length - 1 > this.currentsection.pointer && started){
+            this.currentsection.pointer++;
+        }
+        else if (started){
+            //If the previous section has reached its end, move to the next one IF THERE IS such a thing
+            if (this.sections.length - 1 >this.pointer){
+                this.pointer++;
+                this.currentsection = this.sections[this.pointer]
+            }
+        }
+        //TODO: jatka tästä
+
+        currentitem = this.currentsection.items[this.currentsection.pointer];
+        currentitem.contents.Show();
+    };
 }
 MajakkaMessu.prototype = new Presentation();
 MajakkaMessu.prototype.constructor = MajakkaMessu;
 
-function SectionItem(name,contentobject,itemtype){
+function SectionItem(thissection, name, contentobject,itemtype, item_idx){
     this.name = name;
     this.itemtype = itemtype;
     this.content = contentobject;
+    this.contents = [new SectionTitleContent(thissection, item_idx);]
+    
 }
 
 function Section(name,items){
     //The presentation may be divided into sections
-    this.name = name;
-    this.items = items;
-    this.pointer = 0;
+    //
 
     this.CreateLeftbanner = function(highlighted){
         leftbanner = document.createElement('ul');
@@ -202,6 +222,15 @@ function Section(name,items){
         sectionbanner.innerText = this.name;
         return sectionbanner;
     };
+
+    this.name = name;
+    this.items = [];
+    for (var section_item_idx in items){
+        this_sectionitem = items[section_item_idx];
+        this.items[this.items.length] = new SectionItem(this, this_sectionitem[0],this_sectionitem[1],this_sectionitem[2],section_item_idx);
+    }
+    this.pointer = 0;
+
 }
 
 function ScreenContent(){
