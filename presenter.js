@@ -3,10 +3,10 @@ function Presentation(){
 
     // The pointer is set to the id of the 
     // songcontent object currently set as active
-    this.pointer = undefined;
     this.contents = [];
+    this.started = false;
     // This might be unnecessary:
-    this.currentcontent = undefined;
+    this.current = undefined;
     //Setting the pointer.. Will probably be removed as unnecessary
     this.SetActiveContent = function(oid){
         this.pointer = oid;
@@ -21,36 +21,36 @@ function Presentation(){
             this.pointer = 0;
             started = false;
         }
-        var currentcontent = this.contents[this.pointer]
+        var current = this.contents[this.pointer]
 
         //Try to increment inner pointer of the current screencontent 
-        if(currentcontent.items.length - 1 > currentcontent.pointer && started){
+        if(current.items.length - 1 > current.pointer && started){
             //if there are still items to be shown in this content object
             //AND if this is not the first content of the presentation
-            currentcontent.pointer++;
+            current.pointer++;
         }
         else if (started){
             //If the previous content has reached its end
             //Move to the next one IF THERE IS such a thing
             if (this.contents.length - 1 >this.pointer){
                 this.pointer++;
-                currentcontent = this.contents[this.pointer]
+                current = this.contents[this.pointer]
             }
         }
         //Finally, print the output on the screen and...
         //... depending of the type of the content, possibly also something else
-        switch(currentcontent.content_type){
+        switch(current.content_type){
             case "song":
                 break;
             case "sectiontitle":
                 if(started){
-                    currentcontent.mysection.pointer++;
+                    current.mysection.pointer++;
                 }
                 break;
             default:
                 break;
         }
-        currentcontent.Show();
+        current.Show();
     };
 
     this.Backwards = function(){
@@ -59,34 +59,34 @@ function Presentation(){
             //If the presentation has not started yet, stop the function
             return false;
         }
-        var currentcontent = this.contents[this.pointer]
+        var current = this.contents[this.pointer]
 
         //Try to increment inner pointer of the current screencontent 
-        if(currentcontent.pointer>0){
+        if(current.pointer>0){
             //if there are still items to be shown in this content object
             //AND if this is not the first content of the presentation
-            currentcontent.pointer--;
+            current.pointer--;
         }
         else{
             //If the content has reached its beginning
             //Move to the previous one IF THERE IS such a thing
             if (this.pointer>0){
                 this.pointer--;
-                currentcontent = this.contents[this.pointer]
+                current = this.contents[this.pointer]
             }
         }
-        switch(currentcontent.content_type){
+        switch(current.content_type){
             case "song":
                 break;
             case "sectiontitle":
-                if(currentcontent.mysection.pointer>0){
-                    currentcontent.mysection.pointer--;
+                if(current.mysection.pointer>0){
+                    current.mysection.pointer--;
                 }
                 break;
             default:
                 break;
         }
-        currentcontent.Show();
+        current.Show();
     };
 
 
@@ -130,7 +130,7 @@ function MajakkaMessu(){
     this.GetStructure();
     this.showtype = "majakka";
     //TODO: make creating these sections simpler
-    this.sections = [new Section('Johdanto', [['Alkulaulu',this.songs['Alkulaulu'],'song'],
+    this.items = [new Section('Johdanto', [['Alkulaulu',this.songs['Alkulaulu'],'song'],
                                               ['Alkusanat ja seurakuntalaisen sana',false,'header']]),
                      new Section('Sana',     [['Päivän laulu',this.songs['Päivän laulu'],'song'],
                                               ['Saarna','false','header'],
@@ -139,51 +139,14 @@ function MajakkaMessu(){
                     ];
                       //TODO ^^ liittyen ehkä mieti, että näkyviin tulisi sanailijan nimi siihen,
                       //missä tavallisesti laulun nimi. Muista myös ajatella laulun tekijänoikeuksia.
-    this.sectionpointer = 0;
-    this.currentsection = undefined;
-
-    this.contents = [];
-    //Empty the contents array and replace it with sections
-    for(var i in this.sections){
-        thissection = this.sections[i];
-        //Add the songs and other content in the section
-        for(var item_idx in thissection.items){
-            //add all the items in the section
-            thisitem = thissection.items[item_idx];
-            thiscontent = false;
-            if (thisitem.content){
-                //If this SectionItem is a song etc. add the actual song
-                thiscontent = thisitem.content;
-            }
-            //Create the header and add it to contents
-            this.contents[this.contents.length] = new SectionTitleContent(thissection,item_idx);
-            if(thiscontent){
-                //If this sectionitem is a song, add the song to the general content array as well
-                this.contents[this.contents.length] = thiscontent;
-            }
-        }
-    }
+    this.pointer = new Pointer(this.items.length);
+    this.current = this.items[0];
 
     this.Forward = function(){
-        var started = true;
-        if (this.pointer === undefined){
-            this.pointer = 0;
-            started = false;
+        if(this.pointer.Increment()){
+           //if content=sections left in this show
+           this.currentsection = this.items[this.pointer.position];
         }
-
-        this.currentsection = this.sections[this.pointer]
-        if(this.currentsection.items.length - 1 > this.currentsection.pointer && started){
-            this.currentsection.pointer++;
-        }
-        else if (started){
-            //If the previous section has reached its end, move to the next one IF THERE IS such a thing
-            if (this.sections.length - 1 >this.pointer){
-                this.pointer++;
-                this.currentsection = this.sections[this.pointer]
-            }
-        }
-        //TODO: jatka tästä
-
         currentitem = this.currentsection.items[this.currentsection.pointer];
         currentitem.contents.Show();
     };
@@ -191,18 +154,59 @@ function MajakkaMessu(){
 MajakkaMessu.prototype = new Presentation();
 MajakkaMessu.prototype.constructor = MajakkaMessu;
 
+function GetNestedContent(parentobject){
+    //Go down the section/sectionitem/songverse etc chain as deep as needed
+    thisobject = parentobject;
+    chain = [thisobject];
+    while (thisobject.hasOwnProperty('current')){
+        thisobject=thisobject.current
+        chain[chain.length] = thisobject;
+    }
+    //increment pointers
+    chain_idx = chain.length - 1;
+    while(chain_idx >= 0){
+        thisobject = chain[chain_idx];
+        if(thisobject.pointer.Increment()){
+            break;
+        }
+        else if(!thisobject.pointer.started){
+            thisobject.pointer.started = true;
+            break;
+        }
+        chain_idx--;
+    }
+
+    return thisobject;
+}
+
+function Pointer(max){
+    //Pointers keep track of a set of contents in order to show them on the screen 
+    //on the right moment
+    this.max  = max;
+    this.started = false;
+    this.position = 0;
+    this.Increment = function(){
+        if(this.position +1 < this.max){
+            this.position++;
+            return this.position;
+        }
+        else{
+            return false;
+        }
+    };
+}
+
 function SectionItem(thissection, name, contentobject,itemtype, item_idx){
     this.name = name;
     this.itemtype = itemtype;
     this.content = contentobject;
-    this.contents = [new SectionTitleContent(thissection, item_idx);]
-    
+    this.items = [new SectionTitleContent(thissection, item_idx)];
+    this.pointer = new Pointer(this.items.length);
+    this.current = this.items[0];
 }
 
 function Section(name,items){
     //The presentation may be divided into sections
-    //
-
     this.CreateLeftbanner = function(highlighted){
         leftbanner = document.createElement('ul');
         for(var i in this.items){
@@ -229,7 +233,8 @@ function Section(name,items){
         this_sectionitem = items[section_item_idx];
         this.items[this.items.length] = new SectionItem(this, this_sectionitem[0],this_sectionitem[1],this_sectionitem[2],section_item_idx);
     }
-    this.pointer = 0;
+    this.pointer = new Pointer(this.items.length);
+    this.current = this.items[0];
 
 }
 
@@ -244,8 +249,7 @@ function ScreenContent(){
     // item here means the content blocks divided into 
     // parts that will be shown at the time
     this.items = [];
-    this.Show = 
-        function(){
+    this.Show = function(){
             //Print the content of this object to screen
 
             //1. Clear the layout of the screen
@@ -306,10 +310,9 @@ function SongContent(title, songtexts){
                 }
                 return domcontents;
             }(this.songtexts);
-    this.PrintTitleSlide = 
-        function(){
-        
-        };
+
+    this.pointer = new Pointer(this.items.length);
+
 }
 SongContent.prototype = new ScreenContent();
 SongContent.prototype.constructor = SongContent;
@@ -325,6 +328,7 @@ function SongTitleContent(title){
     el.className = 'songtitle';
     el.innerText = title;
     this.items = [el];
+    this.pointer = new Pointer(this.items.length);
 }
 SongTitleContent.prototype = new ScreenContent();
 SongTitleContent.prototype.constructor = SongTitleContent;
@@ -335,6 +339,7 @@ function SectionTitleContent(section,curitem){
     this.mysection = section;
     this.content_type = "sectiontitle";
     this.items = [section.CreateLeftbanner(curitem)];
+    this.pointer = new Pointer(this.items.length);
     return 0;
 }
 SectionTitleContent.prototype = new ScreenContent();
