@@ -33,16 +33,19 @@ function Presentation(){
                     break;
                 }
                 else if(!thisobject.pointer.started && typeof thisobject.Show === 'function'){
-                    thisobject.pointer.started = true;
                     break;
                 }
                 chain_idx--;
             }
+
+            thisobject.pointer.started = true;
+
             while(typeof thisobject.Show === 'undefined'){
                 //Iterating down to first showable content
                 thisobject = thisobject.current;
             }
             thisobject.Show();
+            this.GetContentChain();
     }
 
 
@@ -164,8 +167,11 @@ function Pointer(pointed){
 function SectionItem(thissection, name, contentobject,itemtype, item_idx){
     this.name = name;
     this.itemtype = itemtype;
-    this.content = contentobject;
     this.items = [new SectionTitleContent(thissection, item_idx)];
+    if (contentobject){
+        //If this object has subcontent
+        this.items[this.items.length] = contentobject;
+    }
     SetPointers(this, true);
 }
 
@@ -222,7 +228,7 @@ function ScreenContent(){
             //type-dependently populating the screen
             switch (this.content_type){ 
                 case "song":
-                    CurrentScreen.UpdateContent('textcontent',this.items[this.pointer]);
+                    CurrentScreen.UpdateContent('textcontent',this.items[this.pointer.position]);
                     break;
                 case "sectiontitle":
                     sitem = this.mysection.current;
@@ -231,7 +237,10 @@ function ScreenContent(){
                     if (sitem.itemtype=='song'){
                         //Consider removing the itemtype prop!
                         //Insert the song's title as a content on the right of the screen
-                        CurrentScreen.UpdateContent('itemtitle',sitem.content.titleslide.items[0]);
+                        //Songs as sectionitems are always of the format:
+                        //[sectiiontitle, song]
+                        //this is why items[1]
+                        CurrentScreen.UpdateContent('itemtitle',sitem.items[1].titleslide.items[0]);
                         //TODO: lyrics by, music by...
                     }
                     break;
