@@ -29,7 +29,7 @@ function Presentation(){
             chain_idx = this.chain.length - 1;
             while(chain_idx >= 0){
                 thisobject = this.chain[chain_idx];
-                if(['incremented','started'].indexOf(thisobject.pointer.Increment()) > -1){
+                if(['decremented','incremented','started'].indexOf(thisobject.pointer.Move("increment")) > -1){
                     break;
                 }
                 chain_idx--;
@@ -145,32 +145,50 @@ function Pointer(pointed){
     this.pointed = pointed;
     this.started = false;
     this.position = 0;
-    this.Increment = function(){
-        //Make sure the parent object won't get stuck
-        //this.pointed.pointer.started = true;
+    this.Move = function(movetype){
+        var returnvalue = false;
+        if (movetype == "increment"){
 
-        if(this.position +1 < this.max){
-            this.position++;
-            //Set the parent object's currently active element
-            if (this.pointed.hasOwnProperty('current')){
-                pointed.current = pointed.items[this.position];
-            }
-            this.started = true;
-            return "incremented";
-        }
-        else{
-            if(!this.started){
+            if(this.position +1 < this.max){
+                this.position++;
                 this.started = true;
-                if (typeof this.pointed.Show === 'undefined'){
-                    //if only one content object and this object not showable
-                    return false;
+                returnvalue =  "incremented";
+            }
+            else{
+                if(!this.started){
+                    this.started = true;
+                    if (typeof this.pointed.Show === 'undefined'){
+                        //if only one content object and this object not showable
+                        returnvalue =  false;
+                    }
+                    else{
+                        returnvalue =  "started";
+                    }
                 }
-                return "started";
+            }
+
+        }
+        else if (movetype == "decrement"){
+
+            if(this.position -1 >= 0){
+                this.position--;
+                return "decremented";
             }
             else{
                 return false;
             }
+        
         }
+
+        //Set the parent object's currently active element
+        if (this.pointed.hasOwnProperty('current')){
+            pointed.current = pointed.items[this.position];
+        }
+        return returnvalue;
+    };
+
+
+    this.Decrement = function(){
     };
 }
 
