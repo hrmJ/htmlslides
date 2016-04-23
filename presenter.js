@@ -29,16 +29,11 @@ function Presentation(){
             chain_idx = this.chain.length - 1;
             while(chain_idx >= 0){
                 thisobject = this.chain[chain_idx];
-                if(thisobject.pointer.Increment()){
-                    break;
-                }
-                else if(!thisobject.pointer.started && typeof thisobject.Show === 'function'){
+                if(['incremented','started'].indexOf(thisobject.pointer.Increment()) > -1){
                     break;
                 }
                 chain_idx--;
             }
-
-            thisobject.pointer.started = true;
 
             while(typeof thisobject.Show === 'undefined'){
                 //Iterating down to first showable content
@@ -46,6 +41,7 @@ function Presentation(){
             }
             thisobject.Show();
             this.GetContentChain();
+            console.log(this.items[0].pointer)
     }
 
 
@@ -128,10 +124,10 @@ function MajakkaMessu(){
     //TODO: make creating these sections simpler
     this.items = [new Section('Johdanto', [['Alkulaulu',this.songs['Alkulaulu'],'song'],
                                               ['Alkusanat ja seurakuntalaisen sana',false,'header']]),
-                     new Section('Sana',     [['Päivän laulu',this.songs['Päivän laulu'],'song'],
-                                              ['Saarna','false','header'],
-                                              ['Synnintunnustus','false','header'],
-                                              ['Uskontunnustus','false','header']])
+                  new Section('Sana',     [['Päivän laulu',this.songs['Päivän laulu'],'song'],
+                                              ['Saarna',false,'header'],
+                                              ['Synnintunnustus',false,'header'],
+                                              ['Uskontunnustus',false,'header']])
                     ];
                       //TODO ^^ liittyen ehkä mieti, että näkyviin tulisi sanailijan nimi siihen,
                       //missä tavallisesti laulun nimi. Muista myös ajatella laulun tekijänoikeuksia.
@@ -150,16 +146,30 @@ function Pointer(pointed){
     this.started = false;
     this.position = 0;
     this.Increment = function(){
+        //Make sure the parent object won't get stuck
+        //this.pointed.pointer.started = true;
+
         if(this.position +1 < this.max){
             this.position++;
             //Set the parent object's currently active element
             if (this.pointed.hasOwnProperty('current')){
                 pointed.current = pointed.items[this.position];
             }
-            return this.position;
+            this.started = true;
+            return "incremented";
         }
         else{
-            return false;
+            if(!this.started){
+                this.started = true;
+                if (typeof this.pointed.Show === 'undefined'){
+                    //if only one content object and this object not showable
+                    return false;
+                }
+                return "started";
+            }
+            else{
+                return false;
+            }
         }
     };
 }
@@ -213,8 +223,6 @@ function ScreenContent(){
     this.custombg="";
     this.id = CreateUid();
     this.content_type = "";
-    //The pointer property is important. It Tells which item to show
-    this.pointer = 0;
     // item here means the content blocks divided into 
     // parts that will be shown at the time
     this.items = [];
@@ -224,6 +232,8 @@ function ScreenContent(){
             //1. Clear the layout of the screen
             //TODO: only do this when necessary
             CurrentScreen.Refresh();
+            //2. make shure the item is shown only once
+            this.pointer.started = true;
 
             //type-dependently populating the screen
             switch (this.content_type){ 
