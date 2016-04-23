@@ -24,12 +24,12 @@ function Presentation(){
             }
     };
 
-    this.Forward = function(){
+    this.Move = function(movetype){
             //increment pointers
             chain_idx = this.chain.length - 1;
             while(chain_idx >= 0){
                 thisobject = this.chain[chain_idx];
-                if(['decremented','incremented','started'].indexOf(thisobject.pointer.Move("increment")) > -1){
+                if(['decremented','incremented','started'].indexOf(thisobject.pointer.Move(movetype)) > -1){
                     break;
                 }
                 chain_idx--;
@@ -172,10 +172,10 @@ function Pointer(pointed){
 
             if(this.position -1 >= 0){
                 this.position--;
-                return "decremented";
+                returnvalue = "decremented";
             }
             else{
-                return false;
+                returnvalue = false;
             }
         
         }
