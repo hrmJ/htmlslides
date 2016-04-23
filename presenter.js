@@ -13,45 +13,38 @@ function Presentation(){
         return 0;
     };
 
-    //Move in the presentation
-    this.Forward = function(){
-        var started = true;
-        if (this.pointer === undefined){
-            //If the presentation has not yet started, set the pointer to zero
-            this.pointer = 0;
-            started = false;
-        }
-        var current = this.contents[this.pointer]
-
-        //Try to increment inner pointer of the current screencontent 
-        if(current.items.length - 1 > current.pointer && started){
-            //if there are still items to be shown in this content object
-            //AND if this is not the first content of the presentation
-            current.pointer++;
-        }
-        else if (started){
-            //If the previous content has reached its end
-            //Move to the next one IF THERE IS such a thing
-            if (this.contents.length - 1 >this.pointer){
-                this.pointer++;
-                current = this.contents[this.pointer]
+    this.GetContentChain = function(){
+            //Go down the section/sectionitem/songverse etc chain as deep as needed
+            //and compile a chain of contents
+            thisobject = this;
+            this.chain = [thisobject];
+            while (thisobject.hasOwnProperty('current')){
+                thisobject=thisobject.current;
+                this.chain[this.chain.length] = thisobject;
             }
-        }
-        //Finally, print the output on the screen and...
-        //... depending of the type of the content, possibly also something else
-        switch(current.content_type){
-            case "song":
-                break;
-            case "sectiontitle":
-                if(started){
-                    current.mysection.pointer++;
-                }
-                break;
-            default:
-                break;
-        }
-        current.Show();
     };
+
+    this.Forward = function(){
+            //increment pointers
+            chain_idx = this.chain.length - 1;
+            while(chain_idx >= 0){
+                thisobject = this.chain[chain_idx];
+                if(thisobject.pointer.Increment()){
+                    break;
+                }
+                else if(!thisobject.pointer.started && typeof thisobject.Show === 'function'){
+                    thisobject.pointer.started = true;
+                    break;
+                }
+                chain_idx--;
+            }
+            while(typeof thisobject.Show === 'undefined'){
+                //Iterating down to first showable content
+                thisobject = thisobject.current;
+            }
+            thisobject.Show();
+    }
+
 
     this.Backwards = function(){
         //TODO combine the ff and bw functions as much as possible!
@@ -139,55 +132,27 @@ function MajakkaMessu(){
                     ];
                       //TODO ^^ liittyen ehkä mieti, että näkyviin tulisi sanailijan nimi siihen,
                       //missä tavallisesti laulun nimi. Muista myös ajatella laulun tekijänoikeuksia.
-    this.pointer = new Pointer(this.items.length);
-    this.current = this.items[0];
-
-    this.Forward = function(){
-        if(this.pointer.Increment()){
-           //if content=sections left in this show
-           this.currentsection = this.items[this.pointer.position];
-        }
-        currentitem = this.currentsection.items[this.currentsection.pointer];
-        currentitem.contents.Show();
-    };
+    SetPointers(this, true);
+    this.GetContentChain();
 }
 MajakkaMessu.prototype = new Presentation();
 MajakkaMessu.prototype.constructor = MajakkaMessu;
 
-function GetNestedContent(parentobject){
-    //Go down the section/sectionitem/songverse etc chain as deep as needed
-    thisobject = parentobject;
-    chain = [thisobject];
-    while (thisobject.hasOwnProperty('current')){
-        thisobject=thisobject.current
-        chain[chain.length] = thisobject;
-    }
-    //increment pointers
-    chain_idx = chain.length - 1;
-    while(chain_idx >= 0){
-        thisobject = chain[chain_idx];
-        if(thisobject.pointer.Increment()){
-            break;
-        }
-        else if(!thisobject.pointer.started){
-            thisobject.pointer.started = true;
-            break;
-        }
-        chain_idx--;
-    }
 
-    return thisobject;
-}
-
-function Pointer(max){
+function Pointer(pointed){
     //Pointers keep track of a set of contents in order to show them on the screen 
     //on the right moment
-    this.max  = max;
+    this.max  = pointed.items.length;
+    this.pointed = pointed;
     this.started = false;
     this.position = 0;
     this.Increment = function(){
         if(this.position +1 < this.max){
             this.position++;
+            //Set the parent object's currently active element
+            if (this.pointed.hasOwnProperty('current')){
+                pointed.current = pointed.items[this.position];
+            }
             return this.position;
         }
         else{
@@ -201,8 +166,7 @@ function SectionItem(thissection, name, contentobject,itemtype, item_idx){
     this.itemtype = itemtype;
     this.content = contentobject;
     this.items = [new SectionTitleContent(thissection, item_idx)];
-    this.pointer = new Pointer(this.items.length);
-    this.current = this.items[0];
+    SetPointers(this, true);
 }
 
 function Section(name,items){
@@ -233,8 +197,7 @@ function Section(name,items){
         this_sectionitem = items[section_item_idx];
         this.items[this.items.length] = new SectionItem(this, this_sectionitem[0],this_sectionitem[1],this_sectionitem[2],section_item_idx);
     }
-    this.pointer = new Pointer(this.items.length);
-    this.current = this.items[0];
+    SetPointers(this, true);
 
 }
 
@@ -262,9 +225,9 @@ function ScreenContent(){
                     CurrentScreen.UpdateContent('textcontent',this.items[this.pointer]);
                     break;
                 case "sectiontitle":
-                    sitem = this.mysection.items[this.mysection.pointer]
+                    sitem = this.mysection.current;
                     CurrentScreen.UpdateContent('sections',this.mysection.PrintSectionName());
-                    CurrentScreen.UpdateContent('sitems',this.mysection.CreateLeftbanner(this.mysection.pointer));
+                    CurrentScreen.UpdateContent('sitems',this.mysection.CreateLeftbanner(this.mysection.pointer.position));
                     if (sitem.itemtype=='song'){
                         //Consider removing the itemtype prop!
                         //Insert the song's title as a content on the right of the screen
@@ -311,7 +274,8 @@ function SongContent(title, songtexts){
                 return domcontents;
             }(this.songtexts);
 
-    this.pointer = new Pointer(this.items.length);
+    //SOngContent has no "current" property, only a pointer
+    SetPointers(this, false);
 
 }
 SongContent.prototype = new ScreenContent();
@@ -328,7 +292,7 @@ function SongTitleContent(title){
     el.className = 'songtitle';
     el.innerText = title;
     this.items = [el];
-    this.pointer = new Pointer(this.items.length);
+    SetPointers(this, true);
 }
 SongTitleContent.prototype = new ScreenContent();
 SongTitleContent.prototype.constructor = SongTitleContent;
@@ -339,7 +303,7 @@ function SectionTitleContent(section,curitem){
     this.mysection = section;
     this.content_type = "sectiontitle";
     this.items = [section.CreateLeftbanner(curitem)];
-    this.pointer = new Pointer(this.items.length);
+    SetPointers(this, false);
     return 0;
 }
 SectionTitleContent.prototype = new ScreenContent();
@@ -360,6 +324,14 @@ function ClearContent(myNode){
 while (myNode.firstChild) {
     myNode.removeChild(myNode.firstChild);
 }
+}
+
+function SetPointers(object, setcurrent){
+    object.pointer = new Pointer(object);
+    if (setcurrent){
+        //The "current" property is not set for Sectiontitlecontent etc
+        object.current = object.items[0];
+    }
 }
 
 function GetSongs(){
