@@ -45,43 +45,6 @@ function Presentation(){
     }
 
 
-    this.Backwards = function(){
-        //TODO combine the ff and bw functions as much as possible!
-        if (this.pointer === undefined){
-            //If the presentation has not started yet, stop the function
-            return false;
-        }
-        var current = this.contents[this.pointer]
-
-        //Try to increment inner pointer of the current screencontent 
-        if(current.pointer>0){
-            //if there are still items to be shown in this content object
-            //AND if this is not the first content of the presentation
-            current.pointer--;
-        }
-        else{
-            //If the content has reached its beginning
-            //Move to the previous one IF THERE IS such a thing
-            if (this.pointer>0){
-                this.pointer--;
-                current = this.contents[this.pointer]
-            }
-        }
-        switch(current.content_type){
-            case "song":
-                break;
-            case "sectiontitle":
-                if(current.mysection.pointer>0){
-                    current.mysection.pointer--;
-                }
-                break;
-            default:
-                break;
-        }
-        current.Show();
-    };
-
-
     this.GetStructure= function (){
         //If there is a predefined structure for the presantation
         //this function extracts it
@@ -122,9 +85,9 @@ function MajakkaMessu(){
     this.GetStructure();
     this.showtype = "majakka";
     //TODO: make creating these sections simpler
-    this.items = [new Section('Johdanto', [['Alkulaulu',this.songs['Alkulaulu'],'song'],
+    this.items = [new Section(this, 'Johdanto', [['Alkulaulu',this.songs['Alkulaulu'],'song'],
                                               ['Alkusanat ja seurakuntalaisen sana',false,'header']]),
-                  new Section('Sana',     [['Päivän laulu',this.songs['Päivän laulu'],'song'],
+                  new Section(this, 'Sana',     [['Päivän laulu',this.songs['Päivän laulu'],'song'],
                                               ['Saarna',false,'header'],
                                               ['Synnintunnustus',false,'header'],
                                               ['Uskontunnustus',false,'header']])
@@ -203,10 +166,13 @@ function SectionItem(thissection, name, contentobject,itemtype, item_idx){
     SetPointers(this, true);
 }
 
-function Section(name,items){
+function Section(mypresentation, name, items){
     //The presentation may be divided into sections
+    
+    //mypresentation saves reference to the 'parent' pres
+    this.mypresentation = mypresentation;
     this.CreateLeftbanner = function(highlighted){
-        leftbanner = document.createElement('ul');
+        var leftbanner = document.createElement('ul');
         for(var i in this.items){
             thisitem = this.items[i];
             this_li = document.createElement('li');
@@ -219,9 +185,19 @@ function Section(name,items){
         return leftbanner;
     };
 
-    this.PrintSectionName = function(){
-        sectionbanner = document.createElement('h1');
-        sectionbanner.innerText = this.name;
+    this.PrintSectionName = function(highlighted){
+        //Print a list of section names and highlight the current one
+        //TODO: COmbine this and Create left banner
+        var sectionbanner = document.createElement('ul');
+        for(var section_idx in this.mypresentation.items){
+            var sec = this.mypresentation.items[section_idx];
+            this_li = document.createElement('li');
+            this_li.innerText = sec.name;
+            if (section_idx == highlighted){
+                this_li.className = "sectionhl";
+            }
+            sectionbanner.appendChild(this_li);
+        }
         return sectionbanner;
     };
 
@@ -232,7 +208,6 @@ function Section(name,items){
         this.items[this.items.length] = new SectionItem(this, this_sectionitem[0],this_sectionitem[1],this_sectionitem[2],section_item_idx);
     }
     SetPointers(this, true);
-
 }
 
 function ScreenContent(){
@@ -260,7 +235,7 @@ function ScreenContent(){
                     break;
                 case "sectiontitle":
                     sitem = this.mysection.current;
-                    CurrentScreen.UpdateContent('sections',this.mysection.PrintSectionName());
+                    CurrentScreen.UpdateContent('sections',this.mysection.PrintSectionName(this.mysection.mypresentation.pointer.position));
                     CurrentScreen.UpdateContent('sitems',this.mysection.CreateLeftbanner(this.mysection.pointer.position));
                     if (sitem.itemtype=='song'){
                         //Consider removing the itemtype prop!
