@@ -191,8 +191,11 @@ function Section(mypresentation, name, items){
         var sectionbanner = document.createElement('ul');
         for(var section_idx in this.mypresentation.items){
             var sec = this.mypresentation.items[section_idx];
-            this_li = document.createElement('li');
+            var this_li = document.createElement('li');
+            this_li.id = 'sectionheader_' + section_idx + '_' + sec.name;
             this_li.innerText = sec.name;
+            //tricky, see this so question:  http://stackoverflow.com/questions/256754/how-to-pass-arguments-to-addeventlistener-listener-function
+            this_li.addEventListener('click',function(){Mover(this.id);},false);
             if (section_idx == highlighted){
                 this_li.className = "sectionhl";
             }
@@ -208,6 +211,10 @@ function Section(mypresentation, name, items){
         this.items[this.items.length] = new SectionItem(this, this_sectionitem[0],this_sectionitem[1],this_sectionitem[2],section_item_idx);
     }
     SetPointers(this, true);
+}
+
+function Mover(text){
+    console.log(text);
 }
 
 function ScreenContent(){
