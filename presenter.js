@@ -1,3 +1,5 @@
+var all_screencontents = {};
+
 function Presentation(){
     // PRESENTATION is the class that wraps different content and decides what to show
 
@@ -164,6 +166,10 @@ function SectionItem(thissection, name, contentobject,itemtype, item_idx){
         this.items[this.items.length] = contentobject;
     }
     SetPointers(this, true);
+    //finally, add this scrreencontent to the global variable 
+    //in order to reference it by links etc.
+    //this is a hash with ids as keys
+    all_screencontents[this.id] = this;
 }
 
 function Section(mypresentation, name, items){
@@ -185,18 +191,36 @@ function Section(mypresentation, name, items){
         return leftbanner;
     };
 
-    this.PrintSectionName = function(highlighted){
+    this.PrintSectionName = function(){
         //Print a list of section names and highlight the current one
         //TODO: COmbine this and Create left banner
         var sectionbanner = document.createElement('ul');
         for(var section_idx in this.mypresentation.items){
             var sec = this.mypresentation.items[section_idx];
             var this_li = document.createElement('li');
-            this_li.id = 'sectionheader_' + section_idx + '_' + sec.name;
             this_li.innerText = sec.name;
+
+            //Get the first element of this section:
+            //TODO abstract this to a function
+            //AND make it less hacky
+            var firstitem = sec.items[0];
+            if (firstitem.hasOwnProperty('items')){
+                while (firstitem.hasOwnProperty('items') && firstitem.items[0] instanceof ScreenContent){
+                    if(firstitem.items[0] instanceof ScreenContent){
+                    firstitem = firstitem.items[0];
+                    }
+                    if(!firstitem.hasOwnProperty('items')){
+                        break;
+                    }
+                }
+            }
+
+            console.log(firstitem)
+            this_li.setAttribute('target', firstitem.id);
+
             //tricky, see this so question:  http://stackoverflow.com/questions/256754/how-to-pass-arguments-to-addeventlistener-listener-function
-            this_li.addEventListener('click',function(){Mover(this.id);},false);
-            if (section_idx == highlighted){
+            //this_li.addEventListener('click',function(){Mover(this.id);},false);
+            if (section_idx == this.mypresentation.pointer.position){
                 this_li.className = "sectionhl";
             }
             sectionbanner.appendChild(this_li);
@@ -221,7 +245,6 @@ function ScreenContent(){
     // Screencontent is the class that contains the actual data to be shown
 
     this.custombg="";
-    this.id = CreateUid();
     this.content_type = "";
     // item here means the content blocks divided into 
     // parts that will be shown at the time
@@ -242,7 +265,7 @@ function ScreenContent(){
                     break;
                 case "sectiontitle":
                     sitem = this.mysection.current;
-                    CurrentScreen.UpdateContent('sections',this.mysection.PrintSectionName(this.mysection.mypresentation.pointer.position));
+                    CurrentScreen.UpdateContent('sections',this.mysection.PrintSectionName());
                     CurrentScreen.UpdateContent('sitems',this.mysection.CreateLeftbanner(this.mysection.pointer.position));
                     if (sitem.itemtype=='song'){
                         //Consider removing the itemtype prop!
@@ -265,9 +288,11 @@ function ScreenContent(){
         };
 }
 
+
 function SongContent(title, songtexts){
     // Songcontent is a class for the actual songs
 
+    this.id = CreateUid();
     this.content_type = "song";
     this.titleslide = new SongTitleContent(title);
     this.songtexts = songtexts;
@@ -295,6 +320,10 @@ function SongContent(title, songtexts){
 
     //SOngContent has no "current" property, only a pointer
     SetPointers(this, false);
+    //finally, add this scrreencontent to the global variable 
+    //in order to reference it by links etc.
+    //this is a hash with ids as keys
+    all_screencontents[this.id] = this;
 
 }
 SongContent.prototype = new ScreenContent();
@@ -306,12 +335,18 @@ function SongTitleContent(title){
     //linked to the song by the songs "titleslide" porperty.
     //The titles are printed ONLY as parts of a presentation
     //
+    this.id = CreateUid();
     this.content_type="songtitle";
     el = document.createElement('p');
     el.className = 'songtitle';
     el.innerText = title;
     this.items = [el];
     SetPointers(this, true);
+    //finally, add this scrreencontent to the global variable 
+    //in order to reference it by links etc.
+    //this is a hash with ids as keys
+    all_screencontents[this.id] = this;
+
 }
 SongTitleContent.prototype = new ScreenContent();
 SongTitleContent.prototype.constructor = SongTitleContent;
@@ -319,19 +354,34 @@ SongTitleContent.prototype.constructor = SongTitleContent;
 function SectionTitleContent(section,curitem){
     // Section Titles list the elements (songs, speeches etc) in the current section and 
     // show the current item as highlighted
+    this.id = CreateUid();
     this.mysection = section;
     this.content_type = "sectiontitle";
     this.items = [section.CreateLeftbanner(curitem)];
     SetPointers(this, false);
+    //finally, add this scrreencontent to the global variable 
+    //in order to reference it by links etc.
+    //this is a hash with ids as keys
+    all_screencontents[this.id] = this;
     return 0;
 }
 SectionTitleContent.prototype = new ScreenContent();
 SectionTitleContent.prototype.constructor = SectionTitleContent;
 
 function BibleContent(){
+    this.id = CreateUid();
+    //finally, add this scrreencontent to the global variable 
+    //in order to reference it by links etc.
+    //this is a hash with ids as keys
+    all_screencontents[this.id] = this;
 }
 
 function InfoContent(){
+    this.id = CreateUid();
+    //finally, add this scrreencontent to the global variable 
+    //in order to reference it by links etc.
+    //this is a hash with ids as keys
+    all_screencontents[this.id] = this;
 }
 
 
@@ -418,15 +468,15 @@ function PresScreen(){
 
 }
 
+function ReferenceHolder(){
+
+}
 
 //========================================
 // //The Global screen variables point to the places on the
 //screen, where content is shown to the audience
 
-
-
 var allsongs = GetSongs();
-
 var pres = new Presentation();
 var Majakka = new MajakkaMessu();
 //Now, remove all used data from html (structure, html)
@@ -434,4 +484,6 @@ ClearContent(document.body);
 var CurrentScreen =  new PresScreen()
 
 
+//TODO start using push
+//TODO find out more about prototypes and ids
 //========================================
