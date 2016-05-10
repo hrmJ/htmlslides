@@ -216,10 +216,13 @@ function Section(mypresentation, name, items){
             }
 
             console.log(firstitem)
-            this_li.setAttribute('target', firstitem.id);
+            this_li.setAttribute('prestarget', firstitem.id);
 
             //tricky, see this so question:  http://stackoverflow.com/questions/256754/how-to-pass-arguments-to-addeventlistener-listener-function
-            //this_li.addEventListener('click',function(){Mover(this.id);},false);
+            //And especially, the solution here: http://stackoverflow.com/a/11986895/4609685
+
+            this_li.addEventListener('click',Mover,false);
+
             if (section_idx == this.mypresentation.pointer.position){
                 this_li.className = "sectionhl";
             }
@@ -237,8 +240,8 @@ function Section(mypresentation, name, items){
     SetPointers(this, true);
 }
 
-function Mover(text){
-    console.log(text);
+function Mover(evt){
+    console.log(evt.target.getAttribute('prestarget'));
 }
 
 function ScreenContent(){
