@@ -241,7 +241,11 @@ function Section(mypresentation, name, items){
 }
 
 function Mover(evt){
+    var current_sid = evt.target.getAttribute('prestarget');
+    var currentcontent = all_screencontents[current_sid];
     console.log(evt.target.getAttribute('prestarget'));
+    //TODO: abstract this!
+    Presentations[0].currentcontent
 }
 
 function ScreenContent(){
@@ -485,6 +489,10 @@ var Majakka = new MajakkaMessu();
 //Now, remove all used data from html (structure, html)
 ClearContent(document.body);
 var CurrentScreen =  new PresScreen()
+
+//TODO Get rid of globals!
+var Presentations = [];
+Presentation.push(Majakka);
 
 
 //TODO start using push
