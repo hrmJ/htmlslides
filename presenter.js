@@ -144,6 +144,9 @@ function Pointer(pointed){
             }
         
         }
+        else if (movetype == "unchanged"){
+            returnvalue = "started";
+        }
 
         //Set the parent object's currently active element
         if (this.pointed.hasOwnProperty('current')){
@@ -242,10 +245,11 @@ function Section(mypresentation, name, items){
 
 function Mover(evt){
     var current_sid = evt.target.getAttribute('prestarget');
-    var currentcontent = all_screencontents[current_sid];
     console.log(evt.target.getAttribute('prestarget'));
     //TODO: abstract this!
-    Presentations[0].currentcontent
+    var currentpres = Presentations[0]
+    currentpres.current = all_screencontents[current_sid];
+    currentpres.Move('unchanged');
 }
 
 function ScreenContent(){
@@ -492,7 +496,7 @@ var CurrentScreen =  new PresScreen()
 
 //TODO Get rid of globals!
 var Presentations = [];
-Presentation.push(Majakka);
+Presentations.push(Majakka);
 
 
 //TODO start using push
