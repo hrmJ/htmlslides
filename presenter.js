@@ -1,4 +1,4 @@
-var all_screencontents = {};
+var all_screencontents = [];
 
 function Presentation(){
     // PRESENTATION is the class that wraps different content and decides what to show
@@ -9,11 +9,6 @@ function Presentation(){
     this.started = false;
     // This might be unnecessary:
     this.current = undefined;
-    //Setting the pointer.. Will probably be removed as unnecessary
-    this.SetActiveContent = function(oid){
-        this.pointer = oid;
-        return 0;
-    };
 
     this.GetContentChain = function(){
             //Go down the section/sectionitem/songverse etc chain as deep as needed
@@ -62,7 +57,10 @@ function Presentation(){
                     // If the type of content was a song, add it to the
                     // presentation from the allsongs global variable
 
-                    var song = allsongs[structure.childNodes[i].innerText.toLowerCase()];
+                    //first, make a song object from it
+                    var songdata = allsongs[structure.childNodes[i].innerText.toLowerCase()];
+
+                    var song = new SongContent(songdata.title, songdata.content);
                     //First, add the title of the song to presentation as a separate item
                     this.contents[this.contents.length] = song.titleslide;
                     //Then, add the actual song
@@ -154,10 +152,17 @@ function Pointer(pointed){
         }
         return returnvalue;
     };
-
-
-    this.Decrement = function(){
+    this.maximize = function(){
+        //Move the pointer to the end
+        this.started = true;
+        this.position = this.max;
     };
+    this.minimize = function(){
+        //Move the pointer to the beginning
+        //this.started = true;
+        this.position = 0;
+    }
+
 }
 
 function SectionItem(thissection, name, contentobject,itemtype, item_idx){
@@ -172,7 +177,7 @@ function SectionItem(thissection, name, contentobject,itemtype, item_idx){
     //finally, add this scrreencontent to the global variable 
     //in order to reference it by links etc.
     //this is a hash with ids as keys
-    all_screencontents[this.id] = this;
+    all_screencontents.push(this);
 }
 
 function Section(mypresentation, name, items){
@@ -247,8 +252,43 @@ function Mover(evt){
     var current_sid = evt.target.getAttribute('prestarget');
     console.log(evt.target.getAttribute('prestarget'));
     //TODO: abstract this!
-    var currentpres = Presentations[0]
-    currentpres.current = all_screencontents[current_sid];
+    var currentpres = Presentations[0];
+    var targetcontent = undefined;
+    for (var idx = 0; idx < all_screencontents.length;idx++){
+        /*iterate over all the screencontents and set the pointers:
+         * the ones before the target content >> set to max
+         * the ones after the target content >> set to min
+         * this way further moving in the presentation should become natural
+        */
+        var thiscontent= all_screencontents[idx];
+
+        if(thiscontent.id == evt.target.getAttribute('prestarget')){
+            //For the actual target
+            targetcontent = thiscontent;
+        }
+        else if (targetcontent !== undefined){
+            //for content FOLLOWING the target
+            thiscontent.pointer.minimize();
+        }
+        else{
+            //for content PRECEDING the target
+            thiscontent.pointer.maximize();
+        }
+    
+    }
+    currentpres.current = targetcontent;
+    //Get how manyth element the section of the current sc is
+    switch (targetcontent.content_type){ 
+    case 'sectiontitle':
+        //TODO make this non-child dependent but realizable on the parent's level (inherited)
+        for (var item_idx in currentpres.items){
+            if (currentpres.items[item_idx] == targetcontent.mysection){
+                targetcontent.mysection.mypresentation.pointer = item_idx;
+            }
+        }
+        break;
+    }
+
     currentpres.Move('unchanged');
 }
 
@@ -334,7 +374,7 @@ function SongContent(title, songtexts){
     //finally, add this scrreencontent to the global variable 
     //in order to reference it by links etc.
     //this is a hash with ids as keys
-    all_screencontents[this.id] = this;
+    all_screencontents.push(this);
 
 }
 SongContent.prototype = new ScreenContent();
@@ -356,8 +396,7 @@ function SongTitleContent(title){
     //finally, add this scrreencontent to the global variable 
     //in order to reference it by links etc.
     //this is a hash with ids as keys
-    all_screencontents[this.id] = this;
-
+    all_screencontents.push(this);
 }
 SongTitleContent.prototype = new ScreenContent();
 SongTitleContent.prototype.constructor = SongTitleContent;
@@ -373,7 +412,7 @@ function SectionTitleContent(section,curitem){
     //finally, add this scrreencontent to the global variable 
     //in order to reference it by links etc.
     //this is a hash with ids as keys
-    all_screencontents[this.id] = this;
+    all_screencontents.push(this);
     return 0;
 }
 SectionTitleContent.prototype = new ScreenContent();
@@ -384,7 +423,7 @@ function BibleContent(){
     //finally, add this scrreencontent to the global variable 
     //in order to reference it by links etc.
     //this is a hash with ids as keys
-    all_screencontents[this.id] = this;
+    all_screencontents.push(this);
 }
 
 function InfoContent(){
@@ -392,7 +431,7 @@ function InfoContent(){
     //finally, add this scrreencontent to the global variable 
     //in order to reference it by links etc.
     //this is a hash with ids as keys
-    all_screencontents[this.id] = this;
+    all_screencontents.push(this);
 }
 
 
@@ -417,7 +456,7 @@ function SetPointers(object, setcurrent){
 function GetSongs(){
     //Fetch the songs from  the html file
 
-    var songs = [];
+    var songs = {};
 
     var songdivs = document.getElementsByClassName("songdata");
     for(var i=0;i<songdivs.length;i++){
@@ -426,7 +465,7 @@ function GetSongs(){
 
         content = songdivs[i].getElementsByClassName("songdatacontent")[0].innerText;
         title = songdivs[i].getElementsByClassName("songtitle")[0].innerText;
-        songs[songdivs[i].id.toLowerCase()] = new SongContent(title, content);
+        songs[songdivs[i].id.toLowerCase()] = {"title":title,"content":content};
     }
 
     //When finished, remove the songdata from the html document!
