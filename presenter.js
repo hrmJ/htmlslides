@@ -9,6 +9,8 @@ function Presentation(){
     this.started = false;
     // This might be unnecessary:
     this.current = undefined;
+    //A try to make jumping in the presentation easier
+    this.flatsructure = [];
 
     this.GetContentChain = function(){
             //Go down the section/sectionitem/songverse etc chain as deep as needed
@@ -171,8 +173,10 @@ function SectionItem(thissection, name, contentobject,itemtype, item_idx){
     this.items = [new SectionTitleContent(thissection, item_idx)];
     if (contentobject){
         //If this object has subcontent
-        this.items[this.items.length] = contentobject;
+        this.items.push(contentobject);
+        thissection.mypresentation.flatsructure.push(contentobject);
     }
+    
     SetPointers(this, true);
     //finally, add this scrreencontent to the global variable 
     //in order to reference it by links etc.
@@ -254,13 +258,14 @@ function Mover(evt){
     //TODO: abstract this!
     var currentpres = Presentations[0];
     var targetcontent = undefined;
-    for (var idx = 0; idx < all_screencontents.length;idx++){
+    //TODO make this not specific to majakka presentations
+    for (var item_idx = 0 in currentpres.flatsructure){
         /*iterate over all the screencontents and set the pointers:
          * the ones before the target content >> set to max
          * the ones after the target content >> set to min
          * this way further moving in the presentation should become natural
         */
-        var thiscontent= all_screencontents[idx];
+        var thiscontent= currentpres.flatsructure[item_idx];
 
         if(thiscontent.id == evt.target.getAttribute('prestarget')){
             //For the actual target
@@ -276,11 +281,12 @@ function Mover(evt){
         }
     
     }
-    currentpres.current = targetcontent;
     //Get how manyth element the section of the current sc is
     switch (targetcontent.content_type){ 
     case 'sectiontitle':
         //TODO make this non-child dependent but realizable on the parent's level (inherited)
+        currentpres.current = targetcontent.mysection;
+        targetcontent.mysection.current = targetcontent;
         for (var item_idx in currentpres.items){
             if (currentpres.items[item_idx] == targetcontent.mysection){
                 targetcontent.mysection.mypresentation.pointer = item_idx;
@@ -414,6 +420,7 @@ function SectionTitleContent(section,curitem){
     //in order to reference it by links etc.
     //this is a hash with ids as keys
     all_screencontents.push(this);
+    section.mypresentation.flatsructure.push(this);
     return 0;
 }
 SectionTitleContent.prototype = new ScreenContent();
