@@ -289,7 +289,7 @@ function Mover(evt){
         targetcontent.mysection.current = targetcontent;
         for (var item_idx in currentpres.items){
             if (currentpres.items[item_idx] == targetcontent.mysection){
-                targetcontent.mysection.mypresentation.pointer = item_idx;
+                targetcontent.mysection.mypresentation.pointer.position = item_idx;
                 targetcontent.mysection.mypresentation.pointer.started = true;
             }
         }
