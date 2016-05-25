@@ -296,7 +296,7 @@ function Mover(evt){
         break;
     }
 
-    currentpres.Move('unchanged');
+    targetcontent.Show();
 }
 
 function ScreenContent(){
