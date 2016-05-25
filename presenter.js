@@ -230,7 +230,8 @@ function Section(mypresentation, name, items){
             console.log(firstitem)
             this_li.setAttribute('prestarget', firstitem.id);
 
-            //tricky, see this so question:  http://stackoverflow.com/questions/256754/how-to-pass-arguments-to-addeventlistener-listener-function
+            //tricky, see this so question:  
+            //http://stackoverflow.com/questions/256754/how-to-pass-arguments-to-addeventlistener-listener-function
             //And especially, the solution here: http://stackoverflow.com/a/11986895/4609685
 
             this_li.addEventListener('click',Mover,false);
@@ -286,7 +287,8 @@ function Mover(evt){
     case 'sectiontitle':
         //TODO make this non-child dependent but realizable on the parent's level (inherited)
         currentpres.current = targetcontent.mysection;
-        targetcontent.mysection.current = targetcontent;
+        //TODO Do I need to be able to reference the parent here directly and not assume idx at 0?
+        targetcontent.mysection.current = targetcontent.mysection.items[0];
         for (var item_idx in currentpres.items){
             if (currentpres.items[item_idx] == targetcontent.mysection){
                 targetcontent.mysection.mypresentation.pointer.position = item_idx;
@@ -296,6 +298,7 @@ function Mover(evt){
         break;
     }
 
+    currentpres.GetContentChain();
     targetcontent.Show();
 }
 
