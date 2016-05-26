@@ -228,7 +228,8 @@ function Section(mypresentation, name, items){
             }
 
             console.log(firstitem)
-            this_li.setAttribute('prestarget', firstitem.id);
+            this_li.setAttribute('linktype', 'section');
+            this_li.setAttribute('linktarget', section_idx);
 
             //tricky, see this so question:  
             //http://stackoverflow.com/questions/256754/how-to-pass-arguments-to-addeventlistener-listener-function
@@ -244,6 +245,10 @@ function Section(mypresentation, name, items){
         return sectionbanner;
     };
 
+    this.FixPointers = function(linktarget){
+        //When following links, take care that all the pointers are in the right position
+    }
+
     this.name = name;
     this.items = [];
     for (var section_item_idx in items){
@@ -254,48 +259,74 @@ function Section(mypresentation, name, items){
 }
 
 function Mover(evt){
-    var current_sid = evt.target.getAttribute('prestarget');
-    console.log(evt.target.getAttribute('prestarget'));
+    var linktype = evt.target.getAttribute('linktype');
+    var linktarget = evt.target.getAttribute('linktarget');
+
     //TODO: abstract this!
     var currentpres = Presentations[0];
     var targetcontent = undefined;
     //TODO make this not specific to majakka presentations
-    for (var item_idx = 0 in currentpres.flatsructure){
-        /*iterate over all the screencontents and set the pointers:
-         * the ones before the target content >> set to max
-         * the ones after the target content >> set to min
-         * this way further moving in the presentation should become natural
-        */
-        var thiscontent= currentpres.flatsructure[item_idx];
+    if (currentpres.showtype == 'majakka'){
+        switch(linktype){
+            case 'section':
+                currentpres.current = currentpres.items[linktarget];
+                currentpres.pointer.position = linktarget;
+                currentpres.pointer.started = true;
+                //make sure all subcontents have the right "current" set.
+                thisobject = currentpres.current;
 
-        if(thiscontent.id == evt.target.getAttribute('prestarget')){
-            //For the actual target
-            targetcontent = thiscontent;
+                //first, all the sections
+                for (var section_idx in currentpres.items) {
+                    var thissection = currentpres.items[section_idx];
+                    if (section_idx < linktarget){
+                    //TODO abstraction of this awfulness
+                    //for content PRECEDING the target
+                        thissection.pointer.maximize();
+                        thissection.current = thissection.items[thissection.items.length-1];
+                        //for all subcontent preceding, maximize pointers and make the last items current
+                        var chainobject = thissection.current;
+                        chainobject.pointer.maximize();
+                        chainobject.current = chainobject.items[chainobject.items.length-1];
+                        while(chainobject.hasOwnProperty('items') && chainobject.hasOwnProperty('current')){
+                            chainobject = chainobject.current;
+                            chainobject.pointer.maximize();
+                            if (chainobject.hasOwnProperty('current')){
+                                chainobject.current = chainobject.items[chainobject.items.length-1];
+                            }
+                            else{
+                                break;
+                            }
+                        }
+                    }
+                    else{
+                    //for content FOLLOWING the target
+                    //AND for the actual target section, too
+                        thissection.pointer.minimize();
+                        thissection.current = thissection.items[0];
+                        //for all subcontent inside this section, minimize pointers and make the first items current
+                        var chainobject = thissection.current;
+                        chainobject.pointer.minimize();
+                        chainobject.current = chainobject.items[0];
+                        while(chainobject.hasOwnProperty('items') && chainobject.hasOwnProperty('current')){
+                            chainobject = chainobject.current;
+                            chainobject.pointer.minimize();
+                            if (chainobject.hasOwnProperty('current')){
+                                chainobject.current = chainobject.items[0];
+                            }
+                            else{
+                                break;
+                            }
+                        }
+                        if (section_idx == linktarget){
+                            //TODO: check if the showability of this must be tested
+                            targetcontent = chainobject;
+                        }
+                    }
+                }
+
+
+            break;
         }
-        else if (targetcontent !== undefined){
-            //for content FOLLOWING the target
-            thiscontent.pointer.minimize();
-        }
-        else{
-            //for content PRECEDING the target
-            thiscontent.pointer.maximize();
-        }
-    
-    }
-    //Get how manyth element the section of the current sc is
-    switch (targetcontent.content_type){ 
-    case 'sectiontitle':
-        //TODO make this non-child dependent but realizable on the parent's level (inherited)
-        currentpres.current = targetcontent.mysection;
-        //TODO Do I need to be able to reference the parent here directly and not assume idx at 0?
-        targetcontent.mysection.current = targetcontent.mysection.items[0];
-        for (var item_idx in currentpres.items){
-            if (currentpres.items[item_idx] == targetcontent.mysection){
-                targetcontent.mysection.mypresentation.pointer.position = item_idx;
-                targetcontent.mysection.mypresentation.pointer.started = true;
-            }
-        }
-        break;
     }
 
     currentpres.GetContentChain();
@@ -531,6 +562,24 @@ function PresScreen(){
 
 function ReferenceHolder(){
 
+}
+
+function FixPointers(contobject, linktarget){
+    for (var idx in contobject.items) {
+        var contobjectitem = contobject.items[section_item_idx];
+        if (idx < linktarget){
+        //for content PRECEDING the target
+            contobjectitem.pointer.maximize();
+        }
+        else if (idx > linktarget){
+        //for content FOLLOWING the target
+            contobjectitem.pointer.minimize();
+        }
+        else{
+        //For the actual target
+            contobjectitem.pointer.minimize();
+        }
+    }
 }
 
 //========================================
