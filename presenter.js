@@ -323,6 +323,9 @@ function Mover(evt){
                             if (thissectionitem.hasOwnProperty('pointer')){
                                 thissectionitem.pointer.minimize();
                             }
+                            if (thissectionitem.hasOwnProperty('current')){
+                                thissectionitem.current = thissectionitem.items[0];
+                            }
                             if (thissectionitem.hasOwnProperty('items')){
                                 for (var subitem_idx in thissectionitem.items){
                                     var sectionitems_subcontent  = thissectionitem.items[subitem_idx];
