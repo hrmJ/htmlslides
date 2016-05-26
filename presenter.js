@@ -284,8 +284,12 @@ function Mover(evt){
                             if (thissectionitem.hasOwnProperty('pointer')){
                                 thissectionitem.pointer.maximize();
                             }
+                            if (thissectionitem.hasOwnProperty('current')){
+                                thissectionitem.current = thissectionitem.items[thissectionitem.items.length-1];
+                            }
                             if (thissectionitem.hasOwnProperty('items')){
                                 for (var subitem_idx in thissectionitem.items){
+                                    //songs, section titles etc...
                                     var sectionitems_subcontent  = thissectionitem.items[subitem_idx];
                                     if (sectionitems_subcontent.hasOwnProperty('pointer')){
                                         sectionitems_subcontent.pointer.maximize();
