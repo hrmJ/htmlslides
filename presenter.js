@@ -157,7 +157,7 @@ function Pointer(pointed){
     this.maximize = function(){
         //Move the pointer to the end
         this.started = true;
-        this.position = this.max;
+        this.position = this.max-1;
     };
     this.minimize = function(){
         //Move the pointer to the beginning
@@ -272,29 +272,40 @@ function Mover(evt){
                 currentpres.current = currentpres.items[linktarget];
                 currentpres.pointer.position = linktarget;
                 currentpres.pointer.started = true;
-                //make sure all subcontents have the right "current" set.
-                thisobject = currentpres.current;
-
-                //first, all the sections
                 for (var section_idx in currentpres.items) {
                     var thissection = currentpres.items[section_idx];
                     if (section_idx < linktarget){
-                    //TODO abstraction of this awfulness
+                    //TODO abstraction of this AWFULNESS!!!
                     //for content PRECEDING the target
                         thissection.pointer.maximize();
                         thissection.current = thissection.items[thissection.items.length-1];
-                        //for all subcontent preceding, maximize pointers and make the last items current
-                        var chainobject = thissection.current;
-                        chainobject.pointer.maximize();
-                        chainobject.current = chainobject.items[chainobject.items.length-1];
-                        while(chainobject.hasOwnProperty('items') && chainobject.hasOwnProperty('current')){
-                            chainobject = chainobject.current;
-                            chainobject.pointer.maximize();
-                            if (chainobject.hasOwnProperty('current')){
-                                chainobject.current = chainobject.items[chainobject.items.length-1];
+                        for (var sitem_idx in thissection.items){
+                            var thissectionitem = thissection.items[sitem_idx];
+                            if (thissectionitem.hasOwnProperty('pointer')){
+                                thissectionitem.pointer.maximize();
                             }
-                            else{
-                                break;
+                            if (thissectionitem.hasOwnProperty('items')){
+                                for (var subitem_idx in thissectionitem.items){
+                                    var sectionitems_subcontent  = thissectionitem.items[subitem_idx];
+                                    if (sectionitems_subcontent.hasOwnProperty('pointer')){
+                                        sectionitems_subcontent.pointer.maximize();
+                                    }
+                                    if (sectionitems_subcontent.hasOwnProperty('current')){
+                                        sectionitems_subcontent.current = sectionitems_subcontent.items[sectionitems_subcontent.items.length-1];
+                                    }
+                                    if (sectionitems_subcontent.hasOwnProperty('items')){
+                                        //song verses etc
+                                        for (var subsubitem_idx in sectionitems_subcontent.items){
+                                            var sectionitems_subsubcontent  = sectionitems_subcontent.items[subsubitem_idx];
+                                            if (sectionitems_subsubcontent.hasOwnProperty('pointer')){
+                                                sectionitems_subsubcontent.pointer.maximize();
+                                            }
+                                            if (sectionitems_subsubcontent.hasOwnProperty('current')){
+                                                sectionitems_subsubcontent.current = sectionitems_subsubcontent.items[sectionitems_subsubcontent.items.length-1];
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -303,35 +314,54 @@ function Mover(evt){
                     //AND for the actual target section, too
                         thissection.pointer.minimize();
                         thissection.current = thissection.items[0];
-                        //for all subcontent inside this section, minimize pointers and make the first items current
-                        var chainobject = thissection.current;
-                        chainobject.pointer.minimize();
-                        chainobject.current = chainobject.items[0];
-                        while(chainobject.hasOwnProperty('items') && chainobject.hasOwnProperty('current')){
-                            chainobject = chainobject.current;
-                            chainobject.pointer.minimize();
-                            if (chainobject.hasOwnProperty('current')){
-                                chainobject.current = chainobject.items[0];
+                        for (var sitem_idx in thissection.items){
+                            var thissectionitem = thissection.items[sitem_idx];
+                            if (thissectionitem.hasOwnProperty('pointer')){
+                                thissectionitem.pointer.minimize();
                             }
-                            else{
-                                break;
+                            if (thissectionitem.hasOwnProperty('items')){
+                                for (var subitem_idx in thissectionitem.items){
+                                    var sectionitems_subcontent  = thissectionitem.items[subitem_idx];
+                                    if (sectionitems_subcontent.hasOwnProperty('pointer')){
+                                        sectionitems_subcontent.pointer.minimize();
+                                    }
+                                    if (sectionitems_subcontent.hasOwnProperty('current')){
+                                        sectionitems_subcontent.current = sectionitems_subcontent.items[0];
+                                    }
+                                    if (sectionitems_subcontent.hasOwnProperty('items')){
+                                        //song verses etc
+                                        for (var subsubitem_idx in sectionitems_subcontent.items){
+                                            var sectionitems_subsubcontent  = sectionitems_subcontent.items[subsubitem_idx];
+                                            if (sectionitems_subsubcontent.hasOwnProperty('pointer')){
+                                                sectionitems_subsubcontent.pointer.minimize();
+                                            }
+                                            if (sectionitems_subsubcontent.hasOwnProperty('current')){
+                                                sectionitems_subsubcontent.current = sectionitems_subsubcontent.items[0];
+                                            }
+                                        }
+                                    }
+                                }
                             }
+                        }
                         }
                         if (section_idx == linktarget){
+                            //Finally, navigate to the first showable content of this section
+                            targetcontent = thissection.current;
+                            while(targetcontent.hasOwnProperty('current')){
                             //TODO: check if the showability of this must be tested
-                            targetcontent = chainobject;
+                                targetcontent = targetcontent.current;
+                            }
                         }
                     }
+                break;
                 }
 
 
-            break;
         }
-    }
-
     currentpres.GetContentChain();
     targetcontent.Show();
-}
+    }
+
 
 function ScreenContent(){
     // Screencontent is the class that contains the actual data to be shown
@@ -561,6 +591,11 @@ function PresScreen(){
 }
 
 function ReferenceHolder(){
+
+}
+
+function GetNestedContent(){
+
 
 }
 
