@@ -92,7 +92,10 @@ function MajakkaMessu(){
                   new Section(this, 'Sana',     [['Päivän laulu',this.songs['Päivän laulu'],'song'],
                                               ['Saarna',false,'header'],
                                               ['Synnintunnustus',false,'header'],
-                                              ['Uskontunnustus',false,'header']])
+                                              ['Uskontunnustus',false,'header']]),
+                  new Section(this, 'Ehtoollinen',     [['Kolehtipuhe',false,'header'],
+                                              ['Ehtoollisrukous',false,'header'],
+                                              ['Isä meidän',false,'header']])
                     ];
                       //TODO ^^ liittyen ehkä mieti, että näkyviin tulisi sanailijan nimi siihen,
                       //missä tavallisesti laulun nimi. Muista myös ajatella laulun tekijänoikeuksia.
