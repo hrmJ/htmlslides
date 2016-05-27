@@ -604,9 +604,34 @@ function ReferenceHolder(){
 
 }
 
-function GetNestedContent(){
+function UseIfProperty(thisobject, property, value){
+    if (thissectionitem.hasOwnProperty(property)){
+        if (typeof thissection[property] == 'function' ){
+            thissection[property]();
+        }
+        else {
+            thissection[property] = value;
+        }
+    }
+}
 
-
+function UpdatePointers(item, updatetype){
+    if (item.hasOwnProperty('pointer')){
+        if (updatetype == 'max'){
+            item.pointer.maximize();
+        }
+        else{
+            item.pointer.minimize();
+        }
+    }
+    if (item.hasOwnProperty('current')){
+        if (updatetype == 'max'){
+            item.current = item.items[item.items.length-1];
+        }
+        else{
+            item.current = item.items[0];
+        }
+    }
 }
 
 function FixPointers(contobject, linktarget){
