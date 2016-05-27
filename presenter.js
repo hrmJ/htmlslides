@@ -537,7 +537,7 @@ function AdjustPointersFromSectionDown(thissection, updatetype, targetitem){
             }
         }
 
-        if (!targetitem){
+        if (targetitem !== sitem_idx){
             UpdatePointers(thissectionitem, updatetype);
         }
 
