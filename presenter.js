@@ -275,85 +275,15 @@ function Mover(evt){
                 currentpres.current = currentpres.items[linktarget];
                 currentpres.pointer.position = linktarget;
                 currentpres.pointer.started = true;
+                //TODO some more abstraction to this 
                 for (var section_idx in currentpres.items) {
                     var thissection = currentpres.items[section_idx];
                     if (section_idx < linktarget){
-                    //TODO abstraction of this AWFULNESS!!!
-                    //for content PRECEDING the target
-                        thissection.pointer.maximize();
-                        thissection.current = thissection.items[thissection.items.length-1];
-                        for (var sitem_idx in thissection.items){
-                            var thissectionitem = thissection.items[sitem_idx];
-                            if (thissectionitem.hasOwnProperty('pointer')){
-                                thissectionitem.pointer.maximize();
-                            }
-                            if (thissectionitem.hasOwnProperty('current')){
-                                thissectionitem.current = thissectionitem.items[thissectionitem.items.length-1];
-                            }
-                            if (thissectionitem.hasOwnProperty('items')){
-                                for (var subitem_idx in thissectionitem.items){
-                                    //songs, section titles etc...
-                                    var sectionitems_subcontent  = thissectionitem.items[subitem_idx];
-                                    if (sectionitems_subcontent.hasOwnProperty('pointer')){
-                                        sectionitems_subcontent.pointer.maximize();
-                                    }
-                                    if (sectionitems_subcontent.hasOwnProperty('current')){
-                                        sectionitems_subcontent.current = sectionitems_subcontent.items[sectionitems_subcontent.items.length-1];
-                                    }
-                                    if (sectionitems_subcontent.hasOwnProperty('items')){
-                                        //song verses etc
-                                        for (var subsubitem_idx in sectionitems_subcontent.items){
-                                            var sectionitems_subsubcontent  = sectionitems_subcontent.items[subsubitem_idx];
-                                            if (sectionitems_subsubcontent.hasOwnProperty('pointer')){
-                                                sectionitems_subsubcontent.pointer.maximize();
-                                            }
-                                            if (sectionitems_subsubcontent.hasOwnProperty('current')){
-                                                sectionitems_subsubcontent.current = sectionitems_subsubcontent.items[sectionitems_subsubcontent.items.length-1];
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        AdjustPointersFromSectionDown(thissection, 'max');
                     }
                     else{
-                    //for content FOLLOWING the target
-                    //AND for the actual target section, too
-                        thissection.pointer.minimize();
-                        thissection.current = thissection.items[0];
-                        for (var sitem_idx in thissection.items){
-                            var thissectionitem = thissection.items[sitem_idx];
-                            if (thissectionitem.hasOwnProperty('pointer')){
-                                thissectionitem.pointer.minimize();
-                            }
-                            if (thissectionitem.hasOwnProperty('current')){
-                                thissectionitem.current = thissectionitem.items[0];
-                            }
-                            if (thissectionitem.hasOwnProperty('items')){
-                                for (var subitem_idx in thissectionitem.items){
-                                    var sectionitems_subcontent  = thissectionitem.items[subitem_idx];
-                                    if (sectionitems_subcontent.hasOwnProperty('pointer')){
-                                        sectionitems_subcontent.pointer.minimize();
-                                    }
-                                    if (sectionitems_subcontent.hasOwnProperty('current')){
-                                        sectionitems_subcontent.current = sectionitems_subcontent.items[0];
-                                    }
-                                    if (sectionitems_subcontent.hasOwnProperty('items')){
-                                        //song verses etc
-                                        for (var subsubitem_idx in sectionitems_subcontent.items){
-                                            var sectionitems_subsubcontent  = sectionitems_subcontent.items[subsubitem_idx];
-                                            if (sectionitems_subsubcontent.hasOwnProperty('pointer')){
-                                                sectionitems_subsubcontent.pointer.minimize();
-                                            }
-                                            if (sectionitems_subsubcontent.hasOwnProperty('current')){
-                                                sectionitems_subsubcontent.current = sectionitems_subsubcontent.items[0];
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        }
+                        //for content FOLLOWING the target AND for the actual target section, too
+                        AdjustPointersFromSectionDown(thissection, 'min');
                         if (section_idx == linktarget){
                             //Finally, navigate to the first showable content of this section
                             targetcontent = thissection.current;
@@ -363,14 +293,13 @@ function Mover(evt){
                             }
                         }
                     }
-                break;
                 }
-
-
+                break;
         }
+    }
     currentpres.GetContentChain();
     targetcontent.Show();
-    }
+}
 
 
 function ScreenContent(){
@@ -575,7 +504,6 @@ CreateTag = function(tagname, barid){
 }
 
 function PresScreen(){
-
     this.prescont = CreateTag("div", "prescont");
     this.textcontent = CreateTag("div", "textcontent");
     this.sections = CreateTag("nav", "sections");
@@ -596,22 +524,6 @@ function PresScreen(){
         //contentitem is a screencontent object
         this[divname].appendChild(contentitem);
         this.prescont.appendChild(this[divname]);
-    }
-
-}
-
-function ReferenceHolder(){
-
-}
-
-function UseIfProperty(thisobject, property, value){
-    if (thissectionitem.hasOwnProperty(property)){
-        if (typeof thissection[property] == 'function' ){
-            thissection[property]();
-        }
-        else {
-            thissection[property] = value;
-        }
     }
 }
 
@@ -634,20 +546,24 @@ function UpdatePointers(item, updatetype){
     }
 }
 
-function FixPointers(contobject, linktarget){
-    for (var idx in contobject.items) {
-        var contobjectitem = contobject.items[section_item_idx];
-        if (idx < linktarget){
-        //for content PRECEDING the target
-            contobjectitem.pointer.maximize();
-        }
-        else if (idx > linktarget){
-        //for content FOLLOWING the target
-            contobjectitem.pointer.minimize();
-        }
-        else{
-        //For the actual target
-            contobjectitem.pointer.minimize();
+function AdjustPointersFromSectionDown(thissection, updatetype){
+    UpdatePointers(thissection, updatetype)
+    for (var sitem_idx in thissection.items){
+        var thissectionitem = thissection.items[sitem_idx];
+        UpdatePointers(thissectionitem, updatetype);
+        if (thissectionitem.hasOwnProperty('items')){
+            for (var subitem_idx in thissectionitem.items){
+                //songs, section titles etc...
+                var sectionitems_subcontent  = thissectionitem.items[subitem_idx];
+                UpdatePointers(sectionitems_subcontent, updatetype);
+                if (sectionitems_subcontent.hasOwnProperty('items')){
+                    //song verses etc
+                    for (var subsubitem_idx in sectionitems_subcontent.items){
+                        var sectionitems_subsubcontent  = sectionitems_subcontent.items[subsubitem_idx];
+                        UpdatePointers(sectionitems_subsubcontent, updatetype);
+                    }
+                }
+            }
         }
     }
 }
