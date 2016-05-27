@@ -99,6 +99,10 @@ function MajakkaMessu(){
                     ];
                       //TODO ^^ liittyen ehkä mieti, että näkyviin tulisi sanailijan nimi siihen,
                       //missä tavallisesti laulun nimi. Muista myös ajatella laulun tekijänoikeuksia.
+    //mark the section idx for each of the sections TODO find a better way
+    for(var sec_idx in this.items){
+        this.items[sec_idx].sec_idx = sec_idx;
+    }
     SetPointers(this, true);
     this.GetContentChain();
 }
@@ -187,9 +191,9 @@ function SectionItem(thissection, name, contentobject,itemtype, item_idx){
     all_screencontents.push(this);
 }
 
-function Section(mypresentation, name, items){
+function Section(mypresentation, name, items, sec_idx){
     //The presentation may be divided into sections
-    
+    this.sec_idx = undefined;
     //mypresentation saves reference to the 'parent' pres
     this.mypresentation = mypresentation;
     this.CreateLeftbanner = function(highlighted){
@@ -198,6 +202,7 @@ function Section(mypresentation, name, items){
             thisitem = this.items[i];
             this_li = document.createElement('li');
             this_li.innerText = thisitem.name;
+            ListToLink(this_li, this.sec_idx, i);
             if (i==highlighted){
                 this_li.className = "sectionitemhl";
             }
@@ -214,31 +219,7 @@ function Section(mypresentation, name, items){
             var sec = this.mypresentation.items[section_idx];
             var this_li = document.createElement('li');
             this_li.innerText = sec.name;
-
-            //Get the first element of this section:
-            //TODO abstract this to a function
-            //AND make it less hacky
-            var firstitem = sec.items[0];
-            if (firstitem.hasOwnProperty('items')){
-                while (firstitem.hasOwnProperty('items') && firstitem.items[0] instanceof ScreenContent){
-                    if(firstitem.items[0] instanceof ScreenContent){
-                    firstitem = firstitem.items[0];
-                    }
-                    if(!firstitem.hasOwnProperty('items')){
-                        break;
-                    }
-                }
-            }
-
-            console.log(firstitem)
-            this_li.setAttribute('linktype', 'section');
-            this_li.setAttribute('linktarget', section_idx);
-
-            //tricky, see this so question:  
-            //http://stackoverflow.com/questions/256754/how-to-pass-arguments-to-addeventlistener-listener-function
-            //And especially, the solution here: http://stackoverflow.com/a/11986895/4609685
-
-            this_li.addEventListener('click',Mover,false);
+            ListToLink(this_li, section_idx, 0);
 
             if (section_idx == this.mypresentation.pointer.position){
                 this_li.className = "sectionhl";
@@ -247,10 +228,6 @@ function Section(mypresentation, name, items){
         }
         return sectionbanner;
     };
-
-    this.FixPointers = function(linktarget){
-        //When following links, take care that all the pointers are in the right position
-    }
 
     this.name = name;
     this.items = [];
@@ -263,39 +240,31 @@ function Section(mypresentation, name, items){
 
 function Mover(evt){
     var linktype = evt.target.getAttribute('linktype');
-    var linktarget = evt.target.getAttribute('linktarget');
+    var sectiontarget = evt.target.getAttribute('sectionidx');
+    //The latter is for songs, speeches etc i.e. subitems of sections
+    var secitemtarget = evt.target.getAttribute('secitemidx');
 
     //TODO: abstract this!
     var currentpres = Presentations[0];
     var targetcontent = undefined;
     //TODO make this not specific to majakka presentations
     if (currentpres.showtype == 'majakka'){
-        switch(linktype){
-            case 'section':
-                currentpres.current = currentpres.items[linktarget];
-                currentpres.pointer.position = linktarget;
+                currentpres.current = currentpres.items[sectiontarget];
+                currentpres.pointer.position = sectiontarget;
                 currentpres.pointer.started = true;
                 //TODO some more abstraction to this 
                 for (var section_idx in currentpres.items) {
                     var thissection = currentpres.items[section_idx];
-                    if (section_idx < linktarget){
-                        AdjustPointersFromSectionDown(thissection, 'max');
+                    if (section_idx < sectiontarget){
+                        AdjustPointersFromSectionDown(thissection, 'max', undefined);
                     }
-                    else{
-                        //for content FOLLOWING the target AND for the actual target section, too
-                        AdjustPointersFromSectionDown(thissection, 'min');
-                        if (section_idx == linktarget){
-                            //Finally, navigate to the first showable content of this section
-                            targetcontent = thissection.current;
-                            while(targetcontent.hasOwnProperty('current')){
-                            //TODO: check if the showability of this must be tested
-                                targetcontent = targetcontent.current;
-                            }
-                        }
+                    else if (section_idx == sectiontarget){
+                        var targetcontent = AdjustPointersFromSectionDown(thissection, 'min', secitemtarget);
+                    }
+                    else if (section_idx == sectiontarget){
+                        AdjustPointersFromSectionDown(thissection, 'min', undefined);
                     }
                 }
-                break;
-        }
     }
     currentpres.GetContentChain();
     targetcontent.Show();
@@ -546,11 +515,32 @@ function UpdatePointers(item, updatetype){
     }
 }
 
-function AdjustPointersFromSectionDown(thissection, updatetype){
+function AdjustPointersFromSectionDown(thissection, updatetype, targetitem){
     UpdatePointers(thissection, updatetype)
     for (var sitem_idx in thissection.items){
         var thissectionitem = thissection.items[sitem_idx];
-        UpdatePointers(thissectionitem, updatetype);
+        if (targetitem && sitem_idx < targetitem){
+            updatetype = 'max';
+        }
+        else if (targetitem && sitem_idx > targetitem){
+            updatetype = 'min';
+        }
+        else if (targetitem && sitem_idx == targetitem){
+            //navigate to the first showable content of the desired sectionitem
+            UpdatePointers(thissectionitem, updatetype);
+            thissection.current = thissectionitem;
+            thissection.pointer.position = targetitem;
+            var targetcontent = thissectionitem;
+            while(typeof targetcontent.Show === 'undefined'){
+                //Iterating down to first showable content
+                targetcontent = targetcontent.current;
+            }
+        }
+
+        if (!targetitem){
+            UpdatePointers(thissectionitem, updatetype);
+        }
+
         if (thissectionitem.hasOwnProperty('items')){
             for (var subitem_idx in thissectionitem.items){
                 //songs, section titles etc...
@@ -566,6 +556,17 @@ function AdjustPointersFromSectionDown(thissection, updatetype){
             }
         }
     }
+
+    if (targetitem){
+        return targetcontent;
+    }
+}
+
+function ListToLink(this_li, sectionidx, secitemidx){
+    this_li.setAttribute('sectionidx', sectionidx);
+    this_li.setAttribute('secitemidx', secitemidx);
+    //http://stackoverflow.com/questions/256754/how-to-pass-arguments-to-addeventlistener-listener-function
+    this_li.addEventListener('click',Mover,false);
 }
 
 //========================================
