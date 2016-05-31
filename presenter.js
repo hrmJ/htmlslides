@@ -47,7 +47,7 @@ function Presentation(){
     this.GetStructure= function (){
         //If there is a predefined structure for the presantation
         //this function extracts it
-        var structure = document.getElementById("structure");
+        var structure = presdocument.getElementById("structure");
         this.songs = {};
         for (var i=0;i<structure.childNodes.length;i++){
             if (structure.childNodes[i].nodeName!=="#text"){
@@ -76,7 +76,7 @@ function Presentation(){
             }
         }
         //Remove the information from html
-        ClearContent(document.getElementById("structure"));
+        ClearContent(presdocument.getElementById("structure"));
         return 0;
     };
 }
@@ -197,10 +197,10 @@ function Section(mypresentation, name, items, sec_idx){
     //mypresentation saves reference to the 'parent' pres
     this.mypresentation = mypresentation;
     this.CreateLeftbanner = function(highlighted){
-        var leftbanner = document.createElement('ul');
+        var leftbanner = presdocument.createElement('ul');
         for(var i in this.items){
             thisitem = this.items[i];
-            this_li = document.createElement('li');
+            this_li = presdocument.createElement('li');
             this_li.innerText = thisitem.name;
             ListToLink(this_li, this.sec_idx, i);
             if (i==highlighted){
@@ -214,10 +214,10 @@ function Section(mypresentation, name, items, sec_idx){
     this.PrintSectionName = function(){
         //Print a list of section names and highlight the current one
         //TODO: COmbine this and Create left banner
-        var sectionbanner = document.createElement('ul');
+        var sectionbanner = presdocument.createElement('ul');
         for(var section_idx in this.mypresentation.items){
             var sec = this.mypresentation.items[section_idx];
-            var this_li = document.createElement('li');
+            var this_li = presdocument.createElement('li');
             this_li.innerText = sec.name;
             ListToLink(this_li, section_idx, 0);
 
@@ -341,7 +341,7 @@ function SongContent(title, songtexts){
                 //These two loops should probably be combined 
                 domcontents = [];
                 for (verseid in rawcontents){
-                    domcontents[verseid] = document.createElement('p');
+                    domcontents[verseid] = presdocument.createElement('p');
                     domcontents[verseid].className = 'verse';
                     domcontents[verseid].innerText = rawcontents[verseid];
                 }
@@ -367,7 +367,7 @@ function SongTitleContent(title){
     //
     this.id = CreateUid();
     this.content_type="songtitle";
-    el = document.createElement('p');
+    el = presdocument.createElement('p');
     el.className = 'songtitle';
     el.innerText = title;
     this.items = [el];
@@ -438,7 +438,7 @@ function GetSongs(){
 
     var songs = {};
 
-    var songdivs = document.getElementsByClassName("songdata");
+    var songdivs = presdocument.getElementsByClassName("songdata");
     for(var i=0;i<songdivs.length;i++){
         // Add a new songcontent object to the songs container object
         // todo: composer, writer
@@ -449,7 +449,7 @@ function GetSongs(){
     }
 
     //When finished, remove the songdata from the html document!
-    ClearContent(document.getElementById('songs'))
+    ClearContent(presdocument.getElementById('songs'))
     return songs;
 }
 
@@ -467,7 +467,7 @@ function CreateUid(){
 
 CreateTag = function(tagname, barid){
     //These elements are for displaying the structure of the presentation
-    bar = document.createElement(tagname);
+    bar = presdocument.createElement(tagname);
     bar.id = barid;
     return bar;
 }
@@ -478,7 +478,7 @@ function PresScreen(){
     this.sections = CreateTag("nav", "sections");
     this.sitems = CreateTag("nav", "sitems");
     this.itemtitle = CreateTag("div", "itemtitle");
-    document.body.appendChild(this.prescont);
+    presdocument.body.appendChild(this.prescont);
 
     this.Refresh = function(){
         //TODO Make this a LOOP!
@@ -569,16 +569,23 @@ function ListToLink(this_li, sectionidx, secitemidx){
     this_li.addEventListener('click',Mover,false);
 }
 
+function OpenPres(){
+    preswindow = window.open('template.html','_blank', 'toolbar=0,location=0,menubar=0');
+    presdocument = preswindow.document;
+    CurrentScreen = new PresScreen();
+}
+
 //========================================
-// //The Global screen variables point to the places on the
-//screen, where content is shown to the audience
+
+//If a new document opened, these variables take care of it
+var presdocument = document;
+var preswindow = undefined;
 
 var allsongs = GetSongs();
-var pres = new Presentation();
 var Majakka = new MajakkaMessu();
 //Now, remove all used data from html (structure, html)
-ClearContent(document.body);
-var CurrentScreen =  new PresScreen()
+ClearContent(presdocument.body);
+var CurrentScreen =  new PresScreen();
 
 //TODO Get rid of globals!
 var Presentations = [];

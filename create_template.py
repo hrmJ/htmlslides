@@ -113,6 +113,7 @@ def CreateHtmlTemplate(songpath = '/home/juho/Dropbox/laulut/*.txt', servicestru
     if servicestructure:
         htmlfile += "\n" + ExtractStructure(servicestructure, allsongnames) + "\n"
 
+    startlink = "<a href='#' onClick='OpenPres();'>Start</a>"
     htmlfile += songhtml + "\n<script src='presenter.js'></script>\n</body>\n</html>"
     #jsfile += "};"
 
