@@ -11,6 +11,7 @@ function Presentation(){
     this.current = undefined;
     //A try to make jumping in the presentation easier
     this.flatsructure = [];
+    this.screen = undefined;
 
     this.GetContentChain = function(){
             //Go down the section/sectionitem/songverse etc chain as deep as needed
@@ -38,7 +39,7 @@ function Presentation(){
                 //Iterating down to first showable content
                 thisobject = thisobject.current;
             }
-            thisobject.Show();
+            thisobject.Show(this.screen);
             this.GetContentChain();
             console.log(this.items[0].pointer)
     }
@@ -47,7 +48,7 @@ function Presentation(){
     this.GetStructure= function (){
         //If there is a predefined structure for the presantation
         //this function extracts it
-        var structure = presdocument.getElementById("structure");
+        var structure = document.getElementById("structure");
         this.songs = {};
         for (var i=0;i<structure.childNodes.length;i++){
             if (structure.childNodes[i].nodeName!=="#text"){
@@ -76,7 +77,7 @@ function Presentation(){
             }
         }
         //Remove the information from html
-        ClearContent(presdocument.getElementById("structure"));
+        ClearContent(document.getElementById("structure"));
         return 0;
     };
 }
@@ -105,7 +106,27 @@ function MajakkaMessu(){
     }
     SetPointers(this, true);
     this.GetContentChain();
+
+    this.CreateNavigation = function(){
+        //Create links in the secondary screen for jumping from one section to another
+        NavScreen.Refresh();
+        var link = document.createElement('a');
+        link.href = '#';
+        link.innerText = 'Avaa esitys';
+        link.addEventListener('click',OpenPres,false);
+        NavScreen.UpdateContent('textcontent',link);
+        var sectionlist = document.createElement('ul');
+        for (var section_idx in this.items){
+            var thissec = this.items[section_idx];
+            var this_li = document.createElement('li');
+            this_li.innerText = thissec.name;
+            ListToLink(this_li, section_idx, 0);
+            sectionlist.appendChild(this_li);
+        }
+        NavScreen.UpdateContent('sectionlinks',sectionlist);
+    };
 }
+
 MajakkaMessu.prototype = new Presentation();
 MajakkaMessu.prototype.constructor = MajakkaMessu;
 
@@ -197,10 +218,10 @@ function Section(mypresentation, name, items, sec_idx){
     //mypresentation saves reference to the 'parent' pres
     this.mypresentation = mypresentation;
     this.CreateLeftbanner = function(highlighted){
-        var leftbanner = presdocument.createElement('ul');
+        var leftbanner = document.createElement('ul');
         for(var i in this.items){
             thisitem = this.items[i];
-            this_li = presdocument.createElement('li');
+            var this_li = document.createElement('li');
             this_li.innerText = thisitem.name;
             ListToLink(this_li, this.sec_idx, i);
             if (i==highlighted){
@@ -214,10 +235,10 @@ function Section(mypresentation, name, items, sec_idx){
     this.PrintSectionName = function(){
         //Print a list of section names and highlight the current one
         //TODO: COmbine this and Create left banner
-        var sectionbanner = presdocument.createElement('ul');
+        var sectionbanner = document.createElement('ul');
         for(var section_idx in this.mypresentation.items){
             var sec = this.mypresentation.items[section_idx];
-            var this_li = presdocument.createElement('li');
+            var this_li = document.createElement('li');
             this_li.innerText = sec.name;
             ListToLink(this_li, section_idx, 0);
 
@@ -267,7 +288,7 @@ function Mover(evt){
                 }
     }
     currentpres.GetContentChain();
-    targetcontent.Show();
+    targetcontent.Show(currentpres.screen);
 }
 
 
@@ -279,40 +300,40 @@ function ScreenContent(){
     // item here means the content blocks divided into 
     // parts that will be shown at the time
     this.items = [];
-    this.Show = function(){
+    this.Show = function(PresScreen){
             //Print the content of this object to screen
 
             //1. Clear the layout of the screen
             //TODO: only do this when necessary
-            CurrentScreen.Refresh();
+            PresScreen.Refresh();
             //2. make shure the item is shown only once
             this.pointer.started = true;
 
             //type-dependently populating the screen
             switch (this.content_type){ 
                 case "song":
-                    CurrentScreen.UpdateContent('textcontent',this.items[this.pointer.position]);
+                    PresScreen.UpdateContent('textcontent',this.items[this.pointer.position]);
                     break;
                 case "sectiontitle":
                     sitem = this.mysection.current;
-                    CurrentScreen.UpdateContent('sections',this.mysection.PrintSectionName());
-                    CurrentScreen.UpdateContent('sitems',this.mysection.CreateLeftbanner(this.mysection.pointer.position));
+                    PresScreen.UpdateContent('sections',this.mysection.PrintSectionName());
+                    PresScreen.UpdateContent('sitems',this.mysection.CreateLeftbanner(this.mysection.pointer.position));
                     if (sitem.itemtype=='song'){
                         //Consider removing the itemtype prop!
                         //Insert the song's title as a content on the right of the screen
                         //Songs as sectionitems are always of the format:
                         //[sectiiontitle, song]
                         //this is why items[1]
-                        CurrentScreen.UpdateContent('itemtitle',sitem.items[1].titleslide.items[0]);
+                        PresScreen.UpdateContent('itemtitle',sitem.items[1].titleslide.items[0]);
                         //TODO: lyrics by, music by...
                     }
                     break;
                 case "songtitle":
                     //Think about songtitles also as not part of a special sectioned service
-                    CurrentScreen.UpdateContent('textcontent',this.items[this.pointer]);
+                    PresScreen.UpdateContent('textcontent',this.items[this.pointer]);
                     break;
                 default:
-                    CurrentScreen.UpdateContent('textcontent',this.items[this.pointer]);
+                    PresScreen.UpdateContent('textcontent',this.items[this.pointer]);
                     break;
             }
         };
@@ -341,7 +362,7 @@ function SongContent(title, songtexts){
                 //These two loops should probably be combined 
                 domcontents = [];
                 for (verseid in rawcontents){
-                    domcontents[verseid] = presdocument.createElement('p');
+                    domcontents[verseid] = document.createElement('p');
                     domcontents[verseid].className = 'verse';
                     domcontents[verseid].innerText = rawcontents[verseid];
                 }
@@ -367,7 +388,7 @@ function SongTitleContent(title){
     //
     this.id = CreateUid();
     this.content_type="songtitle";
-    el = presdocument.createElement('p');
+    el = document.createElement('p');
     el.className = 'songtitle';
     el.innerText = title;
     this.items = [el];
@@ -438,7 +459,7 @@ function GetSongs(){
 
     var songs = {};
 
-    var songdivs = presdocument.getElementsByClassName("songdata");
+    var songdivs = document.getElementsByClassName("songdata");
     for(var i=0;i<songdivs.length;i++){
         // Add a new songcontent object to the songs container object
         // todo: composer, writer
@@ -449,7 +470,7 @@ function GetSongs(){
     }
 
     //When finished, remove the songdata from the html document!
-    ClearContent(presdocument.getElementById('songs'))
+    ClearContent(document.getElementById('songs'))
     return songs;
 }
 
@@ -465,20 +486,24 @@ function CreateUid(){
     return newuid;
 }
 
-CreateTag = function(tagname, barid){
+CreateTag = function(tagname, barid, thisdocument){
     //These elements are for displaying the structure of the presentation
-    bar = presdocument.createElement(tagname);
+    bar = thisdocument.createElement(tagname);
     bar.id = barid;
     return bar;
 }
 
-function PresScreen(){
-    this.prescont = CreateTag("div", "prescont");
-    this.textcontent = CreateTag("div", "textcontent");
-    this.sections = CreateTag("nav", "sections");
-    this.sitems = CreateTag("nav", "sitems");
-    this.itemtitle = CreateTag("div", "itemtitle");
-    presdocument.body.appendChild(this.prescont);
+
+function Screen(thisdocument){
+    this.prescont = CreateTag("div", "prescont", thisdocument);
+    this.textcontent = CreateTag("div", "textcontent", thisdocument);
+    this.sections = CreateTag("nav", "sections", thisdocument);
+    this.sitems = CreateTag("nav", "sitems", thisdocument);
+    this.itemtitle = CreateTag("div", "itemtitle", thisdocument);
+
+    //For the navigation window
+    this.sectionlinks = CreateTag("div", "sectionlinks", thisdocument);
+    thisdocument.body.appendChild(this.prescont);
 
     this.Refresh = function(){
         //TODO Make this a LOOP!
@@ -569,29 +594,29 @@ function ListToLink(this_li, sectionidx, secitemidx){
     this_li.addEventListener('click',Mover,false);
 }
 
-function OpenPres(){
-    preswindow = window.open('template.html','_blank', 'toolbar=0,location=0,menubar=0');
-    presdocument = preswindow.document;
-    CurrentScreen = new PresScreen();
+function OpenPres(pres){
+    preswindow = window.open('','_blank', 'toolbar=0,location=0,menubar=0');
+    ClearContent(preswindow.document.body);
+    ////TODO:this is the key to make separate screen working!
+    Presentations[0].screen = new Screen(preswindow.document);
 }
+
 
 //========================================
 
 //If a new document opened, these variables take care of it
-var presdocument = document;
 var preswindow = undefined;
 
 var allsongs = GetSongs();
 var Majakka = new MajakkaMessu();
 //Now, remove all used data from html (structure, html)
-ClearContent(presdocument.body);
-var CurrentScreen =  new PresScreen();
+ClearContent(document.body);
+
+var NavScreen =  new Screen(document);
 
 //TODO Get rid of globals!
 var Presentations = [];
 Presentations.push(Majakka);
+Majakka.CreateNavigation();
 
-
-//TODO start using push
-//TODO find out more about prototypes and ids
 //========================================

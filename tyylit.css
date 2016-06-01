@@ -55,6 +55,12 @@ height:100%;
     padding-left: 5px;
 }
 
+#sectionlinks{
+    float:left;
+    margin-right: 12px;
+    padding-left: 5px;
+    color:white;
+}
 
 .songdata{
     display:none;
