@@ -41,9 +41,7 @@ function Presentation(){
             }
             thisobject.Show(this.screen);
             this.GetContentChain();
-            console.log(this.items[0].pointer)
     }
-
 
     this.GetStructure= function (){
         //If there is a predefined structure for the presantation
@@ -600,6 +598,29 @@ function OpenPres(pres){
     ClearContent(preswindow.document.body);
     ////TODO:this is the key to make separate screen working!
     Presentations[0].screen = new Screen(preswindow.document);
+    preswindow.onkeydown = checkKey;
+    document.onkeydown = checkKey;
+}
+
+//========================================
+
+function checkKey(e) {
+    //Kaappaa nuolinäppäimet niin ohjainikkunassa kuin esitysikkunassakin
+    //http://stackoverflow.com/questions/5597060/detecting-arrow-key-presses-in-javascript
+    e = e || window.event;
+
+    if (e.keyCode == '38') {
+        Presentations[Presentations.length-1].Move('decrement');
+    }
+    else if (e.keyCode == '40') {
+        Presentations[Presentations.length-1].Move('increment');
+    }
+    else if (e.keyCode == '37') {
+        Presentations[Presentations.length-1].Move('decrement');
+    }
+    else if (e.keyCode == '39') {
+        Presentations[Presentations.length-1].Move('increment');
+    }
 }
 
 
@@ -619,5 +640,6 @@ var NavScreen =  new Screen(document);
 var Presentations = [];
 Presentations.push(Majakka);
 Majakka.CreateNavigation();
+
 
 //========================================
