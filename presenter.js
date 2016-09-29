@@ -107,12 +107,17 @@ function MajakkaMessu(){
 
     this.CreateNavigation = function(){
         //Create links in the secondary screen for jumping from one section to another
-        NavScreen.Refresh();
+        var mainsec = CreateTag("section","",document, "navsection");
+        //This is where the general navigation between sections is
+        var leftsec = CreateTag("section","section_nav", document, "navchildsec", mainsec);
+        //This is where the upcoming/previous slides will be presented
+        var rightsec = CreateTag("section","previewer", document, "navchildsec", mainsec);
+
         var link = document.createElement('a');
         link.href = '#';
         link.innerText = 'Avaa esitys';
         link.addEventListener('click',OpenPres,false);
-        NavScreen.UpdateContent('textcontent',link);
+
         var sectionlist = document.createElement('ul');
         for (var section_idx in this.items){
             var thissec = this.items[section_idx];
@@ -121,7 +126,9 @@ function MajakkaMessu(){
             ListToLink(this_li, section_idx, 0);
             sectionlist.appendChild(this_li);
         }
-        NavScreen.UpdateContent('sectionlinks',sectionlist);
+        leftsec.appendChild(link);
+        leftsec.appendChild(sectionlist);
+        document.body.appendChild(mainsec);
     };
 }
 
@@ -190,7 +197,6 @@ function Pointer(pointed){
         //this.started = true;
         this.position = 0;
     }
-
 }
 
 function SectionItem(thissection, name, contentobject,itemtype, item_idx){
@@ -289,6 +295,10 @@ function Mover(evt){
     targetcontent.Show(currentpres.screen);
 }
 
+function VerseMover(evt){
+    //TODO: make this a way of jumping from a song's verse to another by clicking thee verrse 
+    //in the navigator window (started 29.9.2016)
+}
 
 function ScreenContent(){
     // Screencontent is the class that contains the actual data to be shown
@@ -311,6 +321,8 @@ function ScreenContent(){
             switch (this.content_type){ 
                 case "song":
                     PresScreen.UpdateContent('textcontent',this.items[this.pointer.position]);
+                    //Set what's seen in the navigator screen
+                    this.UpdatePreview();
                     break;
                 case "sectiontitle":
                     sitem = this.mysection.current;
@@ -336,6 +348,7 @@ function ScreenContent(){
             }
         };
 }
+
 
 
 function SongContent(title, songtexts){
@@ -373,6 +386,24 @@ function SongContent(title, songtexts){
     //in order to reference it by links etc.
     //this is a hash with ids as keys
     all_screencontents.push(this);
+
+    this.UpdatePreview = function(){
+        //If this is a song, update the preview window
+        var prevsec = document.getElementById('previewer');
+        //Remove existing content
+        ClearContent(prevsec);
+        var verselist = CreateTag("div","", document, "");
+        for (var verse_idx in this.items){
+            var thisverse = this.items[verse_idx].cloneNode(true);
+            //ListToLink(this_li, section_idx, 0);
+            //highlight the current:
+            if (verse_idx == this.pointer.position){
+                thisverse.className = 'hlverse';
+            }
+            verselist.appendChild(thisverse);
+        }
+        prevsec.appendChild(verselist);
+    };
 
 }
 SongContent.prototype = new ScreenContent();
@@ -484,10 +515,14 @@ function CreateUid(){
     return newuid;
 }
 
-CreateTag = function(tagname, barid, thisdocument){
+CreateTag = function(tagname, barid, thisdocument, tagclass, parenttag){
     //These elements are for displaying the structure of the presentation
     bar = thisdocument.createElement(tagname);
     bar.id = barid;
+    bar.className = tagclass;
+    if (parenttag !== undefined){
+        parenttag.appendChild(bar);
+    }
     return bar;
 }
 
@@ -634,7 +669,7 @@ var Majakka = new MajakkaMessu();
 //Now, remove all used data from html (structure, html)
 ClearContent(document.body);
 
-var NavScreen =  new Screen(document);
+//var NavScreen =  new Screen(document);
 
 //TODO Get rid of globals!
 var Presentations = [];

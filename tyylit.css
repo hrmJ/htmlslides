@@ -11,6 +11,29 @@ body {
     font-family: 'Merriweather', Georgia, 'Times New Roman', Times, serif;
 }
 
+/* NAVIGATOR */
+
+#section_nav ul{
+    color:white;
+}
+
+#previewer p:not(.hlverse){
+    color:white;
+}
+
+#previewer p{
+    text-align:left;
+}
+
+.navchildsec{
+    float:left;
+    margin-right:2em;
+}
+
+.hlverse{
+    color:yellow;
+}
+
 /*  Verses etc */
 
 .verse{
@@ -19,6 +42,7 @@ body {
 .songtitle{
     color:white;
 }
+
 
 .sectionitemhl, .sectionhl{
     color:yellow;
