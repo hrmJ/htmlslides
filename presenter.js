@@ -298,6 +298,13 @@ function Mover(evt){
 function VerseMover(evt){
     //TODO: make this a way of jumping from a song's verse to another by clicking thee verrse 
     //in the navigator window (started 29.9.2016)
+    var tag = evt.target;
+    var thispres = Presentations[Presentations.length-1];
+    //Find the current song on display
+    thispres.GetContentChain();
+    var thissong = thispres.chain[thispres.chain.length-1];
+    thissong.pointer.position = tag.getAttribute('pointerpos');
+    thissong.Show(thispres.screen);
 }
 
 function ScreenContent(){
@@ -395,6 +402,8 @@ function SongContent(title, songtexts){
         var verselist = CreateTag("div","", document, "");
         for (var verse_idx in this.items){
             var thisverse = this.items[verse_idx].cloneNode(true);
+            thisverse.setAttribute('pointerpos',verse_idx);
+            thisverse.addEventListener('click',VerseMover,false);
             //ListToLink(this_li, section_idx, 0);
             //highlight the current:
             if (verse_idx == this.pointer.position){
