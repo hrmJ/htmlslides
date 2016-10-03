@@ -124,6 +124,16 @@ function MajakkaMessu(){
             var this_li = document.createElement('li');
             this_li.innerText = thissec.name;
             ListToLink(this_li, section_idx, 0);
+            //Now, feed the lower level elements to the tree
+            var subsectionlist = document.createElement('ul');
+            for (var subsection_idx in thissec.items){
+                var thissubsec = thissec.items[subsection_idx];
+                var this_subli = document.createElement('li');
+                this_subli.innerText = thissubsec.name;
+                subsectionlist.appendChild(this_subli);
+                ListToLink(this_subli, section_idx, subsection_idx);
+            }
+            this_li.appendChild(subsectionlist);
             sectionlist.appendChild(this_li);
         }
         leftsec.appendChild(link);
