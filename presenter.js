@@ -130,6 +130,11 @@ function MajakkaMessu(){
                 var thissubsec = thissec.items[subsection_idx];
                 var this_subli = document.createElement('li');
                 this_subli.innerText = thissubsec.name;
+                console.log('mo');
+                if (thissubsec.itemtype == 'song'){
+                    //TODO: get rid of the magic number
+                    this_subli.innerText += ': ' + thissubsec.items[1].titleslide.titletext;
+                }
                 subsectionlist.appendChild(this_subli);
                 ListToLink(this_subli, section_idx, subsection_idx);
             }
@@ -155,6 +160,8 @@ function Pointer(pointed){
     this.position = 0;
     this.Move = function(movetype){
         var returnvalue = false;
+        //Make sure the value is interpreted corretly after jumping from links etc
+        this.position = parseInt(this.position);
         if (movetype == "increment"){
 
             if(this.position +1 < this.max){
@@ -285,7 +292,7 @@ function Mover(evt){
     //TODO make this not specific to majakka presentations
     if (currentpres.showtype == 'majakka'){
                 currentpres.current = currentpres.items[sectiontarget];
-                currentpres.pointer.position = sectiontarget;
+                currentpres.pointer.position = parseInt(sectiontarget);
                 currentpres.pointer.started = true;
                 //TODO some more abstraction to this 
                 for (var section_idx in currentpres.items) {
@@ -334,12 +341,10 @@ function ScreenContent(){
             //2. make shure the item is shown only once
             this.pointer.started = true;
 
-            //type-dependently populating the screen
             switch (this.content_type){ 
                 case "song":
                     PresScreen.UpdateContent('textcontent',this.items[this.pointer.position]);
                     //Set what's seen in the navigator screen
-                    this.UpdatePreview();
                     break;
                 case "sectiontitle":
                     sitem = this.mysection.current;
@@ -363,7 +368,38 @@ function ScreenContent(){
                     PresScreen.UpdateContent('textcontent',this.items[this.pointer]);
                     break;
             }
+            //Add or remove content from te navigator
+            this.UpdatePreview();
         };
+
+
+this.UpdatePreview = function(){
+    var prevsec = document.getElementById('previewer');
+    //Remove existing content
+    ClearContent(prevsec);
+    switch (this.content_type){ 
+        //If this is a song, update the preview window
+        //TODO: add something for other types as well
+        case "song":
+        var verselist = CreateTag("div","", document, "");
+        for (var verse_idx in this.items){
+            var thisverse = this.items[verse_idx].cloneNode(true);
+            thisverse.setAttribute('pointerpos',verse_idx);
+            thisverse.addEventListener('click',VerseMover,false);
+            //ListToLink(this_li, section_idx, 0);
+            //highlight the current:
+            if (verse_idx == this.pointer.position){
+                thisverse.className = 'hlverse';
+            }
+            verselist.appendChild(thisverse);
+        }
+        prevsec.appendChild(verselist);
+        break;
+        default:
+        break;
+    }
+};
+
 }
 
 
@@ -404,25 +440,6 @@ function SongContent(title, songtexts){
     //this is a hash with ids as keys
     all_screencontents.push(this);
 
-    this.UpdatePreview = function(){
-        //If this is a song, update the preview window
-        var prevsec = document.getElementById('previewer');
-        //Remove existing content
-        ClearContent(prevsec);
-        var verselist = CreateTag("div","", document, "");
-        for (var verse_idx in this.items){
-            var thisverse = this.items[verse_idx].cloneNode(true);
-            thisverse.setAttribute('pointerpos',verse_idx);
-            thisverse.addEventListener('click',VerseMover,false);
-            //ListToLink(this_li, section_idx, 0);
-            //highlight the current:
-            if (verse_idx == this.pointer.position){
-                thisverse.className = 'hlverse';
-            }
-            verselist.appendChild(thisverse);
-        }
-        prevsec.appendChild(verselist);
-    };
 
 }
 SongContent.prototype = new ScreenContent();
@@ -439,6 +456,7 @@ function SongTitleContent(title){
     el = document.createElement('p');
     el.className = 'songtitle';
     el.innerText = title;
+    this.titletext = title;
     this.items = [el];
     SetPointers(this, true);
     //finally, add this scrreencontent to the global variable 

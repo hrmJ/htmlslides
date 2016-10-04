@@ -2,7 +2,9 @@ pinnalla
 ========
 
 [ ] Lauluesikatselun piilottaminen
-[ ] navigaattorissa tarkempi navigointi (avautuva puu jossa laulujen nimet mukana?)
+[ ] Lisää hiirellä toimivat eteen/taakse -napit naviin
+    - laulun nimeä uudestaan klikkaamalla laulu käyntiin?
+[X] navigaattorissa tarkempi navigointi (avautuva puu jossa laulujen nimet mukana?)
     (- tai kovempi: navigaattorissa nykyisen esityksen lauluhaku?)
 
 vanhemmat
