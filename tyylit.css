@@ -44,6 +44,18 @@ body {
 }
 
 
+.unlhsection{
+    color:white;
+}
+
+.subsectionnavhl{
+    color:red;
+}
+
+.sectionnavhl{
+    color:yellow;
+}
+
 .sectionitemhl, .sectionhl{
     color:yellow;
 }

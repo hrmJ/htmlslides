@@ -119,18 +119,22 @@ function MajakkaMessu(){
         link.addEventListener('click',OpenPres,false);
 
         var sectionlist = document.createElement('ul');
+        sectionlist.id = "navigator_sectionlist";
         for (var section_idx in this.items){
             var thissec = this.items[section_idx];
             var this_li = document.createElement('li');
             this_li.innerText = thissec.name;
+            //The section_nav_header class helps in highlighting in the navigator
+            sec_classname = "unhlsection";
+            this_li.className = sec_classname;
             ListToLink(this_li, section_idx, 0);
             //Now, feed the lower level elements to the tree
             var subsectionlist = document.createElement('ul');
             for (var subsection_idx in thissec.items){
                 var thissubsec = thissec.items[subsection_idx];
                 var this_subli = document.createElement('li');
+                this_subli.className = sec_classname;
                 this_subli.innerText = thissubsec.name;
-                console.log('mo');
                 if (thissubsec.itemtype == 'song'){
                     //TODO: get rid of the magic number
                     this_subli.innerText += ': ' + thissubsec.items[1].titleslide.titletext;
@@ -375,7 +379,35 @@ function ScreenContent(){
 
 this.UpdatePreview = function(){
     var prevsec = document.getElementById('previewer');
-    //Remove existing content
+    var thispres = Presentations[Presentations.length-1];
+    // Update section highlighters
+    var navsection = document.getElementById('navigator_sectionlist');
+    for (var navel_idx in navsection.children){
+        if (isNumber(navel_idx)){
+            var this_item = navsection.children[navel_idx];
+            var subitems = this_item.children[0].children;
+            this_item.className = "unhlsection";
+            if(this_item.getAttribute("sectionidx")==thispres.current.sec_idx){
+                this_item.className = "sectionnavhl";
+            }
+        }
+        for (var subitem_idx in subitems){
+            //subsection headers
+            if (isNumber(subitem_idx)){
+                var this_subitem = subitems[subitem_idx];
+                this_subitem.className = "unhlsection";
+                if(this_subitem.getAttribute("sectionidx")==thispres.current.sec_idx){
+                    this_subitem.className = "sectionnavhl";
+                    if(this_subitem.getAttribute("secitemidx")==thispres.current.pointer.position){
+                        this_subitem.className = "subsectionnavhl";
+                    }
+                }
+            }
+        }
+    }
+    //thispres.chain
+
+    //Remove existing (verse etc) content
     ClearContent(prevsec);
     switch (this.content_type){ 
         //If this is a song, update the preview window
@@ -695,6 +727,10 @@ function checkKey(e) {
     }
 }
 
+function isNumber(n) {
+// http://stackoverflow.com/questions/9716468/is-there-any-function-like-isnumeric-in-javascript-to-validate-numbers
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
 
 //========================================
 
