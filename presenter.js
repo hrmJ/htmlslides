@@ -598,7 +598,14 @@ CreateTag = function(tagname, barid, thisdocument, tagclass, parenttag){
 
 function Screen(thisdocument){
     this.prescont = CreateTag("div", "prescont", thisdocument);
+    this.navwrapper = CreateTag("section", "navwrapper", thisdocument,"",this.prescont);
+    this.navcontainer = CreateTag("section", "navcontainer", thisdocument,"",this.navwrapper);
     this.textcontent = CreateTag("div", "textcontent", thisdocument);
+    this.heading = CreateTag("nav", "heading", thisdocument);
+    var heading = CreateTag("h2", "", thisdocument, "",this.heading);
+    heading.innerText = "Majakkamessu";
+    var subheading = CreateTag("h3", "", thisdocument, "",this.heading);
+    subheading.innerText = "Isä meidän - meidän isä";
     this.sections = CreateTag("nav", "sections", thisdocument);
     this.sitems = CreateTag("nav", "sitems", thisdocument);
     this.itemtitle = CreateTag("div", "itemtitle", thisdocument);
@@ -610,6 +617,7 @@ function Screen(thisdocument){
     this.Refresh = function(){
         //TODO Make this a LOOP!
         ClearContent(this.prescont);
+        ClearContent(this.navcontainer);
         ClearContent(this.textcontent);
         ClearContent(this.sections);
         ClearContent(this.sitems);
@@ -619,7 +627,16 @@ function Screen(thisdocument){
     this.UpdateContent = function(divname, contentitem){
         //contentitem is a screencontent object
         this[divname].appendChild(contentitem);
-        this.prescont.appendChild(this[divname]);
+        if(divname != "textcontent"){
+            //upadting the navigation
+            this.navwrapper.appendChild(this.heading);
+            this.navcontainer.appendChild(this[divname]);
+            this.navwrapper.appendChild(this.navcontainer);
+            this.prescont.appendChild(this.navwrapper);
+        }
+        else{
+            this.prescont.appendChild(this[divname]);
+        }
     }
 }
 

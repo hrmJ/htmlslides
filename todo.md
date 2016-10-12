@@ -1,7 +1,9 @@
+
 pinnalla
 ========
 
-[ ] Lauluesikatselun piilottaminen
+[ ] ikonit osioitten eteen?
+[X] Lauluesikatselun piilottaminen
 [ ] Lisää hiirellä toimivat eteen/taakse -napit naviin
     - laulun nimeä uudestaan klikkaamalla laulu käyntiin?
 [X] navigaattorissa tarkempi navigointi (avautuva puu jossa laulujen nimet mukana?)
