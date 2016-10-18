@@ -42,6 +42,11 @@ body {
 }
 .songtitle{
     color:white;
+    font-family: fantasy;
+    font-size: 150%;
+    background: -webkit-linear-gradient(#eee, rgb(217, 247, 128));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 
@@ -61,33 +66,49 @@ body {
 /*  The actual contents */
 
 #heading{
-    clear:left;
+    /* clear:left; */
     /*background: url('images/otsikko.png')  no-repeat;*/
+    /* position: absolute; */
+    /* left: -50%; */
+    text-align: center;
 }
 
 #heading h3{
     color: rgba(228, 221, 117, 0.87);
     font-size: 130%;
     margin-bottom:2em;
+    margin-top: -2em;
     position:relative;
-    left: -22%;
+    /* display: inline-block; */
+    left: -50%;
+    /* font-style: italic; */
 }
 
 #heading h2{
     color:white;
     font-size: 300%;
+    /* font-family: arial, sans-serif; */
     /* margin-bottom:2em; */
-    position:relative;
-    left: -31%;
+    /* display: none; */
+    position: relative;
+    left: -50%;
+    /* top: 2em; */
+    /* font-style: italic; */
 }
 
 #prescont{
-    /* width:100%; */
-    height:100%;
+    width: 100%;
+    height: 90%;
     background-size: contain;
     position: relative;
-    background: url('images/lh_2.png')  no-repeat;
+    /* background: url('images/lh_2.png')  no-repeat; */
     /* http://st.gde-fon.com/wallpapers_original/574104_ostrova_more_noch_mayak_2048x1360_www.Gde-Fon.com.jpg*/
+    /* background: black; */
+/* Safari 4-5, Chrome 1-9 */
+    background: -webkit-gradient(radial, 80% 20%, 0, 80% 40%, 100, from(#1a82f7), to(#2F2727));    /* Safari 5.1+, Chrome 10+ */
+    background: -webkit-radial-gradient(-200% 20%, closest-corner, #f9ff9c, #000000);    /* Firefox 3.6+ */
+    background: -moz-radial-gradient(80% 20%, closest-corner, #1a82f7, #2F2727);    /* IE 10 */
+    background: -ms-radial-gradient(80% 20%, closest-corner, #1a82f7, #2F2727);
 }
 
 #prescont #navwrapper{
@@ -96,6 +117,7 @@ body {
     margin-top: 5%;
     /* display: -webkit-flex; */
     /* display: flex; */
+    /* flex-direction: row; */
 }
 
 #prescont #navwrapper #navcontainer{
@@ -133,16 +155,17 @@ body {
 #sections li {
     margin-top: 1em;
     padding: 1em;
+    border-radius: 12px;
     /* display: inline; */
 }
 
 #sections li {
-    background: rgba(255, 229, 229, 0.49);
-    color: #adacac;
+    color: rgba(128, 113, 113, 0.51);
 }
 
 #sections li.sectionhl {
     background: #353567;
+    background: linear-gradient(to bottom, rgb(39, 39, 89), rgba(0, 0, 0, 0));
     color: white;
 }
 
@@ -152,13 +175,17 @@ body {
     /* float: left; */
     /* margin-top: 20em; */
     /* border-right: 1px dashed yellow; */
+    border-radius: 12px;
     color: #ffffff;
-    background: rgba(53, 53, 103, 0.82);
-    padding-right:12px;
-    /* padding-left: 1px; */
+    /* background: rgba(53, 53, 103, 0.82); */
+    background: linear-gradient(to bottom, rgba(40, 52, 146, 0.55), rgba(64, 60, 72, 0.13));
+    padding-right: 22px;
+    padding-left: 22px;
     /* margin-right: 5em; */
     margin-left: 3em;
     font-size: 120%;
+    height: 20%;
+    /* box-shadow: 0px -2px 2px rgba(34,34,34,0.6); */
 }
 
 
