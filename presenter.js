@@ -635,11 +635,7 @@ function Screen(thisdocument){
             this.prescont.appendChild(this.navwrapper);
         }
         else{
-            ClearContent(this.navcontainer);
-            ClearContent(this.navwrapper);
-            this.navwrapper.appendChild(this.navcontainer);
-            this.navcontainer.appendChild(this[divname]);
-            this.prescont.appendChild(this.navwrapper);
+            this.prescont.appendChild(this[divname]);
         }
     }
 }
