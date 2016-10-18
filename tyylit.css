@@ -39,14 +39,15 @@ body {
 #textcontent .verse{
     text-align:center;
     font-size: 300%;
+    font-family: sans-serif;
 }
 .songtitle{
     color:white;
     font-family: fantasy;
     font-size: 150%;
-    background: -webkit-linear-gradient(#eee, rgb(217, 247, 128));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    /* background: -webkit-linear-gradient(#eee, rgb(217, 247, 128)); */
+    /* -webkit-background-clip: text; */
+    /* -webkit-text-fill-color: transparent; */
 }
 
 
@@ -99,10 +100,12 @@ body {
 #prescont{
     width:100%;
     height: 90%;
-    background-size: contain;
+    background-size: cover;
+    /* background-size: 100% 100%; */
     position: relative;
-    background: url('images/lh_2.png')  no-repeat;
+    background: url('images/lh_2.png') no-repeat center center fixed;
     /* http://st.gde-fon.com/wallpapers_original/574104_ostrova_more_noch_mayak_2048x1360_www.Gde-Fon.com.jpg*/
+    /* background-image: url(images/lh2.png), linear-gradient(rgba(235, 1, 165, 0), #717171); */ /* W3C */
 }
 
 #prescont #navwrapper{
@@ -118,8 +121,8 @@ body {
     position: relative;
     left: -50%;
     display: -webkit-flex;
-    display: flex;
-    -webkit-flex-direction: row;
+    /* display: flex; */
+    /* -webkit-flex-direction: row; */
     flex-direction: row;
 }
 
@@ -203,6 +206,7 @@ nav#sitems li {
 
 #textcontent{
     color:white;
+    /* overflow: hidden; */
 }
 
 #itemtitle{
