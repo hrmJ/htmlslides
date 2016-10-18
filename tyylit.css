@@ -97,18 +97,12 @@ body {
 }
 
 #prescont{
-    width: 100%;
+    width:100%;
     height: 90%;
     background-size: contain;
     position: relative;
-    /* background: url('images/lh_2.png')  no-repeat; */
+    background: url('images/lh_2.png')  no-repeat;
     /* http://st.gde-fon.com/wallpapers_original/574104_ostrova_more_noch_mayak_2048x1360_www.Gde-Fon.com.jpg*/
-    /* background: black; */
-/* Safari 4-5, Chrome 1-9 */
-    background: -webkit-gradient(radial, 80% 20%, 0, 80% 40%, 100, from(#1a82f7), to(#2F2727));    /* Safari 5.1+, Chrome 10+ */
-    background: -webkit-radial-gradient(-200% 20%, closest-corner, #f9ff9c, #000000);    /* Firefox 3.6+ */
-    background: -moz-radial-gradient(80% 20%, closest-corner, #1a82f7, #2F2727);    /* IE 10 */
-    background: -ms-radial-gradient(80% 20%, closest-corner, #1a82f7, #2F2727);
 }
 
 #prescont #navwrapper{
