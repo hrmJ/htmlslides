@@ -6,6 +6,7 @@ Yleistä
 ----------
 
 - [ ] Täysi majakkarakenne ylistyslauluineen ja infodioineen
+- [ ] Raamattuintegrointi: https://github.com/zefanja/swordjs
 
 
 Navigaattori
