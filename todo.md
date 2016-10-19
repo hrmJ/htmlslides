@@ -15,6 +15,7 @@ Navigaattori
 - [ ] Navigaattoriin mahdollisuus syöttää yksittäinen dia esityksen ulkopuolista infoa/tekstiä
 - [ ] Navigaattoriin mahdollisuus syöttää  esityksen ulkopuolisia lauluja
 - [ ] Navigointiosuuden rinnalle "Muokkaa sisältöä" -osuus, jossa sanojen ja vastuunkantajien ym. muokkaaminen onnistuu
+- [ ] Laita pelkkä otsikko näkyviin / Laita tyhjä=musta tausta näkyviin
 - [ ] Lisää hiirellä toimivat eteen/taakse -napit naviin
     - laulun nimeä uudestaan klikkaamalla laulu käyntiin?
 - [X] Lauluesikatselun piilottaminen
