@@ -58,7 +58,12 @@ function Presentation(){
                     // If the type of content was a song, add it to the
                     // presentation from the allsongs global variable
 
-                    //first, make a song object from it
+                    // First, create an array if this is the first song if its type
+                    if (!this.songs.hasOwnProperty(role)){
+                        this.songs[role] = [];
+                    }
+
+                    //then, make a song object from it
                     var songdata = allsongs[structure.childNodes[i].innerText.toLowerCase()];
 
                     var song = new SongContent(songdata.title, songdata.content);
@@ -67,7 +72,7 @@ function Presentation(){
                     //Then, add the actual song
                     this.contents[this.contents.length] = song;
                     //Add the song also to a structured list
-                    this.songs[role] = song;
+                    this.songs[role].push(song);
                 }
                 else{
                     this.contents[this.contents.length] = structure.childNodes[i];
@@ -86,15 +91,28 @@ function MajakkaMessu(){
     this.GetStructure();
     this.showtype = "majakka";
     //TODO: make creating these sections simpler
-    this.items = [new Section(this, 'Johdanto', [['Alkulaulu',this.songs['Alkulaulu'],'song'],
-                                              ['Alkusanat ja seurakuntalaisen sana',false,'header']]),
-                  new Section(this, 'Sana',     [['Päivän laulu',this.songs['Päivän laulu'],'song'],
-                                              ['Saarna',false,'header'],
-                                              ['Synnintunnustus',false,'header'],
-                                              ['Uskontunnustus',false,'header']]),
-                  new Section(this, 'Ehtoollinen',     [['Kolehtipuhe',false,'header'],
-                                              ['Ehtoollisrukous',false,'header'],
-                                              ['Isä meidän',false,'header']])
+    //1. Collect all worship songs and make them into a section
+    var worshipsongs = MultiSong(this.songs,"Ylistys- ja rukouslauluja", "Ylistyslaulu ");
+    worshipsongs.push(['Esirukous',false,'header']);
+    var communionsongs = MultiSong(this.songs,"Ehtoollislauluja", "Ehtoollislaulu ");
+
+    //2. Combine all the sections
+    this.items = [new Section(this, 'Johdanto',           [['Alkulaulu',this.songs['Alkulaulu'][0],'song'],
+                                                          ['Alkusanat ja seurakuntalaisen sana',false,'header']]),
+                  new Section(this, 'Sana',               [['Päivän laulu',this.songs['Päivän laulu'][0],'song'],
+                                                          ['Saarna',false,'header'],
+                                                          ['Synnintunnustus',false,'header'],
+                                                          ['Uskontunnustus',false,'header']]),
+                  new Section(this, 'Ylistys ja rukous', worshipsongs),
+                  new Section(this, 'Ehtoollisen asetus', [['Pyhä',this.songs['Pyhä-hymni'][0],'song'], 
+                                                          ['Ehtoollisrukous',false,'header'],
+                                                          ['Isä meidän',false,'header'],
+                                                          ['Jumalan karitsa',this.songs['Jumalan karitsa'][0],'song']]),
+                  new Section(this, 'Ehtoollisen vietto',   communionsongs),
+                  new Section(this, 'Siunaus ja lähettäminen',  [['Herran siunaus',false,'heading'],
+                                                         ['Loppusanat',false,'heading'],
+                                                         ['Loppulaulu',this.songs['Loppulaulu'][0],'song']
+                                                          ])
                     ];
                       //TODO ^^ liittyen ehkä mieti, että näkyviin tulisi sanailijan nimi siihen,
                       //missä tavallisesti laulun nimi. Muista myös ajatella laulun tekijänoikeuksia.
@@ -154,6 +172,16 @@ function MajakkaMessu(){
 MajakkaMessu.prototype = new Presentation();
 MajakkaMessu.prototype.constructor = MajakkaMessu;
 
+function MultiSong(songlist, songrole, header){
+    songs = [];
+    var wscounter = 1;
+    for(var songidx in songlist[songrole]){
+        var wsong = songlist[songrole][songidx];
+        songs.push([header + wscounter, wsong, 'song']);
+        wscounter++;
+    }
+    return songs
+}
 
 function Pointer(pointed){
     //Pointers keep track of a set of contents in order to show them on the screen 
