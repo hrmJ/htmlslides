@@ -699,6 +699,8 @@ function AdjustPointersFromSectionDown(thissection, updatetype, targetitem){
         }
         else if (targetitem && sitem_idx == targetitem){
             //navigate to the first showable content of the desired sectionitem
+            updatetype = 'min';
+            //^^ 'min' here means that when moving to an item ALWAYS assume it will be started FROM THE BEGINNING
             UpdatePointers(thissectionitem, updatetype);
             thissection.current = thissectionitem;
             thissection.pointer.position = targetitem;
