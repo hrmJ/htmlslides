@@ -166,6 +166,7 @@ function MajakkaMessu(){
         leftsec.appendChild(link);
         leftsec.appendChild(sectionlist);
         document.body.appendChild(mainsec);
+        document.body.style.overflow="auto";
     };
 }
 
@@ -289,16 +290,25 @@ function Section(mypresentation, name, items, sec_idx){
         //Print a list of section names and highlight the current one
         //TODO: COmbine this and Create left banner
         var sectionbanner = document.createElement('ul');
+        //How many preceding / upcoming sections will be shown in the list
+        var sectionbuffer = 1;
         for(var section_idx in this.mypresentation.items){
-            var sec = this.mypresentation.items[section_idx];
-            var this_li = document.createElement('li');
-            this_li.innerText = sec.name;
-            ListToLink(this_li, section_idx, 0);
-
-            if (section_idx == this.mypresentation.pointer.position){
-                this_li.className = "sectionhl";
+            highlighted = this.mypresentation.pointer.position;
+            if (highlighted == 0 || highlighted == this.mypresentation.items.length){
+                //set minimum visible headings to 3
+                sectionbuffer = 2;
             }
-            sectionbanner.appendChild(this_li);
+            if((section_idx>=highlighted-sectionbuffer && section_idx<=highlighted+sectionbuffer) || section_idx == highlighted){
+                var sec = this.mypresentation.items[section_idx];
+                var this_li = document.createElement('li');
+                this_li.innerText = sec.name;
+                ListToLink(this_li, section_idx, 0);
+
+                if (section_idx == this.mypresentation.pointer.position){
+                    this_li.className = "sectionhl";
+                }
+                sectionbanner.appendChild(this_li);
+            }
         }
         return sectionbanner;
     };
@@ -402,6 +412,9 @@ function ScreenContent(){
             }
             //Add or remove content from te navigator
             this.UpdatePreview();
+            //Adjust the Section headings to the center
+            //AdjustHeadings(PresScreen);
+
         };
 
 
@@ -458,10 +471,31 @@ this.UpdatePreview = function(){
         default:
         break;
     }
+    document.body.style.overflow="auto";
 };
 
 }
 
+function AdjustHeadings(screen){
+    //Get seciton item list position and height
+    var sitemspos = PosFromTop(screen.sitems);
+    //var sectionspos = PosFromTop(screen.sections);
+    //var wrapperheight = screen.navwrapper.offsetHeight;
+    //Get current sectiontitle position and height
+    var hlheading = screen.doc.getElementsByClassName('sectionhl')[0];
+    var hlheadingpos = PosFromTop(hlheading);
+    //Calculate: if too low, raise the active section heading
+    distancetotop = hlheadingpos - sitemspos;
+    if(distancetotop > 2*hlheading.offsetHeight){
+        screen.sections.style.marginTop = "-" + (distancetotop) + "px";
+    }
+    else{
+        //screen.sections.style.marginTop = "0px";
+    }
+    //Set the maximum size for the heading list
+    screen.sections.style.height = hlheading.offsetHeight*4;
+
+}
 
 
 function SongContent(title, songtexts){
@@ -637,6 +671,7 @@ function Screen(thisdocument){
     this.sections = CreateTag("nav", "sections", thisdocument);
     this.sitems = CreateTag("nav", "sitems", thisdocument);
     this.itemtitle = CreateTag("div", "itemtitle", thisdocument);
+    this.doc = thisdocument;
 
     //For the navigation window
     this.sectionlinks = CreateTag("div", "sectionlinks", thisdocument);
@@ -661,6 +696,7 @@ function Screen(thisdocument){
             this.navcontainer.appendChild(this[divname]);
             this.navwrapper.appendChild(this.navcontainer);
             this.prescont.appendChild(this.navwrapper);
+            this.doc.getElementById('navwrapper').style.width = 0.7*this.prescont.offsetWidth + "px";
         }
         else{
             this.prescont.appendChild(this[divname]);
@@ -777,6 +813,11 @@ function checkKey(e) {
 function isNumber(n) {
 // http://stackoverflow.com/questions/9716468/is-there-any-function-like-isnumeric-in-javascript-to-validate-numbers
   return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
+function PosFromTop(el){
+    var rect = el.getBoundingClientRect();
+    return rect.top;
 }
 
 //========================================

@@ -9,6 +9,7 @@ body {
     /* font-size: 200%; */
     line-height:1.5;
     font-family: 'Merriweather', Georgia, 'Times New Roman', Times, serif;
+    overflow:hidden;
 }
 
 /* NAVIGATOR */
@@ -41,7 +42,7 @@ body {
     font-size: 300%;
     font-family: sans-serif;
     /* margin-top: 9em; */
-    padding-top: 2em;
+    margin-top: 0.1em;
 }
 .songtitle{
     color:white;
@@ -108,12 +109,13 @@ body {
     background: url('images/lh_2.png') no-repeat center center fixed;
     /* http://st.gde-fon.com/wallpapers_original/574104_ostrova_more_noch_mayak_2048x1360_www.Gde-Fon.com.jpg*/
     /* background-image: url(images/lh2.png), linear-gradient(rgba(235, 1, 165, 0), #717171); */ /* W3C */
+    overflow:hidden;
 }
 
 #prescont #navwrapper{
     position: absolute;
     left: 50%;
-    margin-top: 5%;
+    /*margin-top: 5%;*/
     /* display: -webkit-flex; */
     /* display: flex; */
     /* flex-direction: row; */
@@ -127,6 +129,7 @@ body {
     /* -webkit-flex-direction: row; */
     flex-direction: row;
 }
+
 
 #sections{
     /* margin-left: 30em; */
