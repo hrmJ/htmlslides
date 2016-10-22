@@ -335,7 +335,7 @@ function Mover(evt){
                     else if (section_idx == sectiontarget){
                         var targetcontent = AdjustPointersFromSectionDown(thissection, 'min', secitemtarget);
                     }
-                    else if (section_idx == sectiontarget){
+                    else if (section_idx > sectiontarget){
                         AdjustPointersFromSectionDown(thissection, 'min', undefined);
                     }
                 }
