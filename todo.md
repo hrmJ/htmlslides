@@ -6,6 +6,7 @@ Yleistä
 ----------
 
 - [ ] Täysi majakkarakenne ylistyslauluineen ja infodioineen
+    NYT oleellisin: Messun otsikko fiksusti Majakka-olion attribuutiksi
 - [ ] Raamattuintegrointi: https://github.com/zefanja/swordjs
 
 

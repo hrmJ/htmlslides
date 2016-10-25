@@ -95,10 +95,13 @@ function MajakkaMessu(){
     var worshipsongs = MultiSong(this.songs,"Ylistys- ja rukouslauluja", "Ylistyslaulu ");
     worshipsongs.push(['Esirukous',false,'header']);
     var communionsongs = MultiSong(this.songs,"Ehtoollislauluja", "Ehtoollislaulu ");
+    var info1 = new InfoContent('blaablaablabla');
 
     //2. Combine all the sections
     this.items = [new Section(this, 'Johdanto',           [['Alkulaulu',this.songs['Alkulaulu'][0],'song'],
-                                                          ['Alkusanat ja seurakuntalaisen sana',false,'header']]),
+                                                          ['Alkusanat ja seurakuntalaisen sana',false,'header'],
+                                                          ['Pyhisinfo',info1,'info']
+                                                          ]),
                   new Section(this, 'Sana',               [['Päivän laulu',this.songs['Päivän laulu'][0],'song'],
                                                           ['Saarna',false,'header'],
                                                           ['Synnintunnustus',false,'header'],
@@ -252,11 +255,16 @@ function Pointer(pointed){
 function SectionItem(thissection, name, contentobject,itemtype, item_idx){
     this.name = name;
     this.itemtype = itemtype;
-    this.items = [new SectionTitleContent(thissection, item_idx)];
-    if (contentobject){
-        //If this object has subcontent
-        this.items.push(contentobject);
-        thissection.mypresentation.flatsructure.push(contentobject);
+    if(itemtype == 'info'){
+        this.items = [contentobject];
+    }
+    else{
+        this.items = [new SectionTitleContent(thissection, item_idx)];
+        if (contentobject){
+            //If this object has subcontent
+            this.items.push(contentobject);
+            thissection.mypresentation.flatsructure.push(contentobject);
+        }
     }
     
     SetPointers(this, true);
@@ -275,13 +283,16 @@ function Section(mypresentation, name, items, sec_idx){
         var leftbanner = document.createElement('ul');
         for(var i in this.items){
             thisitem = this.items[i];
-            var this_li = document.createElement('li');
-            this_li.innerText = thisitem.name;
-            ListToLink(this_li, this.sec_idx, i);
-            if (i==highlighted){
-                this_li.className = "sectionitemhl";
+            if (['info'].indexOf(thisitem.itemtype)==-1){ 
+                //If the object won't be added to the list of section items shown on the main screen
+                var this_li = document.createElement('li');
+                this_li.innerText = thisitem.name;
+                ListToLink(this_li, this.sec_idx, i);
+                if (i==highlighted){
+                    this_li.className = "sectionitemhl";
+                }
+                leftbanner.appendChild(this_li);
             }
-            leftbanner.appendChild(this_li);
         }
         return leftbanner;
     };
@@ -317,7 +328,7 @@ function Section(mypresentation, name, items, sec_idx){
     this.items = [];
     for (var section_item_idx in items){
         this_sectionitem = items[section_item_idx];
-        this.items[this.items.length] = new SectionItem(this, this_sectionitem[0],this_sectionitem[1],this_sectionitem[2],section_item_idx);
+        this.items.push(new SectionItem(this, this_sectionitem[0],this_sectionitem[1],this_sectionitem[2],section_item_idx));
     }
     SetPointers(this, true);
 }
@@ -402,12 +413,12 @@ function ScreenContent(){
                         //TODO: lyrics by, music by...
                     }
                     break;
-                case "songtitle":
+                case "info":
                     //Think about songtitles also as not part of a special sectioned service
-                    PresScreen.UpdateContent('textcontent',this.items[this.pointer]);
+                    PresScreen.UpdateContent('textcontent',this.items[this.pointer.position]);
                     break;
                 default:
-                    PresScreen.UpdateContent('textcontent',this.items[this.pointer]);
+                    PresScreen.UpdateContent('textcontent',this.items[this.pointer.position]);
                     break;
             }
             //Add or remove content from te navigator
@@ -587,14 +598,23 @@ function BibleContent(){
     all_screencontents.push(this);
 }
 
-function InfoContent(){
+
+function InfoContent(infotext){
     this.id = CreateUid();
+    this.content_type="info";
+    el = document.createElement('p');
+    //el.className = 'songtitle';
+    el.innerText = infotext;
+    this.titletext = infotext;
+    this.items = [el];
+    SetPointers(this, false);
     //finally, add this scrreencontent to the global variable 
     //in order to reference it by links etc.
     //this is a hash with ids as keys
     all_screencontents.push(this);
 }
-
+InfoContent.prototype = new ScreenContent();
+InfoContent.prototype.constructor = InfoContent;
 
 //========================================
 //
