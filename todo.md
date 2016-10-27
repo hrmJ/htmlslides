@@ -5,8 +5,8 @@ pinnalla
 Yleistä
 ----------
 
-- [ ] Täysi majakkarakenne ylistyslauluineen ja infodioineen
-    NYT oleellisin: Messun otsikko fiksusti Majakka-olion attribuutiksi
+- [ ] Isä meidän ja uskontunnustus
+- [x] Täysi majakkarakenne ylistyslauluineen ja infodioineen
 - [ ] Raamattuintegrointi: https://github.com/zefanja/swordjs
 
 
@@ -37,4 +37,3 @@ vanhemmat
     - Tai mahdollisesti tiedostonimi id:nä
 - [ ] Katso, mikä häikkä Jumalan karitsassa 
     - Tee GetSongs-funkiosta case-insensitive
-- [ ] Laulujen otsikot + roolit printattuna ennen itse laulun näyttämisen alkamista

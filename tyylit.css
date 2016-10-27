@@ -59,7 +59,7 @@ body {
 }
 
 .subsectionnavhl{
-    color:red;
+    color:#0DFF28;
 }
 
 .sectionnavhl{
@@ -151,6 +151,33 @@ body {
     /* display: inline; */
 }
 
+/*INFO*/
+
+#infobox{
+    margin-top:3em;
+}
+
+.infoheader{
+    color: #E1E17A;
+    font-size: 150%;
+}
+
+.infolist li{
+    margin-top:1.5em;
+}
+
+.infocontent{
+    background: #353567;
+    background: linear-gradient(to bottom, rgb(39, 39, 89), rgba(0, 0, 0, 0));
+    color: white;
+    padding-top:1em;
+    padding-bottom:3em;
+    padding-left:3em;
+    padding-right:3em;
+    font-size:151%;
+    border-radius:12px;
+    font-family: monospace;
+}
 
 /* OSIO-otsikot  */
 

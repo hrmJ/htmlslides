@@ -90,12 +90,19 @@ function MajakkaMessu(){
     //These inherit from the general presentation class
     this.GetStructure();
     this.showtype = "majakka";
+    //TODO: import this from structure html
+    this.title = "Isä meidän - meidän isä";
     //TODO: make creating these sections simpler
     //1. Collect all worship songs and make them into a section
-    var worshipsongs = MultiSong(this.songs,"Ylistys- ja rukouslauluja", "Ylistyslaulu ");
-    worshipsongs.push(['Esirukous',false,'header']);
     var communionsongs = MultiSong(this.songs,"Ehtoollislauluja", "Ehtoollislaulu ");
-    var info1 = new InfoContent('blaablaablabla');
+    var info1 = new InfoContent('Lapsille ja lapsiperheille', ['Päivän laulun aikana 3-6-vuotiaat lapset voivat siirtyä pyhikseen ja yli 6-vuotiaat klubiin.', 'Seuraa vetäjiä - tunnistat heidät lyhdyistä!']);
+    var ehtoollisinfo  = new InfoContent('Ehtoolliskäytännöistä', ['Voit tulla ehtoolliselle jo Jumalan karitsa -hymnin aikana', 'Halutessasi voit jättää kolehdin ehtoolliselle tullessasi oikealla olevaan koriin.']);
+
+    //TODO: Hae esirukoilijatieto autom.
+    var wsinfo  = new InfoContent('Ylistys- ja rukousosio', ['Ylistys- ja rukouslaulujen aikana voit kirjoittaa omia  rukousaiheitasi ja hiljentyä sivualttarin luona.', 'Rukouspalvelu hiljaisessa huoneessa.']);
+
+    var worshipsongs = MultiSong(this.songs,"Ylistys- ja rukouslauluja", "Ylistyslaulu ", ['rukousinfo', wsinfo, 'info']);
+    worshipsongs.push(['Esirukous',false,'header']);
 
     //2. Combine all the sections
     this.items = [new Section(this, 'Johdanto',           [['Alkulaulu',this.songs['Alkulaulu'][0],'song'],
@@ -110,6 +117,7 @@ function MajakkaMessu(){
                   new Section(this, 'Ehtoollisen asetus', [['Pyhä',this.songs['Pyhä-hymni'][0],'song'], 
                                                           ['Ehtoollisrukous',false,'header'],
                                                           ['Isä meidän',false,'header'],
+                                                          ['Ehtoollisinfo', ehtoollisinfo, 'info'],
                                                           ['Jumalan karitsa',this.songs['Jumalan karitsa'][0],'song']]),
                   new Section(this, 'Ehtoollisen vietto',   communionsongs),
                   new Section(this, 'Siunaus ja lähettäminen',  [['Herran siunaus',false,'heading'],
@@ -176,12 +184,18 @@ function MajakkaMessu(){
 MajakkaMessu.prototype = new Presentation();
 MajakkaMessu.prototype.constructor = MajakkaMessu;
 
-function MultiSong(songlist, songrole, header){
+function MultiSong(songlist, songrole, header, constantinfo){
     songs = [];
     var wscounter = 1;
     for(var songidx in songlist[songrole]){
         var wsong = songlist[songrole][songidx];
         songs.push([header + wscounter, wsong, 'song']);
+        if(constantinfo!==undefined){
+            if (songidx < songlist[songrole].length -1 ){
+                //Don't add the info after the last song
+                songs.push(constantinfo);
+            }
+        }
         wscounter++;
     }
     return songs
@@ -415,7 +429,7 @@ function ScreenContent(){
                     break;
                 case "info":
                     //Think about songtitles also as not part of a special sectioned service
-                    PresScreen.UpdateContent('textcontent',this.items[this.pointer.position]);
+                    PresScreen.UpdateContent('infobox',this.items[this.pointer.position]);
                     break;
                 default:
                     PresScreen.UpdateContent('textcontent',this.items[this.pointer.position]);
@@ -599,14 +613,35 @@ function BibleContent(){
 }
 
 
-function InfoContent(infotext){
+function InfoContent(headertext, infotext){
     this.id = CreateUid();
     this.content_type="info";
-    el = document.createElement('p');
-    //el.className = 'songtitle';
-    el.innerText = infotext;
+
+    var div = document.createElement('div');
+    var header = document.createElement('h3');
+
+    if(infotext.constructor === Array){
+        //From arrays: build lists
+        var body = document.createElement('ul');
+        body.className = "infolist";
+        for (var info_id in infotext){
+            var this_li = document.createElement('li');
+            this_li.innerText = infotext[info_id];
+            body.appendChild(this_li);
+        }
+    }
+    else{
+        var body = document.createElement('p');
+        body.innerText = infotext;
+    }
+
+    header.className = 'infoheader';
+    header.innerText = headertext;
+    div.className = 'infocontent';
+    div.appendChild(header);
+    div.appendChild(body);
     this.titletext = infotext;
-    this.items = [el];
+    this.items = [div];
     SetPointers(this, false);
     //finally, add this scrreencontent to the global variable 
     //in order to reference it by links etc.
@@ -684,10 +719,12 @@ function Screen(thisdocument){
     this.navcontainer = CreateTag("section", "navcontainer", thisdocument,"",this.navwrapper);
     this.textcontent = CreateTag("div", "textcontent", thisdocument);
     this.heading = CreateTag("nav", "heading", thisdocument);
+    this.infobox = CreateTag("div", "infobox", thisdocument);
     var heading = CreateTag("h2", "", thisdocument, "",this.heading);
+    //TODO: Avoid the global variable!
     heading.innerText = "Majakkamessu";
     var subheading = CreateTag("h3", "", thisdocument, "",this.heading);
-    subheading.innerText = "Isä meidän - meidän isä";
+    subheading.innerText = Presentations[0].title;
     this.sections = CreateTag("nav", "sections", thisdocument);
     this.sitems = CreateTag("nav", "sitems", thisdocument);
     this.itemtitle = CreateTag("div", "itemtitle", thisdocument);
@@ -701,10 +738,12 @@ function Screen(thisdocument){
         //TODO Make this a LOOP!
         ClearContent(this.prescont);
         ClearContent(this.navcontainer);
+        ClearContent(this.navwrapper);
         ClearContent(this.textcontent);
         ClearContent(this.sections);
         ClearContent(this.sitems);
         ClearContent(this.itemtitle);
+        ClearContent(this.infobox);
     };
 
     this.UpdateContent = function(divname, contentitem){
@@ -712,7 +751,16 @@ function Screen(thisdocument){
         this[divname].appendChild(contentitem);
         if(divname != "textcontent"){
             //upadting the navigation
-            this.navwrapper.appendChild(this.heading);
+            if (divname == 'infobox'){
+                this.navcontainer.style.justifyContent = "center";
+                this.navcontainer.style.alignItems = "center";
+            }
+            else{
+                //Only add the header for non-info stuff
+                this.navcontainer.style.justifyContent = "flex-start";
+                this.navcontainer.style.alignItems = "initial";
+                this.navwrapper.appendChild(this.heading);
+            }
             this.navcontainer.appendChild(this[divname]);
             this.navwrapper.appendChild(this.navcontainer);
             this.prescont.appendChild(this.navwrapper);
