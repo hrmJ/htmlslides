@@ -66,7 +66,13 @@ function Presentation(){
                     //then, make a song object from it
                     var songdata = allsongs[structure.childNodes[i].innerText.toLowerCase()];
 
-                    var song = new SongContent(songdata.title, songdata.content);
+                    //Special attributes:
+                    if (['Jumalan karitsa','Pyhä-hymni'].indexOf(role)>-1){ 
+                        var song = new SongContent('', songdata.content);
+                    }
+                    else{
+                        var song = new SongContent(songdata.title, songdata.content);
+                    }
                     //First, add the title of the song to presentation as a separate item
                     this.contents.push(song.titleslide);
                     //Then, add the actual song
