@@ -5,7 +5,8 @@ pinnalla
 Yleistä
 ----------
 
-- [ ] Isä meidän ja uskontunnustus
+- [ ] Evankeliumi
+- [x] Isä meidän ja uskontunnustus
 - [x] Täysi majakkarakenne ylistyslauluineen ja infodioineen
 - [ ] Raamattuintegrointi: https://github.com/zefanja/swordjs
 
@@ -13,6 +14,7 @@ Yleistä
 Navigaattori
 ----------------
 
+- [ ] Fontin zoomaus (body{font-size:110% jne})
 - [ ] Navigaattoriin mahdollisuus syöttää yksittäinen dia esityksen ulkopuolista infoa/tekstiä
 - [ ] Navigaattoriin mahdollisuus syöttää  esityksen ulkopuolisia lauluja
 - [ ] Navigointiosuuden rinnalle "Muokkaa sisältöä" -osuus, jossa sanojen ja vastuunkantajien ym. muokkaaminen onnistuu

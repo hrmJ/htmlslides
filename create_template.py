@@ -1,8 +1,47 @@
 import glob
 import re
+import sys
 import menus
 from difflib import SequenceMatcher
 
+#THIS is a temporary solution: will be replaced by e.g. swordjs
+#this temporary solution needs separate installation of pysword
+#AND a working sword module installation on the script-running machine
+import pysword
+
+class BibleText:
+
+    def __init__(self, book, chapter, verse, finaddress=''):
+        self.address = input('kirjan nimi *' + book + '* suomeksi?\n>') + chapter + ': ' + verse
+        self.GetBibleText(book,chapter,verse)
+
+    def GetBibleText(self, book, chapter, verse):
+        """Get bible text from a sword module using the pysword library (https://github.com/kcarnold/pysword)"""
+        try:
+            module = pysword.ZModule('finpr92')
+        except:
+            sys.exit('Please set the path of the sword module in pysword.py')
+        text = ''
+        if '-' in verse:
+            verses = verse.split('-')
+            start = int(verses[0])
+            end = int(verses[1])
+            verses = range(start,end+1)
+            pair = ''
+            verselist = list()
+            for verse in verses:
+                if not pair:
+                    pair = module.text_for_ref(book, chapter, verse).decode("utf-8") + '\n'
+                else:
+                    pair += module.text_for_ref(book, chapter, verse).decode("utf-8") + '\n'
+                    verselist.append(pair)
+                    pair = ''
+            if pair:
+                # jos pariton märä jakeita
+                verselist.append(pair)
+        else:
+            verselist = [module.text_for_ref(book, chapter, verse).decode("utf-8")]
+        self.verselist = verselist
 
 class Song():
     def __init__(self, songfile):
@@ -61,6 +100,7 @@ def ExtractStructure(mailfile, allsongnames):
     songs = list()
     AddToStructureList(songs,structure,r'Alkulaulu: ?(.*)','Alkulaulu')
     AddToStructureList(songs,structure,r'Päivän laulu: ?(.*)','Päivän laulu')
+    #AddToStructureList(songs,structure,r'Evankeliumi: ?(.*)','Evankeliumi')
     AddToStructureList(songs,structure,r'Ylistyslaulut.*\n ?--+\n(([a-öA-Ö].*\n)+)','Ylistys- ja rukouslauluja',True)
     AddToStructureList(songs,structure,r'Pyhä-hymni: ?(.*)','Pyhä-hymni')
     AddToStructureList(songs,structure,r'Jumalan karitsa: ?(.*)','Jumalan karitsa')
@@ -70,6 +110,14 @@ def ExtractStructure(mailfile, allsongnames):
 
     htmldata = "<div id='structure'>"
     for song in songs:
+        if song[0] == "Evankeliumi":
+            address = song[1]
+            match = re.search(r'(\d?\w+) (\d+):([0-9,-]+)',song[1].lower())
+            book = match.group(1)
+            chapter = match.group(2)
+            verse = match.group(3)
+            evankeliumi = BibleText(book,chapter,verse,address)
+            import ipdb; ipdb.set_trace()
         if not isinstance(song[1],list):
             song[1] = CheckAvailability(song[1], allsongnames)
             htmldata += "\n<song role='{}'>{}</song>".format(song[0],song[1])
@@ -121,4 +169,5 @@ def CreateHtmlTemplate(songpath = '/home/juho/Dropbox/laulut/*.txt', servicestru
         f.write(htmlfile.strip())
 
 
-CreateHtmlTemplate(servicestructure="tests/teststructure.txt")
+#CreateHtmlTemplate(servicestructure="tests/teststructure.txt")
+CreateHtmlTemplate(servicestructure=sys.argv[1])

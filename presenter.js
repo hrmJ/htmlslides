@@ -68,9 +68,9 @@ function Presentation(){
 
                     var song = new SongContent(songdata.title, songdata.content);
                     //First, add the title of the song to presentation as a separate item
-                    this.contents[this.contents.length] = song.titleslide;
+                    this.contents.push(song.titleslide);
                     //Then, add the actual song
-                    this.contents[this.contents.length] = song;
+                    this.contents.push(song);
                     //Add the song also to a structured list
                     this.songs[role].push(song);
                 }
@@ -97,10 +97,8 @@ function MajakkaMessu(){
     var communionsongs = MultiSong(this.songs,"Ehtoollislauluja", "Ehtoollislaulu ");
     var info1 = new InfoContent('Lapsille ja lapsiperheille', ['Päivän laulun aikana 3-6-vuotiaat lapset voivat siirtyä pyhikseen ja yli 6-vuotiaat klubiin.', 'Seuraa vetäjiä - tunnistat heidät lyhdyistä!']);
     var ehtoollisinfo  = new InfoContent('Ehtoolliskäytännöistä', ['Voit tulla ehtoolliselle jo Jumalan karitsa -hymnin aikana', 'Halutessasi voit jättää kolehdin ehtoolliselle tullessasi oikealla olevaan koriin.']);
-
     //TODO: Hae esirukoilijatieto autom.
     var wsinfo  = new InfoContent('Ylistys- ja rukousosio', ['Ylistys- ja rukouslaulujen aikana voit kirjoittaa omia  rukousaiheitasi ja hiljentyä sivualttarin luona.', 'Rukouspalvelu hiljaisessa huoneessa.']);
-
     var worshipsongs = MultiSong(this.songs,"Ylistys- ja rukouslauluja", "Ylistyslaulu ", ['rukousinfo', wsinfo, 'info']);
     worshipsongs.push(['Esirukous',false,'header']);
 
@@ -112,11 +110,11 @@ function MajakkaMessu(){
                   new Section(this, 'Sana',               [['Päivän laulu',this.songs['Päivän laulu'][0],'song'],
                                                           ['Saarna',false,'header'],
                                                           ['Synnintunnustus',false,'header'],
-                                                          ['Uskontunnustus',false,'header']]),
+                                                          ['Uskontunnustus',new SongContent('', allsongs["uskontunnustus"].content),'song']]),
                   new Section(this, 'Ylistys ja rukous', worshipsongs),
                   new Section(this, 'Ehtoollisen asetus', [['Pyhä',this.songs['Pyhä-hymni'][0],'song'], 
                                                           ['Ehtoollisrukous',false,'header'],
-                                                          ['Isä meidän',false,'header'],
+                                                          ['Isä meidän',new SongContent('', allsongs["isä meidän"].content),'song'],
                                                           ['Ehtoollisinfo', ehtoollisinfo, 'info'],
                                                           ['Jumalan karitsa',this.songs['Jumalan karitsa'][0],'song']]),
                   new Section(this, 'Ehtoollisen vietto',   communionsongs),
