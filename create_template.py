@@ -7,7 +7,7 @@ from difflib import SequenceMatcher
 #THIS is a temporary solution: will be replaced by e.g. swordjs
 #this temporary solution needs separate installation of pysword
 #AND a working sword module installation on the script-running machine
-import pysword
+#import pysword
 
 class BibleText:
 
