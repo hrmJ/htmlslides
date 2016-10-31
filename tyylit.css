@@ -148,6 +148,7 @@ body {
 
 #sections li, #sitems li{
     list-style-type:none;
+    white-space: nowrap;
     /* display: inline; */
 }
 
