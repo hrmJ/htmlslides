@@ -97,7 +97,7 @@ function MajakkaMessu(){
     this.GetStructure();
     this.showtype = "majakka";
     //TODO: import this from structure html
-    this.title = "Isä meidän - meidän isä";
+    this.title = "Jokapäiväinen leipä";
     //TODO: make creating these sections simpler
     //1. Collect all worship songs and make them into a section
     var communionsongs = MultiSong(this.songs,"Ehtoollislauluja", "Ehtoollislaulu ");

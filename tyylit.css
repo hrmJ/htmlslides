@@ -6,7 +6,6 @@ html {
 body {
     /* background: #FFFAFD; */
     /* font-size: 200%; */
-    line-height:1.5;
     font-family: 'Merriweather', Georgia, 'Times New Roman', Times, serif;
     overflow:hidden;
 }
@@ -39,6 +38,7 @@ body {
 #textcontent .verse{
     text-align:center;
     font-size: 300%;
+    line-height:1.5;
     font-family: sans-serif;
     /* margin-top: 9em; */
     margin-top: 0.1em;
@@ -46,7 +46,7 @@ body {
 .songtitle{
     color:white;
     font-family: fantasy;
-    font-size: 300%;
+    font-size: 200%;
     margin-top:0px
     /* background: -webkit-linear-gradient(#eee, rgb(217, 247, 128)); */
     /* -webkit-background-clip: text; */
