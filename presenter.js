@@ -398,6 +398,10 @@ function VerseMover(evt){
     thispres.GetContentChain();
     var thissong = thispres.chain[thispres.chain.length-1];
     thissong.pointer.position = tag.getAttribute('pointerpos');
+    while(thissong.pointer.position == undefined){
+        tag = tag.parentNode;
+        thissong.pointer.position = tag.getAttribute('pointerpos');
+    }
     thissong.Show(thispres.screen);
 }
 

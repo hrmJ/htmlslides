@@ -101,23 +101,23 @@ body {
 
 #heading h3{
     color: rgba(228, 221, 117, 0.87);
-    font-size: 190%;
+    font-size: 290%;
     margin-bottom:2em;
     margin-top: 0.1em;
     position:relative;
     /* display: inline-block; */
-    left: -50%;
+    /* left: -50%; */
     /* font-style: italic; */
 }
 
 #heading h2{
     color: #fbfbfb;
-    font-size: 500%;
+    font-size: 700%;
     /* font-family: arial, sans-serif; */
     /* margin-bottom:2em; */
     /* display: none; */
     position: relative;
-    left: -50%;
+    /* left: -50%; */
     margin-top: 0px;
     /* font-style: italic; */
     margin-bottom: 0px;
@@ -140,7 +140,7 @@ body {
 
 #prescont #navwrapper{
     position: absolute;
-    left: 50%;
+    /* left: 50%; */
     /*margin-top: 5%;*/
     /* display: -webkit-flex; */
     /* display: flex; */
@@ -149,7 +149,7 @@ body {
 
 #prescont #navwrapper #navcontainer{
     position: relative;
-    left: -50%;
+    /* left: -50%; */
     display: -webkit-flex;
     /* display: flex; */
     /* -webkit-flex-direction: row; */
@@ -239,7 +239,7 @@ body {
     padding-left: 22px;
     /* margin-right: 5em; */
     margin-left: 3em;
-    font-size: 190%;
+    font-size: 220%;
     height: 20%;
     /* font-family: -webkit-pictograph; */
     /* box-shadow: 0px -2px 2px rgba(34,34,34,0.6); */
