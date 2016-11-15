@@ -280,6 +280,12 @@ function SectionItem(thissection, name, contentobject,itemtype, item_idx){
         this.items = [new SectionTitleContent(thissection, item_idx)];
         if (contentobject){
             //If this object has subcontent
+            if (itemtype=='song'){
+                //Print song's title with the role as the first slide
+                var div = TagParent('div', [TagWithText('h3',name), TagWithText('h2',contentobject.titletext)],'songtitlediv');
+                contentobject.items.unshift(div);
+                SetPointers(contentobject,false);
+            }
             this.items.push(contentobject);
             thissection.mypresentation.flatsructure.push(contentobject);
         }
@@ -427,7 +433,7 @@ function ScreenContent(){
                         //Songs as sectionitems are always of the format:
                         //[sectiiontitle, song]
                         //this is why items[1]
-                        PresScreen.UpdateContent('itemtitle',sitem.items[1].titleslide.items[0]);
+                        //PresScreen.UpdateContent('itemtitle',sitem.items[1].titleslide.items[0]);
                         //TODO: lyrics by, music by...
                     }
                     break;
@@ -533,6 +539,7 @@ function SongContent(title, songtexts){
     this.id = CreateUid();
     this.content_type = "song";
     this.titleslide = new SongTitleContent(title);
+    this.titletext = title;
     this.songtexts = songtexts;
     this.items = 
         function(content){
@@ -705,16 +712,6 @@ function CreateUid(){
     return newuid;
 }
 
-CreateTag = function(tagname, barid, thisdocument, tagclass, parenttag){
-    //These elements are for displaying the structure of the presentation
-    bar = thisdocument.createElement(tagname);
-    bar.id = barid;
-    bar.className = tagclass;
-    if (parenttag !== undefined){
-        parenttag.appendChild(bar);
-    }
-    return bar;
-}
 
 
 function Screen(thisdocument){
@@ -862,6 +859,33 @@ function OpenPres(pres){
 }
 
 //========================================
+
+TagWithText = function(tagname, tagtext, tagclass){
+    var tag = document.createElement(tagname);
+    tag.innerText = tagtext;
+    tag.className = tagclass;
+    return tag;
+}
+
+TagParent = function(tagname, childlist, classname){
+    var tag = document.createElement(tagname);
+    tag.className = classname;
+    for (child_idx in childlist){
+        tag.appendChild(childlist[child_idx]);
+    }
+    return tag;
+}
+
+CreateTag = function(tagname, barid, thisdocument, tagclass, parenttag){
+    //These elements are for displaying the structure of the presentation
+    bar = thisdocument.createElement(tagname);
+    bar.id = barid;
+    bar.className = tagclass;
+    if (parenttag !== undefined){
+        parenttag.appendChild(bar);
+    }
+    return bar;
+}
 
 function checkKey(e) {
     //Kaappaa nuolinäppäimet niin ohjainikkunassa kuin esitysikkunassakin
