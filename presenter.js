@@ -188,8 +188,11 @@ function MajakkaMessu(){
     var worshipsongs = MultiSong(this.songs,"Ylistys- ja rukouslauluja", "Ylistyslaulu ", ['rukousinfo', wsinfo, 'info']);
     worshipsongs.push(['Esirukous',false,'header']);
 
+    var credits = new CreditContent('', ['Juonto: Joku','Seurakuntalaisen sana: Joku', 'Bändi: Pietari & co', 'Rukouspalvelu: Joku', 'Pyhis: Joku', 'Klubi: Joku', 'Miksaus: Joku', 'Pappi: Matti', 'Saarna: Monia', 'Kahvitus: X', 'Diat: Juho']);
+
     //2. Combine all the sections
-    this.items = [new Section(this, 'Johdanto',           [['Alkulaulu',this.songs['Alkulaulu'][0],'song'],
+    this.items = [new Section(this, 'Johdanto',           [['Krediitit',credits,'info'],
+                                                          ['Alkulaulu',this.songs['Alkulaulu'][0],'song'],
                                                           ['Alkusanat ja seurakuntalaisen sana',false,'header'],
                                                           ['Pyhisinfo',info1,'info']
                                                           ]),
@@ -308,7 +311,7 @@ function Pointer(pointed){
 function SectionItem(thissection, name, contentobject,itemtype, item_idx){
     this.name = name;
     this.itemtype = itemtype;
-    if(itemtype == 'info'){
+    if(itemtype == 'info' || itemtype == 'credits'){
         this.items = [contentobject];
     }
     else{
@@ -488,6 +491,10 @@ function ScreenContent(){
                 case "info":
                     //Think about songtitles also as not part of a special sectioned service
                     PresScreen.UpdateContent('infobox',this.items[this.pointer.position]);
+                    break;
+                case "credits":
+                    //Think about songtitles also as not part of a special sectioned service
+                    PresScreen.UpdateContent('creditbox',this.items[this.pointer.position]);
                     break;
                 default:
                     PresScreen.UpdateContent('textcontent',this.items[this.pointer.position]);
@@ -690,6 +697,43 @@ function BibleContent(){
     all_screencontents.push(this);
 }
 
+function CreditContent(headertext, infotext, content_name){
+    this.id = CreateUid();
+    this.content_type="credits";
+    if (content_name!==undefined){
+        this.name = content_name;
+    }
+
+    var div = document.createElement('div');
+
+    if(infotext.constructor === Array){
+        //From arrays: build lists
+        var body = document.createElement('ul');
+        body.className = "infolist";
+        for (var info_id in infotext){
+            var this_li = document.createElement('li');
+            this_li.innerText = infotext[info_id];
+            body.appendChild(this_li);
+        }
+    }
+    else{
+        var body = document.createElement('p');
+        body.innerText = infotext;
+    }
+
+    div.className = 'infocontent';
+    div.appendChild(body);
+    this.titletext = infotext;
+    this.items = [div];
+    SetPointers(this, false);
+    //finally, add this scrreencontent to the global variable 
+    //in order to reference it by links etc.
+    //this is a hash with ids as keys
+    all_screencontents.push(this);
+}
+CreditContent.prototype = new ScreenContent();
+CreditContent.prototype.constructor = CreditContent;
+
 
 function InfoContent(headertext, infotext, content_name){
     this.id = CreateUid();
@@ -793,6 +837,7 @@ function Screen(newwindow){
     this.textcontent = CreateTag("div", "textcontent", thisdocument);
     this.heading = CreateTag("nav", "heading", thisdocument);
     this.infobox = CreateTag("div", "infobox", thisdocument);
+    this.creditbox = CreateTag("div", "creditbox", thisdocument);
     var heading = CreateTag("h2", "", thisdocument, "",this.heading);
     //TODO: Avoid the global variable!
     heading.innerText = "Majakkamessu";

@@ -28,6 +28,11 @@ body {
     /* -webkit-text-fill-color: transparent; */;
 }
 
+#creditbox{
+    width:100%;
+    text-align:center;
+} 
+
 
 /* NAVIGATOR */
 
