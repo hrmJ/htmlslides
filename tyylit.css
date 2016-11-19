@@ -57,8 +57,8 @@ body {
 /*  Verses etc */
 
 #prescont > #textcontent .verse{
-    text-align:center;
-    font-size: 300%;
+    text-align: start;
+    font-size: 360%;
     line-height:1.5;
     font-family: sans-serif;
     /* margin-top: 9em; */
@@ -186,11 +186,12 @@ body {
 
 .infoheader{
     color: #E1E17A;
-    font-size: 150%;
+    font-size: 110%;
 }
 
 .infolist li{
-    margin-top:1.5em;
+    margin-top: 1em;
+    list-style-type: none;
 }
 
 .infocontent{
@@ -199,11 +200,11 @@ body {
     color: white;
     padding-top:1em;
     padding-bottom:3em;
-    padding-left:3em;
-    padding-right:3em;
-    font-size:151%;
+    padding-left: 1em;
+    padding-right: 1em;
+    font-size: 300%;
     border-radius:12px;
-    font-family: monospace;
+    /* font-family: monospace; */
 }
 
 /* OSIO-otsikot  */
@@ -248,7 +249,7 @@ body {
 
 nav#sitems li.sectionitemhl {
     /* background: #353567; */
-    color: white;
+    color:  white;
 }
 
 nav#sitems li {
