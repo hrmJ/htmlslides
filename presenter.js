@@ -38,11 +38,11 @@ function Presentation(){
                 //Iterating down to first showable content
                 thisobject = thisobject.current;
             }
-            thisobject.Show(Presentations.screen);
+            thisobject.Show();
             this.GetContentChain();
     }
 
-    this.GetStructure= function (){
+    this.GetSongs= function (){
         //If there is a predefined structure for the presantation
         //this function extracts it
         var structure = document.getElementById("structure");
@@ -53,9 +53,6 @@ function Presentation(){
                 var role = structure.childNodes[i].getAttribute("role");
                 //ADD [here] a test for seeing whether allsongs actually contains something by this name
                 //...
-                // If the type of content was a song, add it to the
-                // presentation from the allsongs global variable
-
                 // First, create an array if this is the first song if its type
                 if (!this.songs.hasOwnProperty(role)){
                     this.songs[role] = [];
@@ -71,7 +68,7 @@ function Presentation(){
                 else{
                     var song = new SongContent(songdata.title, songdata.content);
                 }
-                //Add the song also to a structured list
+                //Add the song to a structured list
                 this.songs[role].push(song);
             }
         }
@@ -84,7 +81,7 @@ function Presentation(){
 function MajakkaMessu(){
     //Pre-defined services...
     //These inherit from the general presentation class
-    this.GetStructure();
+    this.GetSongs();
     this.showtype = "majakka";
     //TODO: import this from structure html
     this.title = "Jokapäiväinen leipä";
@@ -383,7 +380,7 @@ function Mover(evt){
                 }
     }
     currentpres.GetContentChain();
-    targetcontent.Show(Presentations.screen);
+    targetcontent.Show();
 }
 
 function VerseMover(evt){
@@ -399,7 +396,7 @@ function VerseMover(evt){
         tag = tag.parentNode;
         thissong.pointer.position = tag.getAttribute('pointerpos');
     }
-    thissong.Show(Presentations.screen);
+    thissong.Show();
 }
 
 function ScreenContent(){
@@ -410,9 +407,11 @@ function ScreenContent(){
     // item here means the content blocks divided into 
     // parts that will be shown at the time
     this.items = [];
-    this.Show = function(PresScreen){
+    this.Show = function(){
+        
             //Print the content of this object to screen
 
+            PresScreen = Presentations.screen;
             //1. Clear the layout of the screen
             //TODO: only do this when necessary
             PresScreen.Refresh();
@@ -863,6 +862,7 @@ function OpenPres(pres){
 //
 function AddFunctionalitySection(){
     var textarea = TagWithText("textarea","Kirjoita tähän tekstiä, jonka haluat näyttää skriinillä","contentinsert");
+    textarea.id = 'added_text_content';
     var link = TagWithText("a","Lisää","");
     link.addEventListener('click', AddTextSlide, false);
     var spontcontdiv = TagParent("div",[TagWithText("h4","Lisää tekstidia",""), textarea,TagParent("p",[link])],"","spontcontdiv");
@@ -871,8 +871,12 @@ function AddFunctionalitySection(){
 }
 
 function AddTextSlide(){
-    console.log("moro");
-    Presentations.spontaneous.items.push(new InfoContent('Ylistys- ja rukousosio', ['Ylistys- ja rukouslaulujen aikana voit kirjoittaa omia  rukousaiheitasi ja hiljentyä sivualttarin luona.', 'Rukouspalvelu hiljaisessa huoneessa.']));
+    var addedtext = document.getElementById('added_text_content').value;
+    Presentations.current = 'spontaneous';
+    Presentations.spontaneous.items.push(new InfoContent('',addedtext));
+    Presentations.spontaneous.current = Presentations.spontaneous.items[0];
+    Presentations.spontaneous.current.Show();
+    //Presentations.current.Move('increment');
 }
 
 TagWithText = function(tagname, tagtext, tagclass){
