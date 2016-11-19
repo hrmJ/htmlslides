@@ -8,6 +8,7 @@ body {
     /* font-size: 200%; */
     font-family: 'Merriweather', Georgia, 'Times New Roman', Times, serif;
     overflow:hidden;
+    color: white;
 }
 
 .songtitlediv h3{
@@ -27,11 +28,25 @@ body {
     /* -webkit-text-fill-color: transparent; */;
 }
 
+
+/* NAVIGATOR */
+
+#navigatorcontainer{
+    display:-webkit-flex;
+    display:flex;
+    flex-direction:row;
+}
+
+#previewer{
+    min-width:10em;
+    padding-left:2em;
+    border-left:1px dashed white;
+    height:100%;
+}
+
 #previewer h3, #previewer h2 {
     color: white;
 }
-
-/* NAVIGATOR */
 
 #section_nav ul{
     color:white;
@@ -52,6 +67,22 @@ body {
 
 .hlverse{
     color:yellow;
+}
+
+#functionsec{
+    border-left:1px dashed white;
+    padding-left:2em;
+    height:100%;
+}
+
+.contentinsert {
+    height:15em;
+    width:17em;
+}
+
+#addedcontent{
+    border-top: 1px dashed white;
+    margin-top:2em;
 }
 
 /*  Verses etc */

@@ -140,11 +140,14 @@ function MajakkaMessu(){
 
     this.CreateNavigation = function(){
         //Create links in the secondary screen for jumping from one section to another
-        var mainsec = CreateTag("section","",document, "navsection");
+        var navigatorcontainer = CreateTag("section","navigatorcontainer",document, "");
         //This is where the general navigation between sections is
-        var leftsec = CreateTag("section","section_nav", document, "navchildsec", mainsec);
+        var contentlist = CreateTag("section","section_nav", document, "navchildsec", navigatorcontainer);
         //This is where the upcoming/previous slides will be presented
-        var rightsec = CreateTag("section","previewer", document, "navchildsec", mainsec);
+        var versepreview = CreateTag("section","previewer", document, "navchildsec", navigatorcontainer);
+        //This is for all the additional functionality such as inserting spontaneous text content, songs, bible slides etc
+        navigatorcontainer.appendChild(AddFunctionalitySection());
+
 
         var link = document.createElement('a');
         link.href = '#';
@@ -178,9 +181,13 @@ function MajakkaMessu(){
             this_li.appendChild(subsectionlist);
             sectionlist.appendChild(this_li);
         }
-        leftsec.appendChild(link);
-        leftsec.appendChild(sectionlist);
-        document.body.appendChild(mainsec);
+        contentlist.appendChild(TagWithText("h3","Sisältö",""));
+        contentlist.appendChild(link);
+        contentlist.appendChild(sectionlist);
+        //This is where any spontaneously added slides will be listed
+        contentlist.appendChild(TagParent("div",[TagWithText("h3","Lisätty sisältö","")],"","addedcontent"));
+
+        document.body.appendChild(navigatorcontainer);
         document.body.style.overflow="auto";
     };
 }
@@ -863,6 +870,19 @@ function OpenPres(pres){
 }
 
 //========================================
+//
+function AddFunctionalitySection(){
+    var textarea = TagWithText("textarea","Kirjoita tähän tekstiä, jonka haluat näyttää skriinillä","contentinsert");
+    var link = TagWithText("a","Lisää","");
+    link.addEventListener('click', AddTextSlide, false);
+    var spontcontdiv = TagParent("div",[TagWithText("h4","Lisää tekstidia",""), textarea,TagParent("p",[link])],"","spontcontdiv");
+    var sec = TagParent("section",[TagWithText("h3","Toiminnot",""), spontcontdiv],"","functionsec");
+    return sec;
+}
+
+function AddTextSlide(){
+    console.log("moro");
+}
 
 TagWithText = function(tagname, tagtext, tagclass){
     var tag = document.createElement(tagname);
@@ -871,11 +891,15 @@ TagWithText = function(tagname, tagtext, tagclass){
     return tag;
 }
 
-TagParent = function(tagname, childlist, classname){
+TagParent = function(tagname, childlist, classname, tagid){
     var tag = document.createElement(tagname);
     tag.className = classname;
     for (child_idx in childlist){
         tag.appendChild(childlist[child_idx]);
+    }
+    if (tagid!==undefined){
+        tag.id = tagid;
+    
     }
     return tag;
 }
@@ -921,6 +945,7 @@ function PosFromTop(el){
 }
 
 //========================================
+
 
 //If a new document opened, these variables take care of it
 var preswindow = undefined;
