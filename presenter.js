@@ -6,7 +6,6 @@ function Presentation(){
     // The pointer is set to the id of the 
     // songcontent object currently set as active
     this.items = [];
-    this.started = false;
     // This might be unnecessary:
     this.current = undefined;
     //A try to make jumping in the presentation easier
@@ -24,6 +23,8 @@ function Presentation(){
     };
 
     this.Move = function(movetype){
+            //Make sure hte presentation is marked as started
+            this.pointer.started = true;
             //increment pointers
             chain_idx = this.chain.length - 1;
             while(chain_idx >= 0){
@@ -76,6 +77,98 @@ function Presentation(){
         ClearContent(document.getElementById("structure"));
         return 0;
     };
+
+    this.CreateNavigation = function(prestype){
+        if(prestype=='default'){
+            //Create links in the secondary screen for jumping from one section to another
+            var navigatorcontainer = CreateTag("section","navigatorcontainer",document, "");
+            //This is where the general navigation between sections is
+            var contentlist = CreateTag("section","section_nav", document, "navchildsec", navigatorcontainer);
+            //This is where the upcoming/previous slides will be presented
+            var versepreview = CreateTag("section","previewer", document, "navchildsec", navigatorcontainer);
+            //This is for all the additional functionality such as inserting spontaneous text content, songs, bible slides etc
+            navigatorcontainer.appendChild(AddFunctionalitySection());
+
+            var link1 = TagWithText("a","Avaa esitys","switchlink");
+            link1.href = '#';
+            link1.addEventListener('click',OpenPres,false);
+
+            var link2 = TagWithText("a","Sulje esitys","switchlink");
+            link2.href = '#';
+            link2.addEventListener('click',ClosePres,false);
+
+            var link = TagParent("p",[link1, link2]);
+        }
+
+
+        var sectionlist = document.createElement('ul');
+        sectionlist.id = "navigator_sectionlist";
+        if (prestype == 'spontaneous'){
+            sectionlist.id = "addedcontent_sectionlist";
+            sectionlist.className='unhlnavsection';
+        }
+        else{
+            //Highlight the default presentation's navigation
+            sectionlist.className='hlnavsection';
+        }
+
+        for (var section_idx in this.items){
+            var thissec = this.items[section_idx];
+            var this_li = document.createElement('li');
+            if (thissec.hasOwnProperty('name')){
+                this_li.innerText = thissec.name;
+            }
+            else{
+                this_li.innerText = 'Untitled';
+            }
+            //The section_nav_header class helps in highlighting in the navigator
+            sec_classname = "unhlsection";
+            this_li.className = sec_classname;
+            ListToLink(this_li, section_idx, 0);
+            //Now, feed the lower level elements to the tree
+            if (thissec.constructor==Section){
+                var subsectionlist = document.createElement('ul');
+                for (var subsection_idx in thissec.items){
+                    var thissubsec = thissec.items[subsection_idx];
+                    var this_subli = document.createElement('li');
+                    this_subli.className = sec_classname;
+                    this_subli.innerText = thissubsec.name;
+                    if (thissubsec.itemtype == 'song'){
+                        //TODO: get rid of the magic number
+                        this_subli.innerText += ': ' + thissubsec.items[1].titleslide.titletext;
+                    }
+                    subsectionlist.appendChild(this_subli);
+                    ListToLink(this_subli, section_idx, subsection_idx);
+                }
+            this_li.appendChild(subsectionlist);
+            }
+            sectionlist.appendChild(this_li);
+        }
+        if(prestype=='default'){
+            var linkheader = TagWithText("h3","Sisältö","unhlpresentation");
+            linkheader.id = 'defaultcontentheader';
+            linkheader.addEventListener('click',SwitchToDefault,false);
+            contentlist.appendChild(linkheader);
+
+            contentlist.appendChild(link);
+            contentlist.appendChild(sectionlist);
+
+            //This is where any spontaneously added slides will be listed
+            var linkheader = TagWithText("h3","Lisätty sisältö","unhlpresentation");
+            linkheader.id = 'addedcontentheader';
+            linkheader.addEventListener('click',SwitchToSpontaneous,false);
+            contentlist.appendChild(TagParent("div",[linkheader,TagParent("div",[],"","addedcontent")],"","addedcontentparent"));
+
+            document.body.appendChild(navigatorcontainer);
+            document.body.style.overflow="auto";
+        }
+        else{
+            var container = document.getElementById('addedcontent');
+            ClearContent(container);
+            container.appendChild(sectionlist);
+        }
+
+    };
 }
 
 function MajakkaMessu(){
@@ -125,58 +218,6 @@ function MajakkaMessu(){
     SetPointers(this, true);
     this.GetContentChain();
 
-    this.CreateNavigation = function(){
-        //Create links in the secondary screen for jumping from one section to another
-        var navigatorcontainer = CreateTag("section","navigatorcontainer",document, "");
-        //This is where the general navigation between sections is
-        var contentlist = CreateTag("section","section_nav", document, "navchildsec", navigatorcontainer);
-        //This is where the upcoming/previous slides will be presented
-        var versepreview = CreateTag("section","previewer", document, "navchildsec", navigatorcontainer);
-        //This is for all the additional functionality such as inserting spontaneous text content, songs, bible slides etc
-        navigatorcontainer.appendChild(AddFunctionalitySection());
-
-
-        var link = document.createElement('a');
-        link.href = '#';
-        link.innerText = 'Avaa esitys';
-        link.addEventListener('click',OpenPres,false);
-
-        var sectionlist = document.createElement('ul');
-        sectionlist.id = "navigator_sectionlist";
-        for (var section_idx in this.items){
-            var thissec = this.items[section_idx];
-            var this_li = document.createElement('li');
-            this_li.innerText = thissec.name;
-            //The section_nav_header class helps in highlighting in the navigator
-            sec_classname = "unhlsection";
-            this_li.className = sec_classname;
-            ListToLink(this_li, section_idx, 0);
-            //Now, feed the lower level elements to the tree
-            var subsectionlist = document.createElement('ul');
-            for (var subsection_idx in thissec.items){
-                var thissubsec = thissec.items[subsection_idx];
-                var this_subli = document.createElement('li');
-                this_subli.className = sec_classname;
-                this_subli.innerText = thissubsec.name;
-                if (thissubsec.itemtype == 'song'){
-                    //TODO: get rid of the magic number
-                    this_subli.innerText += ': ' + thissubsec.items[1].titleslide.titletext;
-                }
-                subsectionlist.appendChild(this_subli);
-                ListToLink(this_subli, section_idx, subsection_idx);
-            }
-            this_li.appendChild(subsectionlist);
-            sectionlist.appendChild(this_li);
-        }
-        contentlist.appendChild(TagWithText("h3","Sisältö",""));
-        contentlist.appendChild(link);
-        contentlist.appendChild(sectionlist);
-        //This is where any spontaneously added slides will be listed
-        contentlist.appendChild(TagParent("div",[TagWithText("h3","Lisätty sisältö","")],"","addedcontent"));
-
-        document.body.appendChild(navigatorcontainer);
-        document.body.style.overflow="auto";
-    };
 }
 
 MajakkaMessu.prototype = new Presentation();
@@ -352,7 +393,6 @@ function Section(mypresentation, name, items, sec_idx){
 }
 
 function Mover(evt){
-    var linktype = evt.target.getAttribute('linktype');
     var sectiontarget = evt.target.getAttribute('sectionidx');
     //The latter is for songs, speeches etc i.e. subitems of sections
     var secitemtarget = evt.target.getAttribute('secitemidx');
@@ -360,11 +400,13 @@ function Mover(evt){
     //TODO: abstract this!
     var currentpres = Presentations[Presentations.current];
     var targetcontent = undefined;
+
     //TODO make this not specific to majakka presentations
+    currentpres.current = currentpres.items[sectiontarget];
+    currentpres.pointer.started = true;
+
     if (currentpres.showtype == 'majakka'){
-                currentpres.current = currentpres.items[sectiontarget];
                 currentpres.pointer.position = parseInt(sectiontarget);
-                currentpres.pointer.started = true;
                 //TODO some more abstraction to this 
                 for (var section_idx in currentpres.items) {
                     var thissection = currentpres.items[section_idx];
@@ -378,6 +420,12 @@ function Mover(evt){
                         AdjustPointersFromSectionDown(thissection, 'min', undefined);
                     }
                 }
+    }
+    else{
+        //If this is a flat presentations, just set the pointers right away
+        //TODO: songs
+        targetcontent = currentpres.current;
+        currentpres.pointer.position = secitemtarget;
     }
     currentpres.GetContentChain();
     targetcontent.Show();
@@ -457,25 +505,44 @@ this.UpdatePreview = function(){
     var prevsec = document.getElementById('previewer');
     var thispres = Presentations[Presentations.current];
     // Update section highlighters
-    var navsection = document.getElementById('navigator_sectionlist');
+    if (Presentations.current == 'default'){
+        var navsection = document.getElementById('navigator_sectionlist');
+    }
+    else{
+        var navsection = document.getElementById('addedcontent_sectionlist');
+    }
+
     for (var navel_idx in navsection.children){
         if (isNumber(navel_idx)){
             var this_item = navsection.children[navel_idx];
-            var subitems = this_item.children[0].children;
-            this_item.className = "unhlsection";
-            if(this_item.getAttribute("sectionidx")==thispres.current.sec_idx){
-                this_item.className = "sectionnavhl";
+            if (this_item.children.length>0){
+                var subitems = this_item.children[0].children;
+                this_item.className = "unhlsection";
+                if(this_item.getAttribute("sectionidx")==thispres.current.sec_idx){
+                    this_item.className = "sectionnavhl";
+                }
+            }
+            else{
+                //If this is not a sectioned but a flat presentation
+                if(this_item.getAttribute("sectionidx")==thispres.current.sec_idx){
+                    this_item.className = "sectionnavhl";
+                }
+                else{
+                    this_item.className = "unhlsection";
+                }
             }
         }
-        for (var subitem_idx in subitems){
-            //subsection headers
-            if (isNumber(subitem_idx)){
-                var this_subitem = subitems[subitem_idx];
-                this_subitem.className = "unhlsection";
-                if(this_subitem.getAttribute("sectionidx")==thispres.current.sec_idx){
-                    this_subitem.className = "sectionnavhl";
-                    if(this_subitem.getAttribute("secitemidx")==thispres.current.pointer.position){
-                        this_subitem.className = "subsectionnavhl";
+        if(subitems!==undefined){
+            for (var subitem_idx in subitems){
+                //subsection headers
+                if (isNumber(subitem_idx)){
+                    var this_subitem = subitems[subitem_idx];
+                    this_subitem.className = "unhlsection";
+                    if(this_subitem.getAttribute("sectionidx")==thispres.current.sec_idx){
+                        this_subitem.className = "sectionnavhl";
+                        if(this_subitem.getAttribute("secitemidx")==thispres.current.pointer.position){
+                            this_subitem.className = "subsectionnavhl";
+                        }
                     }
                 }
             }
@@ -624,9 +691,12 @@ function BibleContent(){
 }
 
 
-function InfoContent(headertext, infotext){
+function InfoContent(headertext, infotext, content_name){
     this.id = CreateUid();
     this.content_type="info";
+    if (content_name!==undefined){
+        this.name = content_name;
+    }
 
     var div = document.createElement('div');
     var header = document.createElement('h3');
@@ -714,7 +784,9 @@ function CreateUid(){
 
 
 
-function Screen(thisdocument){
+function Screen(newwindow){
+    var thisdocument = newwindow.document;
+    this.preswindow = newwindow;
     this.prescont = CreateTag("div", "prescont", thisdocument);
     this.navwrapper = CreateTag("section", "navwrapper", thisdocument,"",this.prescont);
     this.navcontainer = CreateTag("section", "navcontainer", thisdocument,"",this.navwrapper);
@@ -848,22 +920,43 @@ function ListToLink(this_li, sectionidx, secitemidx){
     this_li.addEventListener('click',Mover,false);
 }
 
+function ClosePres(pres){
+    Presentations.screen.preswindow.close();
+}
+
 function OpenPres(pres){
     preswindow = window.open('','_blank', 'toolbar=0,location=0,menubar=0');
     preswindow.document.write('<html lang="fi"><head><meta http-equiv="Content-Type" content="text/html" charset="UTF-8"><link rel="stylesheet" type="text/css" href="tyylit.css"/></head><body></body>');
     ClearContent(preswindow.document.body);
     ////TODO:this is the key to make separate screen working!
-    Presentations.screen = new Screen(preswindow.document);
+    Presentations.screen = new Screen(preswindow);
     preswindow.onkeydown = checkKey;
     document.onkeydown = checkKey;
 }
 
 //========================================
 //
+
+function SwitchToDefault(){
+    Presentations.current = 'default';
+    document.getElementById('defaultcontentheader').className = 'hlpresentation';
+    document.getElementById('addedcontentheader').className = 'unhlpresentation';
+    document.getElementById('navigator_sectionlist').className = 'hlnavsection';
+    document.getElementById('addedcontent_sectionlist').className = 'unhlnavsection';
+}
+
+function SwitchToSpontaneous(){
+    Presentations.current = 'spontaneous';
+    document.getElementById('addedcontentheader').className = 'hlpresentation';
+    document.getElementById('defaultcontentheader').className = 'unhlpresentation';
+    document.getElementById('addedcontent_sectionlist').className = 'hlnavsection';
+    document.getElementById('navigator_sectionlist').className = 'unhlnavsection';
+}
+
 function AddFunctionalitySection(){
     var textarea = TagWithText("textarea","Kirjoita tähän tekstiä, jonka haluat näyttää skriinillä","contentinsert");
     textarea.id = 'added_text_content';
-    var link = TagWithText("a","Lisää","");
+    var link = TagWithText("a","Lisää, mutta älä näytä vielä","");
     link.addEventListener('click', AddTextSlide, false);
     var spontcontdiv = TagParent("div",[TagWithText("h4","Lisää tekstidia",""), textarea,TagParent("p",[link])],"","spontcontdiv");
     var sec = TagParent("section",[TagWithText("h3","Toiminnot",""), spontcontdiv],"","functionsec");
@@ -872,10 +965,21 @@ function AddFunctionalitySection(){
 
 function AddTextSlide(){
     var addedtext = document.getElementById('added_text_content').value;
-    Presentations.current = 'spontaneous';
-    Presentations.spontaneous.items.push(new InfoContent('',addedtext));
+    var addedtextheader = addedtext;
+    if(addedtext.length>20){
+        addedtextheader = addedtext.substr(0,20) + "...";
+    }
+
+    Presentations.spontaneous.items.push(new InfoContent('', addedtext, addedtextheader));
+
     Presentations.spontaneous.current = Presentations.spontaneous.items[0];
-    Presentations.spontaneous.current.Show();
+    Presentations.spontaneous.CreateNavigation('spontaneous');
+    Presentations.spontaneous.GetContentChain();
+    for(var sec_idx in Presentations.spontaneous.items){
+        Presentations.spontaneous.items[sec_idx].sec_idx = sec_idx;
+    }
+    SetPointers(Presentations.spontaneous, true);
+    //Presentations.spontaneous.current.Show();
     //Presentations.current.Move('increment');
 }
 
@@ -939,6 +1043,7 @@ function PosFromTop(el){
     return rect.top;
 }
 
+
 //========================================
 
 
@@ -952,12 +1057,19 @@ var allsongs = GetSongs();
 //At the moment:
 //The global Presentations object is sort of a controller of what is shown on the screen
 
-var Presentations = {'default':new MajakkaMessu(), 'spontaneous': new Presentation(), 'current':'default'};
+//TODO: 
+//1. make a constructor to the Presentations object
+//2. Add a "Save Presentations" -function, which outputs a html documents that contains
+//the blueprints of this presentation including the spontaneous content
 //
+var Presentations = {'default':new MajakkaMessu(), 'spontaneous': new Presentation(), 'current':'default'};
+
+
+
 //Finally, remove all used data from html (structure, html)
 ClearContent(document.body);
 
-Presentations.default.CreateNavigation();
+Presentations.default.CreateNavigation('default');
 
 
 //========================================

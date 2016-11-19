@@ -31,6 +31,19 @@ body {
 
 /* NAVIGATOR */
 
+#navigator_sectionlist, #addedcontentparent{
+    padding: 1em;
+} 
+
+
+.hlnavsection{
+    background: #1c4b74;
+}
+
+.unhlnavsection{
+    background: black;
+}
+
 #navigatorcontainer{
     display:-webkit-flex;
     display:flex;
@@ -80,10 +93,24 @@ body {
     width:17em;
 }
 
-#addedcontent{
+#addedcontentparent{
     border-top: 1px dashed white;
     margin-top:2em;
 }
+
+.switchlink{
+    margin-right:2em;
+    color:yellow;
+}
+
+.unhlpresentation{
+    border:none;
+}
+
+.hlpresentation{
+    border:2px solid yellow;
+    padding:1em;
+} 
 
 /*  Verses etc */
 
