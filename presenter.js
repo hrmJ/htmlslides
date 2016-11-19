@@ -5,13 +5,12 @@ function Presentation(){
 
     // The pointer is set to the id of the 
     // songcontent object currently set as active
-    this.contents = [];
+    this.items = [];
     this.started = false;
     // This might be unnecessary:
     this.current = undefined;
     //A try to make jumping in the presentation easier
     this.flatsructure = [];
-    this.screen = undefined;
 
     this.GetContentChain = function(){
             //Go down the section/sectionitem/songverse etc chain as deep as needed
@@ -39,7 +38,7 @@ function Presentation(){
                 //Iterating down to first showable content
                 thisobject = thisobject.current;
             }
-            thisobject.Show(this.screen);
+            thisobject.Show(Presentations.screen);
             this.GetContentChain();
     }
 
@@ -51,38 +50,29 @@ function Presentation(){
         for (var i=0;i<structure.childNodes.length;i++){
             if (structure.childNodes[i].nodeName!=="#text"){
                 //If the structure div contains tags
-                if (structure.childNodes[i].tagName=="SONG"){
-                    var role = structure.childNodes[i].getAttribute("role");
-                    //ADD [here] a test for seeing whether allsongs actually contains something by this name
-                    //...
-                    // If the type of content was a song, add it to the
-                    // presentation from the allsongs global variable
+                var role = structure.childNodes[i].getAttribute("role");
+                //ADD [here] a test for seeing whether allsongs actually contains something by this name
+                //...
+                // If the type of content was a song, add it to the
+                // presentation from the allsongs global variable
 
-                    // First, create an array if this is the first song if its type
-                    if (!this.songs.hasOwnProperty(role)){
-                        this.songs[role] = [];
-                    }
+                // First, create an array if this is the first song if its type
+                if (!this.songs.hasOwnProperty(role)){
+                    this.songs[role] = [];
+                }
 
-                    //then, make a song object from it
-                    var songdata = allsongs[structure.childNodes[i].innerText.toLowerCase()];
+                //then, make a song object from it
+                var songdata = allsongs[structure.childNodes[i].innerText.toLowerCase()];
 
-                    //Special attributes:
-                    if (['Jumalan karitsa','Pyhä-hymni'].indexOf(role)>-1){ 
-                        var song = new SongContent('', songdata.content);
-                    }
-                    else{
-                        var song = new SongContent(songdata.title, songdata.content);
-                    }
-                    //First, add the title of the song to presentation as a separate item
-                    this.contents.push(song.titleslide);
-                    //Then, add the actual song
-                    this.contents.push(song);
-                    //Add the song also to a structured list
-                    this.songs[role].push(song);
+                //Special attributes:
+                if (['Jumalan karitsa','Pyhä-hymni'].indexOf(role)>-1){ 
+                    var song = new SongContent('', songdata.content);
                 }
                 else{
-                    this.contents[this.contents.length] = structure.childNodes[i];
+                    var song = new SongContent(songdata.title, songdata.content);
                 }
+                //Add the song also to a structured list
+                this.songs[role].push(song);
             }
         }
         //Remove the information from html
@@ -371,7 +361,7 @@ function Mover(evt){
     var secitemtarget = evt.target.getAttribute('secitemidx');
 
     //TODO: abstract this!
-    var currentpres = Presentations[0];
+    var currentpres = Presentations[Presentations.current];
     var targetcontent = undefined;
     //TODO make this not specific to majakka presentations
     if (currentpres.showtype == 'majakka'){
@@ -393,14 +383,14 @@ function Mover(evt){
                 }
     }
     currentpres.GetContentChain();
-    targetcontent.Show(currentpres.screen);
+    targetcontent.Show(Presentations.screen);
 }
 
 function VerseMover(evt){
     //TODO: make this a way of jumping from a song's verse to another by clicking thee verrse 
     //in the navigator window (started 29.9.2016)
     var tag = evt.target;
-    var thispres = Presentations[Presentations.length-1];
+    var thispres = Presentations[Presentations.current];
     //Find the current song on display
     thispres.GetContentChain();
     var thissong = thispres.chain[thispres.chain.length-1];
@@ -409,7 +399,7 @@ function VerseMover(evt){
         tag = tag.parentNode;
         thissong.pointer.position = tag.getAttribute('pointerpos');
     }
-    thissong.Show(thispres.screen);
+    thissong.Show(Presentations.screen);
 }
 
 function ScreenContent(){
@@ -466,7 +456,7 @@ function ScreenContent(){
 
 this.UpdatePreview = function(){
     var prevsec = document.getElementById('previewer');
-    var thispres = Presentations[Presentations.length-1];
+    var thispres = Presentations[Presentations.current];
     // Update section highlighters
     var navsection = document.getElementById('navigator_sectionlist');
     for (var navel_idx in navsection.children){
@@ -736,7 +726,7 @@ function Screen(thisdocument){
     //TODO: Avoid the global variable!
     heading.innerText = "Majakkamessu";
     var subheading = CreateTag("h3", "", thisdocument, "",this.heading);
-    subheading.innerText = Presentations[0].title;
+    subheading.innerText = Presentations["default"].title;
     this.sections = CreateTag("nav", "sections", thisdocument);
     this.sitems = CreateTag("nav", "sitems", thisdocument);
     this.itemtitle = CreateTag("div", "itemtitle", thisdocument);
@@ -864,7 +854,7 @@ function OpenPres(pres){
     preswindow.document.write('<html lang="fi"><head><meta http-equiv="Content-Type" content="text/html" charset="UTF-8"><link rel="stylesheet" type="text/css" href="tyylit.css"/></head><body></body>');
     ClearContent(preswindow.document.body);
     ////TODO:this is the key to make separate screen working!
-    Presentations[0].screen = new Screen(preswindow.document);
+    Presentations.screen = new Screen(preswindow.document);
     preswindow.onkeydown = checkKey;
     document.onkeydown = checkKey;
 }
@@ -882,6 +872,7 @@ function AddFunctionalitySection(){
 
 function AddTextSlide(){
     console.log("moro");
+    Presentations.spontaneous.items.push(new InfoContent('Ylistys- ja rukousosio', ['Ylistys- ja rukouslaulujen aikana voit kirjoittaa omia  rukousaiheitasi ja hiljentyä sivualttarin luona.', 'Rukouspalvelu hiljaisessa huoneessa.']));
 }
 
 TagWithText = function(tagname, tagtext, tagclass){
@@ -921,16 +912,16 @@ function checkKey(e) {
     e = e || window.event;
 
     if (e.keyCode == '38') {
-        Presentations[Presentations.length-1].Move('decrement');
+        Presentations[Presentations.current].Move('decrement');
     }
     else if (e.keyCode == '40') {
-        Presentations[Presentations.length-1].Move('increment');
+        Presentations[Presentations.current].Move('increment');
     }
     else if (e.keyCode == '37') {
-        Presentations[Presentations.length-1].Move('decrement');
+        Presentations[Presentations.current].Move('decrement');
     }
     else if (e.keyCode == '39') {
-        Presentations[Presentations.length-1].Move('increment');
+        Presentations[Presentations.current].Move('increment');
     }
 }
 
@@ -949,18 +940,20 @@ function PosFromTop(el){
 
 //If a new document opened, these variables take care of it
 var preswindow = undefined;
-
 var allsongs = GetSongs();
-var Majakka = new MajakkaMessu();
-//Now, remove all used data from html (structure, html)
-ClearContent(document.body);
 
-//var NavScreen =  new Screen(document);
+
 
 //TODO Get rid of globals!
-var Presentations = [];
-Presentations.push(Majakka);
-Majakka.CreateNavigation();
+//At the moment:
+//The global Presentations object is sort of a controller of what is shown on the screen
+
+var Presentations = {'default':new MajakkaMessu(), 'spontaneous': new Presentation(), 'current':'default'};
+//
+//Finally, remove all used data from html (structure, html)
+ClearContent(document.body);
+
+Presentations.default.CreateNavigation();
 
 
 //========================================
