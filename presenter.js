@@ -177,7 +177,7 @@ function MajakkaMessu(){
     this.GetSongs();
     this.showtype = "majakka";
     //TODO: import this from structure html
-    this.title = "Jokapäiväinen leipä";
+    this.title = "Kristus, Kuningas";
     //TODO: make creating these sections simpler
     //1. Collect all worship songs and make them into a section
     var communionsongs = MultiSong(this.songs,"Ehtoollislauluja", "Ehtoollislaulu ");
@@ -188,10 +188,11 @@ function MajakkaMessu(){
     var worshipsongs = MultiSong(this.songs,"Ylistys- ja rukouslauluja", "Ylistyslaulu ", ['rukousinfo', wsinfo, 'info']);
     worshipsongs.push(['Esirukous',false,'header']);
 
-    var credits = new CreditContent('', ['Juonto: Joku','Seurakuntalaisen sana: Joku', 'Bändi: Pietari & co', 'Rukouspalvelu: Joku', 'Pyhis: Joku', 'Klubi: Joku', 'Miksaus: Joku', 'Pappi: Matti', 'Saarna: Monia', 'Kahvitus: X', 'Diat: Juho']);
+    var credits1 = new CreditContent('', ['Juonto: Vilja', 'Bändi: Pietari & co', 'Rukouspalvelu: ', 'Pyhis: Joku', 'Klubi: Tiina']);
+    var credits2 = new CreditContent('', ['Miksaus: Joku', 'Pappi: Vihtori', 'Saarna: Salamasaarnoja', 'Kahvitus: ', 'Diat: Juho']);
 
     //2. Combine all the sections
-    this.items = [new Section(this, 'Johdanto',           [['Krediitit',credits,'info'],
+    this.items = [new Section(this, 'Johdanto',           [['Krediitit1',credits1,'info'],['Krediitit2',credits2,'info'],
                                                           ['Alkulaulu',this.songs['Alkulaulu'][0],'song'],
                                                           ['Alkusanat ja seurakuntalaisen sana',false,'header'],
                                                           ['Pyhisinfo',info1,'info']
@@ -614,6 +615,7 @@ function SongContent(title, songtexts){
     this.content_type = "song";
     this.titleslide = new SongTitleContent(title);
     this.titletext = title;
+    this.name = title;
     this.songtexts = songtexts;
     this.items = 
         function(content){
@@ -862,6 +864,7 @@ function Screen(newwindow){
         ClearContent(this.sitems);
         ClearContent(this.itemtitle);
         ClearContent(this.infobox);
+        ClearContent(this.creditbox);
     };
 
     this.UpdateContent = function(divname, contentitem){
@@ -1004,8 +1007,55 @@ function AddFunctionalitySection(){
     var link = TagWithText("a","Lisää, mutta älä näytä vielä","");
     link.addEventListener('click', AddTextSlide, false);
     var spontcontdiv = TagParent("div",[TagWithText("h4","Lisää tekstidia",""), textarea,TagParent("p",[link])],"","spontcontdiv");
-    var sec = TagParent("section",[TagWithText("h3","Toiminnot",""), spontcontdiv],"","functionsec");
-    return sec;
+    var sec1 = TagParent("section",[TagWithText("h3","Toiminnot",""), spontcontdiv],"","functionsec");
+
+
+    var link = TagWithText("a","Lisää laulu","");
+    link.addEventListener('click', AddSongSlide, false);
+    var sec2 = TagParent("section",[TagWithText("h4","Lisää laulu",""), SongListDropDown(),TagParent("p",[link])],"","functionsec2");
+    return TagParent("section",[sec1, sec2]);
+}
+
+function SongListDropDown(){
+    var songnames = [];
+    var songoptions = [];
+
+    for (songname in allsongs){
+        songnames.push(songname)
+    }
+
+    songnames.sort();
+
+    for(idx in songnames){
+        var thisname = songnames[idx];
+        var option = TagWithText("option",thisname,"");
+        songoptions.push(option);
+    }
+
+    var select = TagParent("select",songoptions,"","songselect");
+    return select;
+}
+
+
+function AddSongSlide(){
+    var select = document.getElementById("songselect");
+    var selectedsong = select.options[select.selectedIndex].innerText;
+    var title  = allsongs[selectedsong].title;
+
+    var song = new SongContent(title, allsongs[selectedsong].content)
+    var div = TagParent('div', [TagWithText('h2',title)],'songtitlediv');
+    song.items.unshift(div);
+    SetPointers(song,false);
+
+    Presentations.spontaneous.items.push(song);
+
+    Presentations.spontaneous.current = Presentations.spontaneous.items[0];
+    Presentations.spontaneous.CreateNavigation('spontaneous');
+    Presentations.spontaneous.GetContentChain();
+    for(var sec_idx in Presentations.spontaneous.items){
+        Presentations.spontaneous.items[sec_idx].sec_idx = sec_idx;
+    }
+    SetPointers(Presentations.spontaneous, true);
 }
 
 function AddTextSlide(){
