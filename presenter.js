@@ -188,8 +188,8 @@ function MajakkaMessu(){
     var worshipsongs = MultiSong(this.songs,"Ylistys- ja rukouslauluja", "Ylistyslaulu ", ['rukousinfo', wsinfo, 'info']);
     worshipsongs.push(['Esirukous',false,'header']);
 
-    var credits1 = new CreditContent('', ['Juonto: Vilja', 'Bändi: Pietari & co', 'Rukouspalvelu: ', 'Pyhis: Joku', 'Klubi: Tiina']);
-    var credits2 = new CreditContent('', ['Miksaus: Joku', 'Pappi: Vihtori', 'Saarna: Salamasaarnoja', 'Kahvitus: ', 'Diat: Juho']);
+    var credits1 = new CreditContent('', ['Juonto: Vilja', 'Bändi: Pietari & co', 'Rukouspalvelu: Päivi', 'Pyhis: Elina', 'Klubi: Tiina']);
+    var credits2 = new CreditContent('', ['Saliääni: Jussi', 'Pappi: Matti', 'Saarna: Salamasaarnoja', 'Kahvitus: Raamis', 'Diat: Juho']);
 
     //2. Combine all the sections
     this.items = [new Section(this, 'Johdanto',           [['Krediitit1',credits1,'info'],['Krediitit2',credits2,'info'],
