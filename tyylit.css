@@ -128,6 +128,25 @@ body {
 } 
 
 /*  Verses etc */
+#prescont > #textcontent .bibleverse{
+
+    font-size: 290%;
+    line-height: 1;
+    text-align: justify;
+    /* margin-top: 9em; */
+    padding-left: 4em;
+    padding-right: 4em;
+
+}
+
+h3.bibleheader{
+
+    font-size: 290%;
+    line-height: 1;
+    /* margin-top: 9em; */
+    padding-left: 2em;
+
+}
 
 #prescont > #textcontent .verse{
     text-align: start;

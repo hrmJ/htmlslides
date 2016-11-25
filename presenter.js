@@ -183,6 +183,7 @@ function MajakkaMessu(){
     var communionsongs = MultiSong(this.songs,"Ehtoollislauluja", "Ehtoollislaulu ");
     var info1 = new InfoContent('Lapsille ja lapsiperheille', ['Päivän laulun aikana 3-6-vuotiaat lapset voivat siirtyä pyhikseen ja yli 6-vuotiaat klubiin.', 'Seuraa vetäjiä - tunnistat heidät lyhdyistä!']);
     var ehtoollisinfo  = new InfoContent('Ehtoolliskäytännöistä', ['Voit tulla ehtoolliselle jo Jumalan karitsa -hymnin aikana', 'Halutessasi voit jättää kolehdin ehtoolliselle tullessasi oikealla olevaan koriin.']);
+    var evankeliumi = new BibleContent(document.getElementById('evankeliumi').getAttribute('address'), document.getElementById('evankeliumi').innerText );
     //TODO: Hae esirukoilijatieto autom.
     var wsinfo  = new InfoContent('Ylistys- ja rukousosio', ['Ylistys- ja rukouslaulujen aikana voit kirjoittaa omia  rukousaiheitasi ja hiljentyä sivualttarin luona.', 'Rukouspalvelu hiljaisessa huoneessa.']);
     var worshipsongs = MultiSong(this.songs,"Ylistys- ja rukouslauluja", "Ylistyslaulu ", ['rukousinfo', wsinfo, 'info']);
@@ -198,6 +199,7 @@ function MajakkaMessu(){
                                                           ['Pyhisinfo',info1,'info']
                                                           ]),
                   new Section(this, 'Sana',               [['Päivän laulu',this.songs['Päivän laulu'][0],'song'],
+                                                          ['Evankeliumi',evankeliumi,'header'],
                                                           ['Saarna',false,'header'],
                                                           ['Synnintunnustus',false,'header'],
                                                           ['Uskontunnustus',new SongContent('', allsongs["uskontunnustus"].content),'song']]),
@@ -691,14 +693,6 @@ function SectionTitleContent(section,curitem){
 SectionTitleContent.prototype = new ScreenContent();
 SectionTitleContent.prototype.constructor = SectionTitleContent;
 
-function BibleContent(){
-    this.id = CreateUid();
-    //finally, add this scrreencontent to the global variable 
-    //in order to reference it by links etc.
-    //this is a hash with ids as keys
-    all_screencontents.push(this);
-}
-
 function CreditContent(headertext, infotext, content_name){
     this.id = CreateUid();
     this.content_type="credits";
@@ -736,6 +730,30 @@ function CreditContent(headertext, infotext, content_name){
 CreditContent.prototype = new ScreenContent();
 CreditContent.prototype.constructor = CreditContent;
 
+
+function BibleContent(address, content, content_name){
+    this.id = CreateUid();
+    this.content_type="bibletime";
+    if (content_name!==undefined){
+        this.name = content_name;
+    }
+    this.items = [];
+    var div = TagParent('div',[TagWithText('h3',address,'bibleheader')])
+    verses = content.split(/¤/m);
+    for (verseid in verses){
+        div.appendChild(TagWithText('p', verses[verseid], 'bibleverse'));
+        if ( (parseInt(verseid) + 1) % 2 == 0 ){
+            this.items.push(div);
+            var div = TagWithText('div','');
+        }
+    }
+    if ((parseInt(verseid) +1 )% 2 > 0){
+            this.items.push(div);
+    }
+    SetPointers(this, false);
+}
+BibleContent.prototype = new ScreenContent();
+BibleContent.prototype.constructor = BibleContent;
 
 function InfoContent(headertext, infotext, content_name){
     this.id = CreateUid();
@@ -984,6 +1002,11 @@ function OpenPres(pres){
 
 //========================================
 //
+
+
+function GetGospel(){
+    var gospelnode = document.getElementById('evankeliumi');
+}
 
 function SwitchToDefault(){
     Presentations.current = 'default';
