@@ -160,6 +160,10 @@ function Presentation(){
             contentlist.appendChild(TagParent("div",[linkheader,TagParent("div",[],"","addedcontent")],"","addedcontentparent"));
 
             document.body.appendChild(navigatorcontainer);
+            var biblenavi = TagWithText("iframe","","biblenavi");
+            biblenavi.setAttribute('src','bible.html');
+            biblenavi.id = 'biblenavi';
+            document.body.appendChild(biblenavi);
             document.body.style.overflow="auto";
         }
         else{
@@ -169,6 +173,17 @@ function Presentation(){
         }
 
     };
+
+    this.AddContent = function(newcontent){
+            this.items.push(newcontent);
+            this.current = this.items[0];
+            this.CreateNavigation('spontaneous');
+            this.GetContentChain();
+            for(var sec_idx in this.items){
+                this.items[sec_idx].sec_idx = sec_idx;
+            }
+            SetPointers(this, true);
+    }
 }
 
 function MajakkaMessu(){
@@ -737,6 +752,9 @@ function BibleContent(address, content, content_name){
     if (content_name!==undefined){
         this.name = content_name;
     }
+    else{
+        this.name = address;
+    }
     this.items = [];
     var div = TagParent('div',[TagWithText('h3',address,'bibleheader')])
     verses = content.split(/¤/m);
@@ -1000,6 +1018,14 @@ function OpenPres(pres){
     document.onkeydown = checkKey;
 }
 
+function PresentationContainer(){
+
+    this.default = new MajakkaMessu();
+    this.spontaneous =  new Presentation();
+    this.current = 'default';
+
+}
+
 //========================================
 //
 
@@ -1036,7 +1062,11 @@ function AddFunctionalitySection(){
     var link = TagWithText("a","Lisää laulu","");
     link.addEventListener('click', AddSongSlide, false);
     var sec2 = TagParent("section",[TagWithText("h4","Lisää laulu",""), SongListDropDown(),TagParent("p",[link])],"","functionsec2");
-    return TagParent("section",[sec1, sec2]);
+
+    var link = TagWithText("a","Lisää raamatunkohta","");
+    link.addEventListener('click', AddBibleContent, false);
+    var sec3 = TagParent("section",[TagWithText("h4","Lisää Raamatunteksti",""), ,TagParent("p",[link])],"","functionsec3");
+    return TagParent("section",[sec1, sec2, sec3]);
 }
 
 function SongListDropDown(){
@@ -1059,26 +1089,28 @@ function SongListDropDown(){
     return select;
 }
 
+function AddBibleContent(){
+    try {
+        var bibledoc = document.getElementById('biblenavi').contentWindow.document;
+        Presentations.spontaneous.AddContent(new BibleContent('Joh. 3:16', bibledoc.getElementById('biblecontent').innerText));
+    }
+    catch (error) {
+      alert("Raamattusisällön lisääminen toimii vain palvelimelta ajattuna (vähintään localhost)");
+      return false;
+    }
+
+
+}
 
 function AddSongSlide(){
     var select = document.getElementById("songselect");
     var selectedsong = select.options[select.selectedIndex].innerText;
     var title  = allsongs[selectedsong].title;
-
     var song = new SongContent(title, allsongs[selectedsong].content)
     var div = TagParent('div', [TagWithText('h2',title)],'songtitlediv');
     song.items.unshift(div);
     SetPointers(song,false);
-
-    Presentations.spontaneous.items.push(song);
-
-    Presentations.spontaneous.current = Presentations.spontaneous.items[0];
-    Presentations.spontaneous.CreateNavigation('spontaneous');
-    Presentations.spontaneous.GetContentChain();
-    for(var sec_idx in Presentations.spontaneous.items){
-        Presentations.spontaneous.items[sec_idx].sec_idx = sec_idx;
-    }
-    SetPointers(Presentations.spontaneous, true);
+    Presentations.spontaneous.AddContent(song);
 }
 
 function AddTextSlide(){
@@ -1087,18 +1119,16 @@ function AddTextSlide(){
     if(addedtext.length>20){
         addedtextheader = addedtext.substr(0,20) + "...";
     }
+    Presentations.spontaneous.AddContent(new InfoContent('', addedtext, addedtextheader));
+}
 
-    Presentations.spontaneous.items.push(new InfoContent('', addedtext, addedtextheader));
-
-    Presentations.spontaneous.current = Presentations.spontaneous.items[0];
-    Presentations.spontaneous.CreateNavigation('spontaneous');
-    Presentations.spontaneous.GetContentChain();
-    for(var sec_idx in Presentations.spontaneous.items){
-        Presentations.spontaneous.items[sec_idx].sec_idx = sec_idx;
+function AddTextSlide(){
+    var addedtext = document.getElementById('added_text_content').value;
+    var addedtextheader = addedtext;
+    if(addedtext.length>20){
+        addedtextheader = addedtext.substr(0,20) + "...";
     }
-    SetPointers(Presentations.spontaneous, true);
-    //Presentations.spontaneous.current.Show();
-    //Presentations.current.Move('increment');
+    Presentations.spontaneous.AddContent(new InfoContent('', addedtext, addedtextheader));
 }
 
 TagWithText = function(tagname, tagtext, tagclass){
@@ -1180,7 +1210,7 @@ var allsongs = GetSongs();
 //2. Add a "Save Presentations" -function, which outputs a html documents that contains
 //the blueprints of this presentation including the spontaneous content
 //
-var Presentations = {'default':new MajakkaMessu(), 'spontaneous': new Presentation(), 'current':'default'};
+var Presentations = new PresentationContainer();
 
 
 

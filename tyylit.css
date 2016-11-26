@@ -92,13 +92,19 @@ body {
     color:yellow;
 }
 
-#functionsec, #functionsec2{
+.biblenavi{
+    width:0px;
+    height:0px;
+    border:none;
+}
+
+#functionsec, #functionsec2, #functionsec3{
     border-left:1px dashed white;
     padding-left:2em;
     /* height:100%; */
 }
 
-#functionsec2{
+#functionsec2, #functionsec3{
     padding-top:1em;
     border-top: 1px dashed white;
 }
