@@ -40,6 +40,7 @@ function AddVerseContent($versenumber, $verselist, $content){
     return $verselist;
 }
 
+#$pageDom = GetHtml(FormUrl("Mark","5"));
 $pageDom = GetHtml("bibletest.html");
 $headertexts = GetHeaders($pageDom);
 
@@ -80,3 +81,16 @@ if($chaptermark!==False){
 }
 
 ?>
+
+
+<html lang="fi">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+<p id='biblecontent'>
+<?php
+echo implode($verses, "¤");
+?>
+</p>
+</body>

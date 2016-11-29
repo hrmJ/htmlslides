@@ -160,10 +160,6 @@ function Presentation(){
             contentlist.appendChild(TagParent("div",[linkheader,TagParent("div",[],"","addedcontent")],"","addedcontentparent"));
 
             document.body.appendChild(navigatorcontainer);
-            var biblenavi = TagWithText("iframe","","biblenavi");
-            biblenavi.setAttribute('src','bible.html');
-            biblenavi.id = 'biblenavi';
-            document.body.appendChild(biblenavi);
             document.body.style.overflow="auto";
         }
         else{
@@ -1064,8 +1060,10 @@ function AddFunctionalitySection(){
     var sec2 = TagParent("section",[TagWithText("h4","Lisää laulu",""), SongListDropDown(),TagParent("p",[link])],"","functionsec2");
 
     var link = TagWithText("a","Lisää raamatunkohta","");
+    var logger = TagWithText("p","","");
+    logger.id = "logger";
     link.addEventListener('click', AddBibleContent, false);
-    var sec3 = TagParent("section",[TagWithText("h4","Lisää Raamatunteksti",""), ,TagParent("p",[link])],"","functionsec3");
+    var sec3 = TagParent("section",[TagWithText("h4","Lisää Raamatunteksti",""),logger,TagParent("p",[link])],"","functionsec3");
     return TagParent("section",[sec1, sec2, sec3]);
 }
 
@@ -1089,15 +1087,35 @@ function SongListDropDown(){
     return select;
 }
 
+function checkIframeLoaded() {
+    //http://stackoverflow.com/questions/9249680/how-to-check-if-iframe-is-loaded-or-it-has-a-content
+    var iframe = document.getElementById('biblenavi');
+    var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    if (  iframeDoc.getElementById('biblecontent')  !== null) {
+        AddLoadedBibleContent();
+        document.getElementById('logger').innerText = '';
+        return;
+    } 
+    document.getElementById('logger').innerText = 'Ladataan raaamattu sisältöä, odota hetki';
+    window.setTimeout('checkIframeLoaded();', 200);
+}
+
+function AddLoadedBibleContent(){
+    var bibledoc = document.getElementById('biblenavi').contentWindow.document;
+    Presentations.spontaneous.AddContent(new BibleContent('Joh. 3:16', bibledoc.getElementById('biblecontent').innerText));
+}
+
 function AddBibleContent(){
-    try {
-        var bibledoc = document.getElementById('biblenavi').contentWindow.document;
-        Presentations.spontaneous.AddContent(new BibleContent('Joh. 3:16', bibledoc.getElementById('biblecontent').innerText));
-    }
-    catch (error) {
-      alert("Raamattusisällön lisääminen toimii vain palvelimelta ajattuna (vähintään localhost)");
-      return false;
-    }
+        var biblenavi = TagWithText("iframe","","biblenavi");
+        biblenavi.id = 'biblenavi';
+        document.body.appendChild(biblenavi);
+        var biblenavi = document.getElementById("biblenavi");
+        biblenavi.src = 'biblecrawl.php';
+        checkIframeLoaded();
+//    catch (error) {
+//      alert("Raamattusisällön lisääminen toimii vain palvelimelta ajattuna (vähintään localhost)");
+//      return false;
+//    }
 
 
 }
