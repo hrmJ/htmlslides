@@ -133,6 +133,21 @@ body {
     padding:1em;
 } 
 
+.bibaddress{
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: row;
+}  
+
+.bibaddress input{
+    margin-left:1em;
+    width:6em;
+}
+
 /*  Verses etc */
 #prescont > #textcontent .bibleverse{
 

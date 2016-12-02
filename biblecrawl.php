@@ -5,7 +5,9 @@ function FormUrl($book, $chapter){
 }
 
 function StripRaamattuHtml($html){
-    return mb_substr($html, 0, mb_strrpos($html, "<hr>")-1);
+    $html = mb_substr($html, mb_strpos($html, "<hr>")+4,-1);
+    $html = mb_substr($html, 0, mb_strpos($html, "<hr>"));
+    return $html;
 }
 
 
@@ -21,8 +23,12 @@ function GetHtml($origin){
 
 function GetHeaders($pageDom){
     $headers = $pageDom->getElementsByTagName('h4');
+    $headers2 = $pageDom->getElementsByTagName('h2');
     $headertexts = Array();
     foreach ($headers as $header) {
+        $headertexts[]= $header->textContent;
+    }
+    foreach ($headers2 as $header) {
         $headertexts[]= $header->textContent;
     }
     return $headertexts;
@@ -40,8 +46,10 @@ function AddVerseContent($versenumber, $verselist, $content){
     return $verselist;
 }
 
-#$pageDom = GetHtml(FormUrl("Mark","5"));
-$pageDom = GetHtml("bibletest.html");
+
+
+#$pageDom = GetHtml("bibletest2.html");
+$pageDom = GetHtml("http://raamattu.fi/1992/" . $_GET["chap"] . ".html");
 $headertexts = GetHeaders($pageDom);
 
 foreach ($pageDom->childNodes as $item){
@@ -80,6 +88,30 @@ if($chaptermark!==False){
     $verses[sizeof($verses)] = mb_substr($verses[sizeof($verses)], 0, $chaptermark-1);
 }
 
+$verseaddress = $_GET["verses"];
+$selectedverses = Array();
+
+if(strpos($verseaddress,"-")!==False){
+    #jos jakeet intervallina
+    preg_match("/(\\d+)-(\\d+)/", $verseaddress, $groups);
+    $start = $groups[1];
+    $end = $groups[2];
+    for($i=$start;$i<=$end;$i++){
+        $selectedverses[] = $verses[$i];
+    }
+}
+elseif($verseaddress=="" or $verseaddress=="jae/jakeet"){
+    #Jos tyhjä jaeosoite
+    $selectedverses = $verses;
+}
+else{
+    #Jos pelkkä numero
+    $selectedverses = $verses[intval($verseaddress)];
+}
+
+
+
+
 ?>
 
 
@@ -90,7 +122,10 @@ if($chaptermark!==False){
 <body>
 <p id='biblecontent'>
 <?php
-echo implode($verses, "¤");
+if (sizeof($selectedverses)>1)
+    echo implode($selectedverses, "¤");
+else
+    echo ($selectedverses);
 ?>
 </p>
 </body>

@@ -1063,7 +1063,20 @@ function AddFunctionalitySection(){
     var logger = TagWithText("p","","");
     logger.id = "logger";
     link.addEventListener('click', AddBibleContent, false);
-    var sec3 = TagParent("section",[TagWithText("h4","Lisää Raamatunteksti",""),logger,TagParent("p",[link])],"","functionsec3");
+    var select = CreateBookSelect();
+    var chapinput = document.createElement("input");
+    chapinput.id = 'chapter';
+    chapinput.value = 'Luku';
+    var verseinput = document.createElement("input");
+    verseinput.id = 'verse';
+    verseinput.value = 'jae/jakeet';
+
+    var sec3 = TagParent("section",[TagWithText("h4","Lisää Raamatunteksti",""),logger, TagParent("div",[select, chapinput, verseinput],'bibaddress'),TagParent('p',[link])],"","functionsec3");
+
+    //Make a container for the iframe doing the bible loading
+    var biblenavi = TagWithText("iframe","","biblenavi");
+    biblenavi.id = 'biblenavi';
+    document.body.appendChild(biblenavi);
     return TagParent("section",[sec1, sec2, sec3]);
 }
 
@@ -1087,6 +1100,22 @@ function SongListDropDown(){
     return select;
 }
 
+function CreateBookSelect(){
+
+    var booknames = ['Valitse kirja','---------------------','Uusi testamentti','--------------------','Matt', 'Mark', 'Luuk', 'Joh', 'Apt', 'Room', '1Kor', '2Kor', 'Gal', 'Ef', 'Fil', 'Kol', '1Tess', '2Tess', '1Tim', '2Tim', 'Tit', 'Filem', 'Hepr', 'Jaak', '1Piet', '2Piet', '1Joh', '2Joh', '3Joh', 'Juud', 'Ilm','Vanha testamentti', '---------------', '1Moos', '2Moos', '3Moos', '4Moos', '5Moos', 'Joos', 'Tuom', 'Ruut', '1Sam', '2Sam', '1Kun', '2Kun', '1Aik', '2Aik', 'Esra', 'Neh', 'Est', 'Job', 'Ps', 'Sananl', 'Saarn', 'Laull', 'Jes', 'Jer', 'Valit', 'Hes', 'Dan', 'Hoos', 'Joel', 'Aam', 'Ob', 'Joona', 'Miika', 'Nah', 'Hab', 'Sef', 'Hagg', 'Sak', 'Mal']
+    var bookoptions = [];
+    for(idx in booknames){
+        var thisname = booknames[idx];
+        var option = TagWithText("option",thisname,"");
+        bookoptions.push(option);
+    }
+
+    var select = TagParent("select",bookoptions,"","songselect");
+    select.id = 'book';
+    return select;
+
+}
+
 function checkIframeLoaded() {
     //http://stackoverflow.com/questions/9249680/how-to-check-if-iframe-is-loaded-or-it-has-a-content
     var iframe = document.getElementById('biblenavi');
@@ -1101,16 +1130,22 @@ function checkIframeLoaded() {
 }
 
 function AddLoadedBibleContent(){
+    var book = document.getElementById('book');
+    var chapter = document.getElementById('chapter');
+    var verse = document.getElementById('verse');
+    address = book.options[book.selectedIndex].innerText + " " + chapter.value + " " + verse.value;
     var bibledoc = document.getElementById('biblenavi').contentWindow.document;
-    Presentations.spontaneous.AddContent(new BibleContent('Joh. 3:16', bibledoc.getElementById('biblecontent').innerText));
+    Presentations.spontaneous.AddContent(new BibleContent(address, bibledoc.getElementById('biblecontent').innerText));
 }
 
 function AddBibleContent(){
-        var biblenavi = TagWithText("iframe","","biblenavi");
-        biblenavi.id = 'biblenavi';
-        document.body.appendChild(biblenavi);
+        var book = document.getElementById('book');
+        var chapter = document.getElementById('chapter');
+        var verse = document.getElementById('verse');
+        address = book.options[book.selectedIndex].innerText + "." + chapter.value;
         var biblenavi = document.getElementById("biblenavi");
-        biblenavi.src = 'biblecrawl.php';
+        ClearContent(biblenavi.contentWindow.document);
+        biblenavi.src = 'biblecrawl.php?chap=' + address + '&verses=' + verse.value;
         checkIframeLoaded();
 //    catch (error) {
 //      alert("Raamattusisällön lisääminen toimii vain palvelimelta ajattuna (vähintään localhost)");
