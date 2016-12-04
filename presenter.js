@@ -200,11 +200,10 @@ function MajakkaMessu(){
     var worshipsongs = MultiSong(this.songs,"Ylistys- ja rukouslauluja", "Ylistyslaulu ", ['rukousinfo', wsinfo, 'info']);
     worshipsongs.push(['Esirukous',false,'header']);
 
-    var credits1 = new CreditContent('', ['Juonto: Vilja', 'Bändi: Pietari & co', 'Rukouspalvelu: Päivi', 'Pyhis: Elina', 'Klubi: Tiina']);
-    var credits2 = new CreditContent('', ['Saliääni: Jussi', 'Pappi: Matti', 'Saarna: Salamasaarnoja', 'Kahvitus: Raamis', 'Diat: Juho']);
+    var credits1 = new CreditContent('', ['Juonto: Vilja', 'Bändi: Pietari & co', 'Rukouspalvelu: Päivi', 'Pyhis: Elina', 'Klubi: Tiina','Saliääni: Jussi', 'Pappi: Matti', 'Saarna: Salamasaarnoja', 'Kahvitus: Raamis', 'Diat: Juho']);
 
     //2. Combine all the sections
-    this.items = [new Section(this, 'Johdanto',           [['Krediitit1',credits1,'info'],['Krediitit2',credits2,'info'],
+    this.items = [new Section(this, 'Johdanto',           [['Krediitit1',credits1,'info'],
                                                           ['Alkulaulu',this.songs['Alkulaulu'][0],'song'],
                                                           ['Alkusanat ja seurakuntalaisen sana',false,'header'],
                                                           ['Pyhisinfo',info1,'info']
@@ -712,23 +711,15 @@ function CreditContent(headertext, infotext, content_name){
     }
 
     var div = document.createElement('div');
-
-    if(infotext.constructor === Array){
-        //From arrays: build lists
-        var body = document.createElement('ul');
-        body.className = "infolist";
-        for (var info_id in infotext){
-            var this_li = document.createElement('li');
-            this_li.innerText = infotext[info_id];
-            body.appendChild(this_li);
-        }
-    }
-    else{
-        var body = document.createElement('p');
-        body.innerText = infotext;
+    var body = document.createElement('ul');
+    body.className = "infolist";
+    for (var info_id in infotext){
+        var this_li = document.createElement('li');
+        this_li.innerText = infotext[info_id];
+        body.appendChild(this_li);
     }
 
-    div.className = 'infocontent';
+    div.className='infocontent';
     div.appendChild(body);
     this.titletext = infotext;
     this.items = [div];
