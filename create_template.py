@@ -13,8 +13,8 @@ import pysword
 class BibleText:
 
     def __init__(self, book, chapter, verse, finaddress=''):
-        #self.address = input('kirjan nimi *' + book + '* suomeksi?\n>') + chapter + ': ' + verse
-        self.address = 'Osoite'
+        self.address = input('kirjan nimi *' + book + '* suomeksi?\n>') + chapter + ': ' + verse
+        #self.address = 'Osoite'
         self.GetBibleText(book,chapter,verse)
 
     def GetBibleText(self, book, chapter, verse):

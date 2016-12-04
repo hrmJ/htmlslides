@@ -60,7 +60,12 @@ function Presentation(){
                 }
 
                 //then, make a song object from it
-                var songdata = allsongs[structure.childNodes[i].innerText.toLowerCase()];
+                var songname = structure.childNodes[i].innerText.toLowerCase();
+                songname = songname.replace(/\s+/,' ');
+                var songdata = allsongs[songname];
+                if (songdata == undefined){
+                    window.alert('Problem with song "' + songname + '"!');
+                }
 
                 //Special attributes:
                 if (['Jumalan karitsa','Pyhä-hymni'].indexOf(role)>-1){ 
@@ -188,7 +193,7 @@ function MajakkaMessu(){
     this.GetSongs();
     this.showtype = "majakka";
     //TODO: import this from structure html
-    this.title = "Kristus, Kuningas";
+    this.title = "Älkää heittäkö pois rohkeuttanne";
     //TODO: make creating these sections simpler
     //1. Collect all worship songs and make them into a section
     var communionsongs = MultiSong(this.songs,"Ehtoollislauluja", "Ehtoollislaulu ");
@@ -200,7 +205,7 @@ function MajakkaMessu(){
     var worshipsongs = MultiSong(this.songs,"Ylistys- ja rukouslauluja", "Ylistyslaulu ", ['rukousinfo', wsinfo, 'info']);
     worshipsongs.push(['Esirukous',false,'header']);
 
-    var credits1 = new CreditContent('', ['Juonto: Vilja', 'Bändi: Pietari & co', 'Rukouspalvelu: Päivi', 'Pyhis: Elina', 'Klubi: Tiina','Saliääni: Jussi', 'Pappi: Matti', 'Saarna: Salamasaarnoja', 'Kahvitus: Raamis', 'Diat: Juho']);
+    var credits1 = new CreditContent('', ['Juonto: Pekka', 'Bändi: Hope', 'Rukouspalvelu: Ritva', 'Pyhis: Katriina', 'Klubi: Tiina','Saliääni: Jussi', 'Pappi: Matti', 'Saarna: Taneli S.', 'Kahvitus: Hanna-Katri, Sofia & Hanna-Leena', 'Diat: Juho']);
 
     //2. Combine all the sections
     this.items = [new Section(this, 'Johdanto',           [['Krediitit1',credits1,'info'],
@@ -500,6 +505,8 @@ function ScreenContent(){
                         //PresScreen.UpdateContent('itemtitle',sitem.items[1].titleslide.items[0]);
                         //TODO: lyrics by, music by...
                     }
+                    //Adjust the Section headings to the center
+                    AdjustHeadings(PresScreen);
                     break;
                 case "info":
                     //Think about songtitles also as not part of a special sectioned service
@@ -515,8 +522,6 @@ function ScreenContent(){
             }
             //Add or remove content from te navigator
             this.UpdatePreview();
-            //Adjust the Section headings to the center
-            //AdjustHeadings(PresScreen);
 
         };
 
@@ -616,6 +621,7 @@ function AdjustHeadings(screen){
     }
     //Set the maximum size for the heading list
     screen.sections.style.height = hlheading.offsetHeight*4;
+    screen.sitems.style.height = screen.sitems.childNodes[0].offsetHeight + 50 + "px";
 
 }
 
@@ -719,7 +725,7 @@ function CreditContent(headertext, infotext, content_name){
         body.appendChild(this_li);
     }
 
-    div.className='infocontent';
+    div.className='creditcontent';
     div.appendChild(body);
     this.titletext = infotext;
     this.items = [div];
@@ -831,7 +837,9 @@ function GetSongs(){
 
         content = songdivs[i].getElementsByClassName("songdatacontent")[0].innerText;
         title = songdivs[i].getElementsByClassName("songtitle")[0].innerText;
-        songs[songdivs[i].id.toLowerCase()] = {"title":title,"content":content};
+        var songname = songdivs[i].id.toLowerCase();
+        songname = songname.replace(/\s+/,' ');
+        songs[songname] = {"title":title,"content":content};
     }
 
     //When finished, remove the songdata from the html document!
@@ -997,7 +1005,7 @@ function ClosePres(pres){
 
 function OpenPres(pres){
     preswindow = window.open('','_blank', 'toolbar=0,location=0,menubar=0');
-    preswindow.document.write('<html lang="fi"><head><meta http-equiv="Content-Type" content="text/html" charset="UTF-8"><link rel="stylesheet" type="text/css" href="tyylit.css"/></head><body></body>');
+    preswindow.document.write('<html lang="fi"><head><link href="https://fonts.googleapis.com/css?family=Nothing+You+Could+Do|Quicksand" rel="stylesheet"> <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"><link rel="stylesheet" type="text/css" href="tyylit.css"/></head><body></body>');
     ClearContent(preswindow.document.body);
     ////TODO:this is the key to make separate screen working!
     Presentations.screen = new Screen(preswindow);

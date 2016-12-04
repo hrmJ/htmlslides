@@ -30,8 +30,8 @@ body {
 
 #creditbox{
     width:100%;
-    text-align:center;
-    font-size:70%;
+    text-align:left;
+    font-size:60%;
     background:none;
 } 
 
@@ -153,15 +153,22 @@ body {
     width:6em;
 }
 
+/*
+    
+https://css-tricks.com/css3-gradients/
+
+    */
+
 /*  Verses etc */
 #prescont > #textcontent .bibleverse{
 
-    font-size: 290%;
+    font-size: 240%;
+    font-family:'Quicksand';
     line-height: 1;
     text-align: justify;
     /* margin-top: 9em; */
     padding-left: 4em;
-    padding-right: 4em;
+    padding-right: 3em;
 
 }
 
@@ -176,9 +183,10 @@ h3.bibleheader{
 
 #prescont > #textcontent .verse{
     text-align: start;
-    font-size: 360%;
+    font-size: 310%;
     line-height:1.5;
-    font-family: sans-serif;
+    /*font-family: sans-serif;*/
+    font-family:'Quicksand';
     /* margin-top: 9em; */
     margin-top: 0.1em;
 }
@@ -215,11 +223,13 @@ h3.bibleheader{
     /* left: -50%; */
     text-align: center;
     padding-top: 0px;
+    white-space:nowrap;
 }
 
 #heading h3{
     color: rgba(228, 221, 117, 0.87);
     font-size: 290%;
+    font-family: 'Quicksand';
     margin-bottom:1em;
     margin-top: 0.1em;
     position:relative;
@@ -232,6 +242,7 @@ h3.bibleheader{
     color: #fbfbfb;
     font-size: 700%;
     /* font-family: arial, sans-serif; */
+    font-family: 'Nothing You Could Do';
     /* margin-bottom:2em; */
     /* display: none; */
     position: relative;
@@ -321,12 +332,13 @@ h3.bibleheader{
     list-style-type: none;
 }
 
-.infocontent{
+.creditcontent{
     background: #353567;
     background: linear-gradient(to bottom, rgb(39, 39, 89), rgba(0, 0, 0, 0));
     color: white;
-    padding-top:1em;
-    padding-bottom:3em;
+    font-family: 'Quicksand';
+    padding-top:0.3em;
+    padding-bottom:0.3em;
     padding-left: 1em;
     padding-right: 1em;
     font-size: 300%;
@@ -334,7 +346,26 @@ h3.bibleheader{
     /* font-family: monospace; */
 }
 
+
+.infocontent{
+    background: #353567;
+    background: linear-gradient(to bottom, rgb(39, 39, 89), rgba(0, 0, 0, 0));
+    color: white;
+    padding-top:1em;
+    font-family:'Quicksand';
+    padding-bottom:3em;
+    padding-left: 1em;
+    padding-right: 1em;
+    font-size: 200%;
+    border-radius:12px;
+    /* font-family: monospace; */
+}
+
 /* OSIO-otsikot  */
+
+#sections, #sitems{
+    font-family: 'Quicksand';
+}
 
 #sections li {
     margin-top: 1em;
@@ -344,7 +375,8 @@ h3.bibleheader{
 }
 
 #sections li {
-    color: rgba(128, 113, 113, 0.51);
+    /*color: rgba(128, 113, 113, 0.51);*/
+    color: #a7a7a7;
 }
 
 #sections li.sectionhl {
@@ -367,7 +399,7 @@ h3.bibleheader{
     padding-left: 22px;
     /* margin-right: 5em; */
     margin-left: 2em;
-    font-size: 190%;
+    font-size: 200%;
     /* height: 70%; */
     /* font-family: -webkit-pictograph; */
     /* box-shadow: 0px -2px 2px rgba(34,34,34,0.6); */
@@ -381,10 +413,10 @@ nav#sitems li.sectionitemhl {
 
 nav#sitems li {
     /* background: blue; */
-    margin-top: 1em;
+    margin-top: 0.6em;
     padding-top: 1em;
     padding-left: 0.5em;
-    color: grey;
+    color: #a7a7a7;
 }
 
 #sitems ul {
