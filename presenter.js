@@ -79,7 +79,7 @@ function Presentation(){
             }
         }
         //Remove the information from html
-        ClearContent(document.getElementById("structure"));
+        //ClearContent(document.getElementById("structure"));
         return 0;
     };
 
