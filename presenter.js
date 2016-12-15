@@ -60,7 +60,7 @@ function Presentation(){
                 }
 
                 //then, make a song object from it
-                var songname = structure.childNodes[i].innerText.toLowerCase();
+                var songname = structure.childNodes[i].textContent.toLowerCase();
                 songname = songname.replace(/\s+/,' ');
                 var songdata = allsongs[songname];
                 if (songdata == undefined){
@@ -121,10 +121,10 @@ function Presentation(){
             var thissec = this.items[section_idx];
             var this_li = document.createElement('li');
             if (thissec.hasOwnProperty('name')){
-                this_li.innerText = thissec.name;
+                this_li.textContent = thissec.name;
             }
             else{
-                this_li.innerText = 'Untitled';
+                this_li.textContent = 'Untitled';
             }
             //The section_nav_header class helps in highlighting in the navigator
             sec_classname = "unhlsection";
@@ -137,10 +137,10 @@ function Presentation(){
                     var thissubsec = thissec.items[subsection_idx];
                     var this_subli = document.createElement('li');
                     this_subli.className = sec_classname;
-                    this_subli.innerText = thissubsec.name;
+                    this_subli.textContent = thissubsec.name;
                     if (thissubsec.itemtype == 'song'){
                         //TODO: get rid of the magic number
-                        this_subli.innerText += ': ' + thissubsec.items[1].titleslide.titletext;
+                        this_subli.textContent += ': ' + thissubsec.items[1].titleslide.titletext;
                     }
                     subsectionlist.appendChild(this_subli);
                     ListToLink(this_subli, section_idx, subsection_idx);
@@ -199,13 +199,14 @@ function MajakkaMessu(){
     var communionsongs = MultiSong(this.songs,"Ehtoollislauluja", "Ehtoollislaulu ");
     var info1 = new InfoContent('Lapsille ja lapsiperheille', ['Päivän laulun aikana 3-6-vuotiaat lapset voivat siirtyä pyhikseen ja yli 6-vuotiaat klubiin.', 'Seuraa vetäjiä - tunnistat heidät lyhdyistä!']);
     var ehtoollisinfo  = new InfoContent('Ehtoolliskäytännöistä', ['Voit tulla ehtoolliselle jo Jumalan karitsa -hymnin aikana', 'Halutessasi voit jättää kolehdin ehtoolliselle tullessasi oikealla olevaan koriin.']);
-    var evankeliumi = new BibleContent(document.getElementById('evankeliumi').getAttribute('address'), document.getElementById('evankeliumi').innerText );
+    var evankeliumi = new BibleContent(document.getElementById('evankeliumi').getAttribute('address'), document.getElementById('evankeliumi').textContent );
+
     //TODO: Hae esirukoilijatieto autom.
     var wsinfo  = new InfoContent('Ylistys- ja rukousosio', ['Ylistys- ja rukouslaulujen aikana voit kirjoittaa omia  rukousaiheitasi ja hiljentyä sivualttarin luona.', 'Rukouspalvelu hiljaisessa huoneessa.']);
     var worshipsongs = MultiSong(this.songs,"Ylistys- ja rukouslauluja", "Ylistyslaulu ", ['rukousinfo', wsinfo, 'info']);
     worshipsongs.push(['Esirukous',false,'header']);
 
-    var credits1 = new CreditContent('', ['Juonto: Pekka', 'Bändi: Hope', 'Rukouspalvelu: Ritva', 'Pyhis: Katriina', 'Klubi: Tiina','Saliääni: Jussi', 'Pappi: Matti', 'Saarna: Taneli S.', 'Kahvitus: Hanna-Katri, Sofia & Hanna-Leena', 'Diat: Juho']);
+    var credits1 = new CreditContent('', GetCredits());
 
     //2. Combine all the sections
     this.items = [new Section(this, 'Johdanto',           [['Krediitit1',credits1,'info'],
@@ -366,7 +367,7 @@ function Section(mypresentation, name, items, sec_idx){
             if (['info'].indexOf(thisitem.itemtype)==-1){ 
                 //If the object won't be added to the list of section items shown on the main screen
                 var this_li = document.createElement('li');
-                this_li.innerText = thisitem.name;
+                this_li.textContent = thisitem.name;
                 ListToLink(this_li, this.sec_idx, i);
                 if (i==highlighted){
                     this_li.className = "sectionitemhl";
@@ -392,7 +393,7 @@ function Section(mypresentation, name, items, sec_idx){
             if((section_idx>=highlighted-sectionbuffer && section_idx<=highlighted+sectionbuffer) || section_idx == highlighted){
                 var sec = this.mypresentation.items[section_idx];
                 var this_li = document.createElement('li');
-                this_li.innerText = sec.name;
+                this_li.textContent = sec.name;
                 ListToLink(this_li, section_idx, 0);
 
                 if (section_idx == this.mypresentation.pointer.position){
@@ -652,7 +653,7 @@ function SongContent(title, songtexts){
                 for (verseid in rawcontents){
                     domcontents[verseid] = document.createElement('p');
                     domcontents[verseid].className = 'verse';
-                    domcontents[verseid].innerText = rawcontents[verseid];
+                    domcontents[verseid].innerHTML = rawcontents[verseid].replace(/\n/g, '<br>');
                 }
                 return domcontents;
             }(this.songtexts);
@@ -679,7 +680,7 @@ function SongTitleContent(title){
     this.content_type="songtitle";
     el = document.createElement('p');
     el.className = 'songtitle';
-    el.innerText = title;
+    el.textContent = title;
     this.titletext = title;
     this.items = [el];
     SetPointers(this, true);
@@ -721,7 +722,7 @@ function CreditContent(headertext, infotext, content_name){
     body.className = "infolist";
     for (var info_id in infotext){
         var this_li = document.createElement('li');
-        this_li.innerText = infotext[info_id];
+        this_li.textContent = infotext[info_id];
         body.appendChild(this_li);
     }
 
@@ -782,17 +783,17 @@ function InfoContent(headertext, infotext, content_name){
         body.className = "infolist";
         for (var info_id in infotext){
             var this_li = document.createElement('li');
-            this_li.innerText = infotext[info_id];
+            this_li.textContent = infotext[info_id];
             body.appendChild(this_li);
         }
     }
     else{
         var body = document.createElement('p');
-        body.innerText = infotext;
+        body.textContent = infotext;
     }
 
     header.className = 'infoheader';
-    header.innerText = headertext;
+    header.textContent = headertext;
     div.className = 'infocontent';
     div.appendChild(header);
     div.appendChild(body);
@@ -825,6 +826,21 @@ function SetPointers(object, setcurrent){
     }
 }
 
+function GetCredits(){
+    var vastuut = document.getElementsByClassName("vastuudata");
+    var vastuulist = [];
+    for(var i=0;i<vastuut.length;i++){
+        // Add a new songcontent object to the songs container object
+        // todo: composer, writer
+        var vastuu = vastuut[i];
+        if (vastuu.id !== 'Saarnateksti'){
+            vastuulist.push(vastuu.id + ": " + vastuu.textContent);
+        }
+    }
+    return vastuulist;
+}
+
+
 function GetSongs(){
     //Fetch the songs from  the html file
 
@@ -835,15 +851,16 @@ function GetSongs(){
         // Add a new songcontent object to the songs container object
         // todo: composer, writer
 
-        content = songdivs[i].getElementsByClassName("songdatacontent")[0].innerText;
-        title = songdivs[i].getElementsByClassName("songtitle")[0].innerText;
+        content = songdivs[i].getElementsByClassName("songdatacontent")[0].textContent;
+        title = songdivs[i].getElementsByClassName("songtitle")[0].textContent;
         var songname = songdivs[i].id.toLowerCase();
         songname = songname.replace(/\s+/,' ');
         songs[songname] = {"title":title,"content":content};
     }
 
     //When finished, remove the songdata from the html document!
-    ClearContent(document.getElementById('songs'))
+    //
+    //ClearContent(document.getElementById('songs'))
     return songs;
 }
 
@@ -873,9 +890,9 @@ function Screen(newwindow){
     this.creditbox = CreateTag("div", "creditbox", thisdocument);
     var heading = CreateTag("h2", "", thisdocument, "",this.heading);
     //TODO: Avoid the global variable!
-    heading.innerText = "Majakkamessu";
+    heading.textContent = "Majakkamessu";
     var subheading = CreateTag("h3", "", thisdocument, "",this.heading);
-    subheading.innerText = Presentations["default"].title;
+    subheading.textContent = Presentations["default"].title;
     this.sections = CreateTag("nav", "sections", thisdocument);
     this.sitems = CreateTag("nav", "sitems", thisdocument);
     this.itemtitle = CreateTag("div", "itemtitle", thisdocument);
@@ -1121,10 +1138,10 @@ function checkIframeLoaded() {
     var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
     if (  iframeDoc.getElementById('biblecontent')  !== null) {
         AddLoadedBibleContent();
-        document.getElementById('logger').innerText = '';
+        document.getElementById('logger').textContent = '';
         return;
     } 
-    document.getElementById('logger').innerText = 'Ladataan raaamattu sisältöä, odota hetki';
+    document.getElementById('logger').textContent = 'Ladataan raaamattu sisältöä, odota hetki';
     window.setTimeout('checkIframeLoaded();', 200);
 }
 
@@ -1132,16 +1149,16 @@ function AddLoadedBibleContent(){
     var book = document.getElementById('book');
     var chapter = document.getElementById('chapter');
     var verse = document.getElementById('verse');
-    address = book.options[book.selectedIndex].innerText + " " + chapter.value + " " + verse.value;
+    address = book.options[book.selectedIndex].textContent + " " + chapter.value + " " + verse.value;
     var bibledoc = document.getElementById('biblenavi').contentWindow.document;
-    Presentations.spontaneous.AddContent(new BibleContent(address, bibledoc.getElementById('biblecontent').innerText));
+    Presentations.spontaneous.AddContent(new BibleContent(address, bibledoc.getElementById('biblecontent').textContent));
 }
 
 function AddBibleContent(){
         var book = document.getElementById('book');
         var chapter = document.getElementById('chapter');
         var verse = document.getElementById('verse');
-        address = book.options[book.selectedIndex].innerText + "." + chapter.value;
+        address = book.options[book.selectedIndex].textContent + "." + chapter.value;
         var biblenavi = document.getElementById("biblenavi");
         ClearContent(biblenavi.contentWindow.document);
         biblenavi.src = 'biblecrawl.php?chap=' + address + '&verses=' + verse.value;
@@ -1156,7 +1173,7 @@ function AddBibleContent(){
 
 function AddSongSlide(){
     var select = document.getElementById("songselect");
-    var selectedsong = select.options[select.selectedIndex].innerText;
+    var selectedsong = select.options[select.selectedIndex].textContent;
     var title  = allsongs[selectedsong].title;
     var song = new SongContent(title, allsongs[selectedsong].content)
     var div = TagParent('div', [TagWithText('h2',title)],'songtitlediv');
@@ -1185,7 +1202,7 @@ function AddTextSlide(){
 
 TagWithText = function(tagname, tagtext, tagclass){
     var tag = document.createElement(tagname);
-    tag.innerText = tagtext;
+    tag.textContent = tagtext;
     tag.className = tagclass;
     return tag;
 }
@@ -1267,7 +1284,7 @@ var Presentations = new PresentationContainer();
 
 
 //Finally, remove all used data from html (structure, html)
-ClearContent(document.body);
+//ClearContent(document.body);
 
 Presentations.default.CreateNavigation('default');
 

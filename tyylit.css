@@ -11,17 +11,25 @@ body {
     color: white;
 }
 
+#structure,#evankeliumi,#vastuut,#songs{
+    display: block;
+    line-height:0;
+    height: 0;
+    overflow: hidden;
+}
+
 .songtitlediv h3{
     color: rgba(228, 221, 117, 0.87);
     font-size: 290%;
+    font-family: 'Quicksand';
     margin-bottom:2em;
     margin-top: 0.1em;
 }
 
 #textcontent > .songtitlediv h2{
     color:white;
-    font-family: fantasy;
-    font-size: 480%;
+    font-family: 'Nothing You Could Do',fantasy;
+    font-size: 300%;
     margin-top:0px
     /* background: -webkit-linear-gradient(#eee, rgb(217, 247, 128)); */
     /* -webkit-background-clip: text; */
@@ -192,7 +200,7 @@ h3.bibleheader{
 }
 .songtitle{
     color:white;
-    font-family: fantasy;
+    font-family: 'Nothing You Could Do',fantasy;
     font-size: 200%;
     margin-top:0px
     /* background: -webkit-linear-gradient(#eee, rgb(217, 247, 128)); */

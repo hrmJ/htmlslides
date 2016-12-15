@@ -47,85 +47,90 @@ function AddVerseContent($versenumber, $verselist, $content){
 }
 
 
+function FetchBibleContent($chapteraddress, $verseaddress){
+    $pageDom = GetHtml("http://raamattu.fi/1992/" . $chapteraddress . ".html");
+    $headertexts = GetHeaders($pageDom);
+    foreach ($pageDom->childNodes as $item){
+        $text = $item->textContent;
+        //FIX!^^
+    }
 
-#$pageDom = GetHtml("bibletest2.html");
-$pageDom = GetHtml("http://raamattu.fi/1992/" . $_GET["chap"] . ".html");
-$headertexts = GetHeaders($pageDom);
-
-foreach ($pageDom->childNodes as $item){
-    $text = $item->textContent;
-    //FIX!^^
-}
-
-$textcont="";
-foreach(preg_split("/((\r?\n)|(\r\n?))/", $text) as $line){
-    if(!in_array($line,$headertexts))
-        $textcont .= $line . "\n";
-} 
+    $textcont="";
+    foreach(preg_split("/((\r?\n)|(\r\n?))/", $text) as $line){
+        if(!in_array($line,$headertexts))
+            $textcont .= $line . "\n";
+    } 
 
 
-$currentverse=0;
-$verses = Array();
-foreach(preg_split("/((\r?\n)|(\r\n?))/", $textcont) as $line){
-    $wantednum = ($currentverse + 1);
-    $matchbeginning = "/(.*)\\b($wantednum)(\\s+)(.*)/u";
-    preg_match($matchbeginning, trim($line), $groups);
-    if(sizeof($groups)>0){
-        $currentverse++;
-        $line = $groups[4];
-        if(strlen($groups[1])>0){
-            #Jos samalla rivillä kahta jaetta:
-            $verses[sizeof($verses)] .= $groups[1];
+    $currentverse=0;
+    $verses = Array();
+    foreach(preg_split("/((\r?\n)|(\r\n?))/", $textcont) as $line){
+        $wantednum = ($currentverse + 1);
+        $matchbeginning = "/(.*)\\b($wantednum)(\\s+)(.*)/u";
+        preg_match($matchbeginning, trim($line), $groups);
+        if(sizeof($groups)>0){
+            $currentverse++;
+            $line = $groups[4];
+            if(strlen($groups[1])>0){
+                #Jos samalla rivillä kahta jaetta:
+                $verses[sizeof($verses)] .= $groups[1];
+            }
+        }
+        if($currentverse>0)
+            $verses = AddVerseContent($currentverse, $verses, $line);
+    }
+
+
+    $chaptermark =  mb_strpos($verses[sizeof($verses)], 'seuraava luku');
+    if($chaptermark!==False){
+        $verses[sizeof($verses)] = mb_substr($verses[sizeof($verses)], 0, $chaptermark-1);
+    }
+
+    $selectedverses = Array();
+
+    if(strpos($verseaddress,"-")!==False){
+        #jos jakeet intervallina
+        preg_match("/(\\d+)-(\\d+)/", $verseaddress, $groups);
+        $start = $groups[1];
+        $end = $groups[2];
+        for($i=$start;$i<=$end;$i++){
+            $selectedverses[] = $verses[$i];
         }
     }
-    if($currentverse>0)
-        $verses = AddVerseContent($currentverse, $verses, $line);
-}
-
-
-$chaptermark =  mb_strpos($verses[sizeof($verses)], 'seuraava luku');
-if($chaptermark!==False){
-    $verses[sizeof($verses)] = mb_substr($verses[sizeof($verses)], 0, $chaptermark-1);
-}
-
-$verseaddress = $_GET["verses"];
-$selectedverses = Array();
-
-if(strpos($verseaddress,"-")!==False){
-    #jos jakeet intervallina
-    preg_match("/(\\d+)-(\\d+)/", $verseaddress, $groups);
-    $start = $groups[1];
-    $end = $groups[2];
-    for($i=$start;$i<=$end;$i++){
-        $selectedverses[] = $verses[$i];
+    elseif($verseaddress=="" or $verseaddress=="jae/jakeet"){
+        #Jos tyhjä jaeosoite
+        $selectedverses = $verses;
     }
-}
-elseif($verseaddress=="" or $verseaddress=="jae/jakeet"){
-    #Jos tyhjä jaeosoite
-    $selectedverses = $verses;
-}
-else{
-    #Jos pelkkä numero
-    $selectedverses = $verses[intval($verseaddress)];
+    else{
+        #Jos pelkkä numero
+        $selectedverses = $verses[intval($verseaddress)];
+    }
+
+    return $selectedverses;
 }
 
+if(!isset($embed)){
+
+    $selectedverses = FetchBibleContent($_GET["chap"], $_GET["verses"]);
+
+    ?>
 
 
+    <html lang="fi">
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+    <p id='biblecontent'>
+    <?php
+    if (sizeof($selectedverses)>1)
+        echo implode($selectedverses, "¤");
+    else
+        echo ($selectedverses);
+    ?>
+    </p>
+    </body>
 
-?>
-
-
-<html lang="fi">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-</head>
-<body>
-<p id='biblecontent'>
 <?php
-if (sizeof($selectedverses)>1)
-    echo implode($selectedverses, "¤");
-else
-    echo ($selectedverses);
+}
 ?>
-</p>
-</body>
