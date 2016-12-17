@@ -1,6 +1,6 @@
 html {
     /*background: radial-gradient(circle, white, darkgrey);*/
-    background: black;
+    background: #252323;
 }
 
 body {
@@ -11,15 +11,17 @@ body {
     color: white;
 }
 
-#structure,#evankeliumi,#vastuut,#songs{
+
+#structure,#evankeliumi,#vastuut,#songs,#messutitle{
     display: block;
     line-height:0;
     height: 0;
     overflow: hidden;
 }
 
+
 .songtitlediv h3{
-    color: rgba(228, 221, 117, 0.87);
+    color: rgba(239, 226, 41, 0.91);
     font-size: 290%;
     font-family: 'Quicksand';
     margin-bottom:2em;
@@ -51,6 +53,26 @@ body {
 
 /* NAVIGATOR */
 
+.functions_section{
+    /* background: rgba(128, 128, 128, 0.37); */
+    height: 100%;
+    border-radius: 10px;
+    padding: 5em;
+}
+
+#navigatorcontainer h3{
+    font-family:'Nothing You Could Do';
+    text-align:center;
+    padding-bottom: 0.4em;
+    /* border-bottom: 1px solid; */
+    font-size: 170%;
+}
+
+
+#navigatorcontainer{
+    font-family:'Quicksand';
+}
+
 #navigator_sectionlist, #addedcontentparent{
     padding: 1em;
 } 
@@ -61,7 +83,7 @@ body {
 }
 
 .unhlnavsection{
-    background: black;
+    background: #252323;
 }
 
 #navigatorcontainer{
@@ -74,9 +96,9 @@ body {
 }
 
 #previewer{
-    min-width:10em;
+    min-width: 15em;
     padding-left:2em;
-    border-left:1px dashed white;
+    border-left:1px solid white;
     height:100%;
 }
 
@@ -99,6 +121,7 @@ body {
 .navchildsec{
     float:left;
     margin-right:2em;
+    min-width: 20em;
 }
 
 .hlverse{
@@ -111,24 +134,51 @@ body {
     border:none;
 }
 
-#functionsec, #functionsec2, #functionsec3{
-    border-left:1px dashed white;
-    padding-left:2em;
-    /* height:100%; */
+
+#ytembedded{
+    width:15em;
 }
 
-#functionsec2, #functionsec3{
-    padding-top:1em;
-    border-top: 1px dashed white;
+iframe{
+    border:0;
 }
+
+.functionalsection h4{
+    margin-top:0px;
+}
+
+.functionalsection input{
+    margin-left:1em;
+    margin-right:1em;
+
+}
+
+.functionalsection li{
+    margin-top:1em;
+    margin-bottom:1em;
+}
+
+.functionalsection{
+    /* border-left:1px dashed white; */
+    /* padding-left:2em; */
+    font-size:80%;
+    border-radius: 12px;
+    padding: 0.9em;
+    margin-top: 1em;
+    /* height:100%; */
+    background: rgba(98, 139, 141, 0.32);
+    float:left;
+    margin-left:1em;
+}
+
 
 .contentinsert {
-    height:15em;
-    width:17em;
+    height: 11em;
+    width: 24em;
 }
 
 #addedcontentparent{
-    border-top: 1px dashed white;
+    border-top: 1px solid white;
     margin-top:2em;
 }
 
@@ -197,6 +247,7 @@ h3.bibleheader{
     font-family:'Quicksand';
     /* margin-top: 9em; */
     margin-top: 0.1em;
+    text-shadow: 2px 1px 1px #000;
 }
 .songtitle{
     color:white;
@@ -235,7 +286,7 @@ h3.bibleheader{
 }
 
 #heading h3{
-    color: rgba(228, 221, 117, 0.87);
+    color: rgba(239, 226, 41, 0.91);
     font-size: 290%;
     font-family: 'Quicksand';
     margin-bottom:1em;

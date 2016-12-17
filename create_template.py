@@ -136,6 +136,7 @@ def CreateHtmlTemplate(songpath = '/home/juho/Dropbox/laulut/*.txt', servicestru
     htmlfile = """
     <html lang="fi">
     <head>
+    <link href="https://fonts.googleapis.com/css?family=Nothing+You+Could+Do|Quicksand" rel="stylesheet">
     <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="tyylit.css"/>
     </head>

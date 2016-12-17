@@ -1,4 +1,3 @@
-var all_screencontents = [];
 
 function Presentation(){
     // PRESENTATION is the class that wraps different content and decides what to show
@@ -193,7 +192,7 @@ function MajakkaMessu(){
     this.GetSongs();
     this.showtype = "majakka";
     //TODO: import this from structure html
-    this.title = "Älkää heittäkö pois rohkeuttanne";
+    this.title = document.getElementById('messutitle').textContent;
     //TODO: make creating these sections simpler
     //1. Collect all worship songs and make them into a section
     var communionsongs = MultiSong(this.songs,"Ehtoollislauluja", "Ehtoollislaulu ");
@@ -349,10 +348,6 @@ function SectionItem(thissection, name, contentobject,itemtype, item_idx){
     }
     
     SetPointers(this, true);
-    //finally, add this scrreencontent to the global variable 
-    //in order to reference it by links etc.
-    //this is a hash with ids as keys
-    all_screencontents.push(this);
 }
 
 function Section(mypresentation, name, items, sec_idx){
@@ -660,12 +655,6 @@ function SongContent(title, songtexts){
 
     //SOngContent has no "current" property, only a pointer
     SetPointers(this, false);
-    //finally, add this scrreencontent to the global variable 
-    //in order to reference it by links etc.
-    //this is a hash with ids as keys
-    all_screencontents.push(this);
-
-
 }
 SongContent.prototype = new ScreenContent();
 SongContent.prototype.constructor = SongContent;
@@ -684,10 +673,6 @@ function SongTitleContent(title){
     this.titletext = title;
     this.items = [el];
     SetPointers(this, true);
-    //finally, add this scrreencontent to the global variable 
-    //in order to reference it by links etc.
-    //this is a hash with ids as keys
-    all_screencontents.push(this);
 }
 SongTitleContent.prototype = new ScreenContent();
 SongTitleContent.prototype.constructor = SongTitleContent;
@@ -700,10 +685,6 @@ function SectionTitleContent(section,curitem){
     this.content_type = "sectiontitle";
     this.items = [section.CreateLeftbanner(curitem)];
     SetPointers(this, false);
-    //finally, add this scrreencontent to the global variable 
-    //in order to reference it by links etc.
-    //this is a hash with ids as keys
-    all_screencontents.push(this);
     section.mypresentation.flatsructure.push(this);
     return 0;
 }
@@ -731,10 +712,6 @@ function CreditContent(headertext, infotext, content_name){
     this.titletext = infotext;
     this.items = [div];
     SetPointers(this, false);
-    //finally, add this scrreencontent to the global variable 
-    //in order to reference it by links etc.
-    //this is a hash with ids as keys
-    all_screencontents.push(this);
 }
 CreditContent.prototype = new ScreenContent();
 CreditContent.prototype.constructor = CreditContent;
@@ -800,22 +777,37 @@ function InfoContent(headertext, infotext, content_name){
     this.titletext = infotext;
     this.items = [div];
     SetPointers(this, false);
-    //finally, add this scrreencontent to the global variable 
-    //in order to reference it by links etc.
-    //this is a hash with ids as keys
-    all_screencontents.push(this);
 }
 InfoContent.prototype = new ScreenContent();
 InfoContent.prototype.constructor = InfoContent;
+
+
+function EmbeddedContent(EmbeddedElement, content_name){
+    //EmbeddedElement iframe-elementti, videotägi yms...
+    this.id = CreateUid();
+    this.content_type="info";
+    if (content_name!==undefined){
+        this.name = content_name;
+    }
+    else{
+        this.name = "Nimetön sisältö"
+    }
+
+    this.items = [TagParent("div",[EmbeddedElement],"embedderdiv")];
+    SetPointers(this, false);
+}
+EmbeddedContent.prototype = new ScreenContent();
+EmbeddedContent.prototype.constructor = EmbeddedContent;
+
 
 //========================================
 //
 function ClearContent(myNode){
     //Remove child nodes,
     //see also http://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript
-while (myNode.firstChild) {
-    myNode.removeChild(myNode.firstChild);
-}
+    while (myNode.firstChild) {
+        myNode.removeChild(myNode.firstChild);
+    }
 }
 
 function SetPointers(object, setcurrent){
@@ -1022,7 +1014,7 @@ function ClosePres(pres){
 
 function OpenPres(pres){
     preswindow = window.open('','_blank', 'toolbar=0,location=0,menubar=0');
-    preswindow.document.write('<html lang="fi"><head><link href="https://fonts.googleapis.com/css?family=Nothing+You+Could+Do|Quicksand" rel="stylesheet"> <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"><link rel="stylesheet" type="text/css" href="tyylit.css"/></head><body></body>');
+    preswindow.document.write('<html lang="fi" style="background:black;" ><head><link href="https://fonts.googleapis.com/css?family=Nothing+You+Could+Do|Quicksand" rel="stylesheet"> <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"><link rel="stylesheet" type="text/css" href="tyylit.css"/></head><body></body>');
     ClearContent(preswindow.document.body);
     ////TODO:this is the key to make separate screen working!
     Presentations.screen = new Screen(preswindow);
@@ -1065,17 +1057,47 @@ function SwitchToSpontaneous(){
 function AddFunctionalitySection(){
     var textarea = TagWithText("textarea","Kirjoita tähän tekstiä, jonka haluat näyttää skriinillä","contentinsert");
     textarea.id = 'added_text_content';
-    var link = TagWithText("a","Lisää, mutta älä näytä vielä","");
+    var link = TagWithText("a","Lisää","");
     link.addEventListener('click', AddTextSlide, false);
     var spontcontdiv = TagParent("div",[TagWithText("h4","Lisää tekstidia",""), textarea,TagParent("p",[link])],"","spontcontdiv");
-    var sec1 = TagParent("section",[TagWithText("h3","Toiminnot",""), spontcontdiv],"","functionsec");
+    var textcontsec = TagParent("section",[spontcontdiv],"functionalsection","textcontsec");
+
+    /*
+    var link = TagWithText("a","Lisää","");
+    var filepicker = TagParent("input",[],"","filepicker");
+    filepicker.setAttribute("type","file");
+    link.addEventListener('click', AddVideo, false);
+    var sec1b = TagParent("section",[TagWithText("h4","Lisää video tiedostosta",""), filepicker, TagParent("p",[link])],"functionalsection","functionsec1b");
+    */
+
+    var link = TagWithText("a","Lisää","");
+    link.addEventListener('click', AddEmbeddedYoutube, false);
+    var image_from_url_link = TagWithText("a","Lisää","");
+    link.addEventListener('click', AddEmbeddedYoutube, false);
+    image_from_url_link.addEventListener('click', AddImageFromLink, false);
+
+    //TODO: Abstract into functions / objects!
+    var url = TagParent("input",[],"","ytembedded");
+    url.setAttribute("type","text");
+    url.setAttribute("value","kopioi linkki tähän");
+
+    var imgurl = TagParent("input",[],"","imgurl");
+    imgurl.setAttribute("type","text");
+    imgurl.setAttribute("value","kopioi linkki tähän");
+
+    var url = TagParent("input",[],"","ytembedded");
+    url.setAttribute("type","text");
+    url.setAttribute("value","kopioi tähän linkki tähän");
+    var optionlist = TagParent("ul",[TagParent("li",[TagWithText("span","YouTube-linkki",""), url,link]),TagParent("li",[TagWithText("span","Kuva linkistä",""),imgurl,image_from_url_link]),TagParent("li",[TagWithText("span","Kuva images-kansiosta","")]),TagParent("li",[TagWithText("span","video images-kansiosta","")])]);
+    var embcontsec = TagParent("section",[TagWithText("h4","Lisää media",""),optionlist],"functionalsection","embcontsec");
 
 
-    var link = TagWithText("a","Lisää laulu","");
+
+    var link = TagWithText("a","Lisää","");
     link.addEventListener('click', AddSongSlide, false);
-    var sec2 = TagParent("section",[TagWithText("h4","Lisää laulu",""), SongListDropDown(),TagParent("p",[link])],"","functionsec2");
+    var songcontsec = TagParent("section",[TagWithText("h4","Lisää laulu",""), SongListDropDown(),TagParent("p",[link])],"functionalsection","songcontsec");
 
-    var link = TagWithText("a","Lisää raamatunkohta","");
+    var link = TagWithText("a","Lisää","");
     var logger = TagWithText("p","","");
     logger.id = "logger";
     link.addEventListener('click', AddBibleContent, false);
@@ -1087,13 +1109,13 @@ function AddFunctionalitySection(){
     verseinput.id = 'verse';
     verseinput.value = 'jae/jakeet';
 
-    var sec3 = TagParent("section",[TagWithText("h4","Lisää Raamatunteksti",""),logger, TagParent("div",[select, chapinput, verseinput],'bibaddress'),TagParent('p',[link])],"","functionsec3");
+    var bibcontsec = TagParent("section",[TagWithText("h4","Lisää Raamatunteksti",""),logger, TagParent("div",[select, chapinput, verseinput],'bibaddress'),TagParent('p',[link])],"functionalsection","bibcontsec");
 
     //Make a container for the iframe doing the bible loading
     var biblenavi = TagWithText("iframe","","biblenavi");
     biblenavi.id = 'biblenavi';
     document.body.appendChild(biblenavi);
-    return TagParent("section",[sec1, sec2, sec3]);
+    return TagParent("section",[TagWithText("h3","Toiminnot",""), textcontsec, songcontsec, bibcontsec, embcontsec],"functions_section");
 }
 
 function SongListDropDown(){
@@ -1169,6 +1191,32 @@ function AddBibleContent(){
 //    }
 
 
+}
+
+function AddVideo(){
+    var filename = document.getElementById("filepicker").value.match(/[^\/\\]+$/);
+    filename = filename[0];
+    console.log(filename);
+}
+
+function AddImageFromLink(){
+    var url = document.getElementById("imgurl").value;
+    var img = TagParent("img");
+    img.src = url;
+    Presentations.spontaneous.AddContent(new EmbeddedContent(img, "Kuva"));
+    console.log(url);
+}
+
+function AddEmbeddedYoutube(){
+    var url = document.getElementById("ytembedded").value;
+    var idgroups = url.match(/v=(.*)/)
+    var videoid = idgroups[1];
+    var iframe = TagParent("iframe", [],"","");
+    iframe.setAttribute("width","560");
+    iframe.setAttribute("height","315");
+    iframe.setAttribute("allowfullscreen","");
+    iframe.src = "https://www.youtube.com/embed/" + videoid;
+    Presentations.spontaneous.AddContent(new EmbeddedContent(iframe, "YouTube-video"));
 }
 
 function AddSongSlide(){
