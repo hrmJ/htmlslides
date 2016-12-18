@@ -41,7 +41,7 @@ body {
 #creditbox{
     width:100%;
     text-align:left;
-    font-size:60%;
+    font-size:50%;
     background:none;
 } 
 
@@ -370,7 +370,7 @@ h3.bibleheader{
 
 #sections li, #sitems li{
     list-style-type:none;
-    white-space: nowrap;
+    /*white-space: nowrap;*/
     /* display: inline; */
 }
 
@@ -480,8 +480,10 @@ nav#sitems li {
 
 #sitems ul {
     /* list-style: none; */
+    margin-top: 0.1em;
     padding-left: 0;
 }
+
 
 #textcontent{
     color:white;
