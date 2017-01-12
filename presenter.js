@@ -249,7 +249,7 @@ function MultiSong(songlist, songrole, header, constantinfo){
     var wscounter = 1;
     for(var songidx in songlist[songrole]){
         var wsong = songlist[songrole][songidx];
-        songs.push(['Laulu: ' +  wsong.titletext, songrole]);
+        songs.push(['Laulu: ' +  wsong.titletext, wsong, songrole]);
         if(constantinfo!==undefined){
             if (songidx < songlist[songrole].length -1 ){
                 //Don't add the info after the last song
@@ -336,11 +336,19 @@ function SectionItem(thissection, name, contentobject,itemtype, item_idx){
         this.items = [new SectionTitleContent(thissection, item_idx)];
         if (contentobject){
             //If this object has subcontent
-            if (itemtype=='song'){
+            if (itemtype.match(/(song|laulu)/g)){
                 //Print song's title with the role as the first slide
-                var div = TagParent('div', [TagWithText('h3',name), TagWithText('h2',contentobject.titletext)],'songtitlediv');
+                var printedname = name;
+                if (itemtype.match(/laulu/g)){
+                    //Printn the role differently if worship or communion songs in question
+                    var printedname = itemtype;
+                }
+                var div = TagParent('div', [TagWithText('h3',printedname), TagWithText('h2',contentobject.titletext)],'songtitlediv');
                 contentobject.items.unshift(div);
                 SetPointers(contentobject,false);
+            }
+            else{
+                console.log(itemtype)
             }
             this.items.push(contentobject);
             thissection.mypresentation.flatsructure.push(contentobject);
