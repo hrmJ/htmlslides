@@ -249,7 +249,7 @@ function MultiSong(songlist, songrole, header, constantinfo){
     var wscounter = 1;
     for(var songidx in songlist[songrole]){
         var wsong = songlist[songrole][songidx];
-        songs.push([header + wscounter, wsong, 'song']);
+        songs.push(['Laulu: ' +  wsong.titletext, songrole]);
         if(constantinfo!==undefined){
             if (songidx < songlist[songrole].length -1 ){
                 //Don't add the info after the last song
@@ -356,19 +356,35 @@ function Section(mypresentation, name, items, sec_idx){
     //mypresentation saves reference to the 'parent' pres
     this.mypresentation = mypresentation;
     this.CreateLeftbanner = function(highlighted){
+        highlighted = parseInt(highlighted);
         var leftbanner = document.createElement('ul');
+        //How many preceding / upcoming sections will be shown in the list
+        var sectionbuffer = 1;
+        //This is to keep track on the number of visible headers
+        //despite the infocontents that are not listed
+        var itemcounter = 0;
         for(var i in this.items){
-            thisitem = this.items[i];
-            if (['info'].indexOf(thisitem.itemtype)==-1){ 
-                //If the object won't be added to the list of section items shown on the main screen
-                var this_li = document.createElement('li');
-                this_li.textContent = thisitem.name;
-                ListToLink(this_li, this.sec_idx, i);
-                if (i==highlighted){
-                    this_li.className = "sectionitemhl";
-                }
-                leftbanner.appendChild(this_li);
+            if (highlighted == 0 || highlighted == this.mypresentation.items.length){
+                //set minimum visible headings to 3
+                sectionbuffer = 2;
             }
+            if((itemcounter>=highlighted-sectionbuffer && itemcounter<=highlighted+sectionbuffer) || i == highlighted){
+                thisitem = this.items[i];
+                if (['info'].indexOf(thisitem.itemtype)==-1){ 
+                    //If the object won't be added to the list of section items shown on the main screen
+                    var this_li = document.createElement('li');
+                    this_li.textContent = thisitem.name;
+                    ListToLink(this_li, this.sec_idx, i);
+                    if (i==highlighted){
+                        this_li.className = "sectionitemhl";
+                    }
+                    leftbanner.appendChild(this_li);
+                }
+                else{
+                    itemcounter--;
+                }
+            }
+            itemcounter++;
         }
         return leftbanner;
     };
@@ -385,7 +401,7 @@ function Section(mypresentation, name, items, sec_idx){
                 //set minimum visible headings to 3
                 sectionbuffer = 2;
             }
-            if((section_idx>=highlighted-sectionbuffer && section_idx<=highlighted+sectionbuffer) || section_idx == highlighted){
+            if((section_idx>=highlighted-sectionbuffer && section_idx<=parseInt(highlighted)+parseInt(sectionbuffer)) || section_idx == highlighted){
                 var sec = this.mypresentation.items[section_idx];
                 var this_li = document.createElement('li');
                 this_li.textContent = sec.name;
@@ -625,6 +641,16 @@ function AdjustHeadings(screen){
 function SongContent(title, songtexts){
     // Songcontent is a class for the actual songs
 
+    //Make sure first letter uppercase, others lower
+    if(title!==undefined){
+        try{
+            var origtitle = title;
+            title = title[0].toUpperCase() + title.substr(1,title.length-1).toLowerCase();
+        }
+        catch(error){
+            console.log(origtitle);
+        }
+    }
     this.id = CreateUid();
     this.content_type = "song";
     this.titleslide = new SongTitleContent(title);
