@@ -348,7 +348,6 @@ function SectionItem(thissection, name, contentobject,itemtype, item_idx){
                 SetPointers(contentobject,false);
             }
             else{
-                console.log(itemtype)
             }
             this.items.push(contentobject);
             thissection.mypresentation.flatsructure.push(contentobject);
@@ -1063,7 +1062,7 @@ function ClosePres(pres){
 
 function OpenPres(pres){
     preswindow = window.open('','_blank', 'toolbar=0,location=0,menubar=0');
-    preswindow.document.write('<html lang="fi" style="background:black;" ><head><link href="https://fonts.googleapis.com/css?family=Nothing+You+Could+Do|Quicksand" rel="stylesheet"> <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"><link id="stylesetter" rel="stylesheet" type="text/css" href="tyylit.css"/></head><body></body>');
+    preswindow.document.write('<html lang="fi" style="background:black;" ><head><link href="https://fonts.googleapis.com/css?family=Nothing+You+Could+Do|Quicksand" rel="stylesheet"> <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"><link id="stylesetter" rel="stylesheet" type="text/css" href="tyylit2.css"/></head><body></body>');
     ClearContent(preswindow.document.body);
     ////TODO:this is the key to make separate screen working!
     Presentations.screen = new Screen(preswindow);
@@ -1105,11 +1104,11 @@ function SwitchToSpontaneous(){
 
 function ApplyStyles(){
     var stylesetter = Presentations.screen.preswindow.document.getElementById("stylesetter");
-    if (stylesetter.href=='tyylit.css'){
+    if (stylesetter.href!=='tyylit.css'){
         stylesetter.href = "tyylit2.css";
     }
     else{
-        stylesetter.href = "tyylit.css";
+        stylesetter.href = "tyylit2.css";
     }
 
 }
@@ -1178,7 +1177,7 @@ function AddFunctionalitySection(){
     var biblenavi = TagWithText("iframe","","biblenavi");
     biblenavi.id = 'biblenavi';
     document.body.appendChild(biblenavi);
-    return TagParent("section",[TagWithText("h3","Toiminnot",""), textcontsec, songcontsec, bibcontsec, embcontsec, stylesec],"functions_section");
+    return TagParent("section",[TagWithText("h3","Toiminnot",""), textcontsec, songcontsec, bibcontsec, embcontsec],"functions_section");
 }
 
 function SongListDropDown(){
