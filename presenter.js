@@ -1063,7 +1063,7 @@ function ClosePres(pres){
 
 function OpenPres(pres){
     preswindow = window.open('','_blank', 'toolbar=0,location=0,menubar=0');
-    preswindow.document.write('<html lang="fi" style="background:black;" ><head><link href="https://fonts.googleapis.com/css?family=Nothing+You+Could+Do|Quicksand" rel="stylesheet"> <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"><link rel="stylesheet" type="text/css" href="tyylit.css"/></head><body></body>');
+    preswindow.document.write('<html lang="fi" style="background:black;" ><head><link href="https://fonts.googleapis.com/css?family=Nothing+You+Could+Do|Quicksand" rel="stylesheet"> <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"><link id="stylesetter" rel="stylesheet" type="text/css" href="tyylit.css"/></head><body></body>');
     ClearContent(preswindow.document.body);
     ////TODO:this is the key to make separate screen working!
     Presentations.screen = new Screen(preswindow);
@@ -1103,6 +1103,17 @@ function SwitchToSpontaneous(){
     document.getElementById('navigator_sectionlist').className = 'unhlnavsection';
 }
 
+function ApplyStyles(){
+    var stylesetter = Presentations.screen.preswindow.document.getElementById("stylesetter");
+    if (stylesetter.href=='tyylit.css'){
+        stylesetter.href = "tyylit2.css";
+    }
+    else{
+        stylesetter.href = "tyylit.css";
+    }
+
+}
+
 function AddFunctionalitySection(){
     var textarea = TagWithText("textarea","Kirjoita tähän tekstiä, jonka haluat näyttää skriinillä","contentinsert");
     textarea.id = 'added_text_content';
@@ -1140,6 +1151,9 @@ function AddFunctionalitySection(){
     var optionlist = TagParent("ul",[TagParent("li",[TagWithText("span","YouTube-linkki",""), url,link]),TagParent("li",[TagWithText("span","Kuva linkistä",""),imgurl,image_from_url_link]),TagParent("li",[TagWithText("span","Kuva images-kansiosta","")]),TagParent("li",[TagWithText("span","video images-kansiosta","")])]);
     var embcontsec = TagParent("section",[TagWithText("h4","Lisää media",""),optionlist],"functionalsection","embcontsec");
 
+    var stylelink = TagWithText("a","Seuraava tyyli >>");
+    stylelink.addEventListener('click', ApplyStyles, false);
+    var stylesec = TagParent("section",[TagWithText("h4","Muuta tyylejä",""), stylelink],"functionalsection","stylesec");
 
 
     var link = TagWithText("a","Lisää","");
@@ -1164,7 +1178,7 @@ function AddFunctionalitySection(){
     var biblenavi = TagWithText("iframe","","biblenavi");
     biblenavi.id = 'biblenavi';
     document.body.appendChild(biblenavi);
-    return TagParent("section",[TagWithText("h3","Toiminnot",""), textcontsec, songcontsec, bibcontsec, embcontsec],"functions_section");
+    return TagParent("section",[TagWithText("h3","Toiminnot",""), textcontsec, songcontsec, bibcontsec, embcontsec, stylesec],"functions_section");
 }
 
 function SongListDropDown(){
