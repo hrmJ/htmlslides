@@ -22,16 +22,17 @@ body {
 
 .songtitlediv h3{
     color: rgba(239, 226, 41, 0.91);
-    font-size: 290%;
+    font-size: 260%;
     font-family: 'Quicksand';
     margin-bottom:2em;
     margin-top: 0.1em;
+    font-weight: normal;
 }
 
 #textcontent > .songtitlediv h2{
     color:white;
     font-family: 'Nothing You Could Do',fantasy;
-    font-size: 300%;
+    font-size: 347%;
     margin-top:0px
     /* background: -webkit-linear-gradient(#eee, rgb(217, 247, 128)); */
     /* -webkit-background-clip: text; */
@@ -286,11 +287,14 @@ h3.bibleheader{
 }
 
 #heading h3{
-    color: rgba(239, 226, 41, 0.91);
+    color: #FFEB3B;
+    /* padding-bottom: 1em; */
+    /* border-bottom: 1px solid white; */
     font-size: 290%;
     font-family: 'Quicksand';
-    margin-bottom:1em;
-    margin-top: 0.1em;
+    font-weight: normal;
+    margin-bottom: 1.5em;
+    margin-top: 0.3em;
     position:relative;
     /* display: inline-block; */
     /* left: -50%; */
@@ -341,15 +345,17 @@ h3.bibleheader{
 
 #prescont #navwrapper #navcontainer{
     position: relative;
-    /* left: -50%; */ 
+    /* left: -50%; */
     display: -webkit-box;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: -webkit-flex;
-  display: flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
     /* display: flex; */
     /* -webkit-flex-direction: row; */
     flex-direction: row;
+    /* width: 500px; */
+    /* padding-right: 30em; */
 }
 
 
@@ -392,8 +398,8 @@ h3.bibleheader{
 }
 
 .creditcontent{
-    background: #353567;
-    background: linear-gradient(to bottom, rgb(39, 39, 89), rgba(0, 0, 0, 0));
+    /* background: #353567; */
+    /* background: linear-gradient(to bottom, rgb(39, 39, 89), rgba(0, 0, 0, 0)); */
     color: white;
     font-family: 'Quicksand';
     padding-top:0.3em;
@@ -402,7 +408,8 @@ h3.bibleheader{
     padding-right: 1em;
     font-size: 300%;
     border-radius:12px;
-    /* font-family: monospace; */
+    border-left: 2px solid white;
+    border-right: 2px solid white;
 }
 
 
@@ -439,9 +446,11 @@ h3.bibleheader{
 }
 
 #sections li.sectionhl {
-    background: #353567;
-    background: linear-gradient(to bottom, rgb(39, 39, 89), rgba(0, 0, 0, 0));
+    /* background: #353567; */
+    /* background: linear-gradient(to bottom, rgb(179, 179, 222), rgba(0, 0, 0, 0)); */
+    border-left: 3px solid white;
     color: white;
+    border-right: 3px solid white;
 }
 
 
@@ -450,12 +459,14 @@ h3.bibleheader{
     /* float: left; */
     /* margin-top: 20em; */
     /* border-right: 1px dashed yellow; */
-    border-radius: 12px;
+    /* border-radius: 12px; */
     color: #ffffff;
-    /* background: rgba(53, 53, 103, 0.82); */
-    background: linear-gradient(to bottom, rgba(40, 52, 146, 0.55), rgba(64, 60, 72, 0.13));
+    /* background: rgba(142, 142, 150, 0.82); */
+    /* background: linear-gradient(to bottom, rgba(40, 52, 146, 0.55), rgba(64, 60, 72, 0.13)); */
     padding-right: 22px;
     padding-left: 22px;
+    border-left: 3px solid white;
+    /* border-right: 1px solid white; */
     /* margin-right: 5em; */
     margin-left: 2em;
     font-size: 200%;
@@ -478,10 +489,22 @@ nav#sitems li {
     color: #a7a7a7;
 }
 
+nav#sitems li:last-child{
+    margin-bottom:0;
+    padding-bottom:0;
+}
+
+nav#sitems li:first-child{
+    margin-top:0;
+    padding-top:0;
+}
+
 #sitems ul {
     /* list-style: none; */
     margin-top: 0.1em;
     padding-left: 0;
+    /* padding-bottom: 0; */
+    /* margin-bottom: 0; */
 }
 
 
