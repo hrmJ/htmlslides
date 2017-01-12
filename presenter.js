@@ -371,12 +371,27 @@ function Section(mypresentation, name, items, sec_idx){
         //This is to keep track on the number of visible headers
         //despite the infocontents that are not listed
         var itemcounter = 0;
+
+        //If there is "uncounted" (info) content between diaplayed contents
+        //fix  the highlighted number
+        var actualhighlighted = highlighted;
         for(var i in this.items){
-            if (highlighted == 0 || highlighted == this.mypresentation.items.length){
+            thisitem = this.items[i];
+            if(i == highlighted){
+                break;
+            }
+            else if (['info'].indexOf(thisitem.itemtype)>-1){ 
+                //Decrease by one if uncounted material precedes
+                actualhighlighted--;
+            }
+        }
+
+        for(var i in this.items){
+            if (actualhighlighted == 0 || actualhighlighted == this.mypresentation.items.length){
                 //set minimum visible headings to 3
                 sectionbuffer = 2;
             }
-            if((itemcounter>=highlighted-sectionbuffer && itemcounter<=highlighted+sectionbuffer) || i == highlighted){
+            if((itemcounter>=actualhighlighted-sectionbuffer && itemcounter<=actualhighlighted+sectionbuffer) || i == highlighted){
                 thisitem = this.items[i];
                 if (['info'].indexOf(thisitem.itemtype)==-1){ 
                     //If the object won't be added to the list of section items shown on the main screen
