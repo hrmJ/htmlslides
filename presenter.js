@@ -199,6 +199,10 @@ function MajakkaMessu(){
                     // Add a new songcontent object to the songs container object
                     // todo: composer, writer
                     var vastuu = vastuut[i];
+                    if(vastuu.id=='Sanailija'){
+                        vastuu.id = "Seurakuntalaisen sana";
+                    
+                    }
                     if (vastuu.id !== 'Saarnateksti'){
                         vastuulist.push(vastuu.id + ": " + vastuu.textContent);
                         this.credits[vastuu.id] = vastuu.textContent;
@@ -211,24 +215,27 @@ function MajakkaMessu(){
     this.showtype = "majakka";
     //TODO: import this from structure html
     this.title = document.getElementById('messutitle').textContent;
+    var credits1 = new CreditContent('', this.GetCredits());
     //TODO: make creating these sections simpler
     //1. Collect all worship songs and make them into a section
     var communionsongs = MultiSong(this.songs,"Ehtoollislauluja", "Ehtoollislaulu ");
-    var info1 = new InfoContent('Lapsille ja lapsiperheille', ['Päivän laulun aikana 3-6-vuotiaat lapset voivat siirtyä pyhikseen ja yli 6-vuotiaat klubiin.', 'Seuraa vetäjiä - tunnistat heidät lyhdyistä!']);
+    var lapsicredits = "Pyhistä vetää tänään " + this.credits["Pyhis"] + ", klubissa " + this.credits["Klubi"];
+    var info1 = new InfoContent('Lapsille ja lapsiperheille', ['Päivän laulun aikana 3-6-vuotiaat lapset voivat siirtyä pyhikseen ja yli 6-vuotiaat klubiin.', 'Seuraa vetäjiä - tunnistat heidät lyhdyistä!', lapsicredits]);
     var ehtoollisinfo  = new InfoContent('Ehtoolliskäytännöistä', ['Voit tulla ehtoolliselle jo Jumalan karitsa -hymnin aikana', 'Halutessasi voit jättää kolehdin ehtoolliselle tullessasi oikealla olevaan koriin.']);
     var evankeliumi = new BibleContent(document.getElementById('evankeliumi').getAttribute('address'), document.getElementById('evankeliumi').textContent );
 
+    var rukouscredits = "Rukouspalvelijana tänään " + this.credits["Rukouspalvelu"] + ". ";
     //TODO: Hae esirukoilijatieto autom.
-    var wsinfo  = new InfoContent('Ylistys- ja rukousosio', ['Ylistys- ja rukouslaulujen aikana voit kirjoittaa omia  rukousaiheitasi ja hiljentyä sivualttarin luona.', 'Rukouspalvelu hiljaisessa huoneessa.']);
+    var wsinfo  = new InfoContent('Ylistys- ja rukousosio', ['Ylistys- ja rukouslaulujen aikana voit kirjoittaa omia  rukousaiheitasi ja hiljentyä sivualttarin luona.', ' Rukouspalvelu hiljaisessa huoneessa. ' + rukouscredits]);
     var worshipsongs = MultiSong(this.songs,"Ylistys- ja rukouslauluja", "Ylistyslaulu ", ['rukousinfo', wsinfo, 'info']);
     worshipsongs.push(['Esirukous',false,'header']);
 
-    var credits1 = new CreditContent('', this.GetCredits());
 
     //2. Combine all the sections
     this.items = [new Section(this, 'Johdanto',           [['Krediitit1',credits1,'info'],
                                                           ['Alkulaulu',this.songs['Alkulaulu'][0],'song'],
-                                                          ['Alkusanat ja seurakuntalaisen sana',false,'header'],
+                                                          ['Alkusanat',false,'header'],
+                                                          ['Seurakuntalaisen sana',false,'header'],
                                                           ['Pyhisinfo',info1,'info']
                                                           ]),
                   new Section(this, 'Sana',               [['Päivän laulu',this.songs['Päivän laulu'][0],'song'],
@@ -414,7 +421,7 @@ function Section(mypresentation, name, items, sec_idx){
                 if (['info'].indexOf(thisitem.itemtype)==-1){ 
                     //If the object won't be added to the list of section items shown on the main screen
                     var this_li = document.createElement('li');
-                    if(["Saarna"].indexOf(thisitem.name)>-1){
+                    if(["Saarna", "Seurakuntalaisen sana"].indexOf(thisitem.name)>-1){
                         this_li.textContent = thisitem.name + ": " + Presentations.default.credits[thisitem.name];
                     }
                     else{
@@ -755,7 +762,7 @@ function SectionTitleContent(section,curitem){
     this.id = CreateUid();
     this.mysection = section;
     this.content_type = "sectiontitle";
-    this.items = [section.CreateLeftbanner(curitem)];
+    this.items = [];
     SetPointers(this, false);
     section.mypresentation.flatsructure.push(this);
     return 0;
