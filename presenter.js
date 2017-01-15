@@ -189,6 +189,24 @@ function Presentation(){
 function MajakkaMessu(){
     //Pre-defined services...
     //These inherit from the general presentation class
+
+    this.GetCredits = function (){
+                var vastuut = document.getElementsByClassName("vastuudata");
+                var vastuulist = [];
+                //Save the credits to be referenced elswhere, too
+                this.credits = {};
+                for(var i=0;i<vastuut.length;i++){
+                    // Add a new songcontent object to the songs container object
+                    // todo: composer, writer
+                    var vastuu = vastuut[i];
+                    if (vastuu.id !== 'Saarnateksti'){
+                        vastuulist.push(vastuu.id + ": " + vastuu.textContent);
+                        this.credits[vastuu.id] = vastuu.textContent;
+                    }
+                }
+                return vastuulist;
+            };
+
     this.GetSongs();
     this.showtype = "majakka";
     //TODO: import this from structure html
@@ -205,7 +223,7 @@ function MajakkaMessu(){
     var worshipsongs = MultiSong(this.songs,"Ylistys- ja rukouslauluja", "Ylistyslaulu ", ['rukousinfo', wsinfo, 'info']);
     worshipsongs.push(['Esirukous',false,'header']);
 
-    var credits1 = new CreditContent('', GetCredits());
+    var credits1 = new CreditContent('', this.GetCredits());
 
     //2. Combine all the sections
     this.items = [new Section(this, 'Johdanto',           [['Krediitit1',credits1,'info'],
@@ -238,6 +256,7 @@ function MajakkaMessu(){
     }
     SetPointers(this, true);
     this.GetContentChain();
+
 
 }
 
@@ -387,7 +406,7 @@ function Section(mypresentation, name, items, sec_idx){
 
         for(var i in this.items){
             if (actualhighlighted == 0 || actualhighlighted == this.mypresentation.items.length){
-                //set minimum visible headings to 3
+                //set minimum number of visible headings to 3
                 sectionbuffer = 2;
             }
             if((itemcounter>=actualhighlighted-sectionbuffer && itemcounter<=actualhighlighted+sectionbuffer) || i == highlighted){
@@ -395,7 +414,12 @@ function Section(mypresentation, name, items, sec_idx){
                 if (['info'].indexOf(thisitem.itemtype)==-1){ 
                     //If the object won't be added to the list of section items shown on the main screen
                     var this_li = document.createElement('li');
-                    this_li.textContent = thisitem.name;
+                    if(["Saarna"].indexOf(thisitem.name)>-1){
+                        this_li.textContent = thisitem.name + ": " + Presentations.default.credits[thisitem.name];
+                    }
+                    else{
+                        this_li.textContent = thisitem.name;
+                    }
                     ListToLink(this_li, this.sec_idx, i);
                     if (i==highlighted){
                         this_li.className = "sectionitemhl";
@@ -866,19 +890,6 @@ function SetPointers(object, setcurrent){
     }
 }
 
-function GetCredits(){
-    var vastuut = document.getElementsByClassName("vastuudata");
-    var vastuulist = [];
-    for(var i=0;i<vastuut.length;i++){
-        // Add a new songcontent object to the songs container object
-        // todo: composer, writer
-        var vastuu = vastuut[i];
-        if (vastuu.id !== 'Saarnateksti'){
-            vastuulist.push(vastuu.id + ": " + vastuu.textContent);
-        }
-    }
-    return vastuulist;
-}
 
 
 function GetSongs(){
