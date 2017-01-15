@@ -1165,7 +1165,13 @@ function AddFunctionalitySection(){
     var url = TagParent("input",[],"","ytembedded");
     url.setAttribute("type","text");
     url.setAttribute("value","kopioi tähän linkki tähän");
-    var optionlist = TagParent("ul",[TagParent("li",[TagWithText("span","YouTube-linkki",""), url,link]),TagParent("li",[TagWithText("span","Kuva linkistä",""),imgurl,image_from_url_link]),TagParent("li",[TagWithText("span","Kuva images-kansiosta","")]),TagParent("li",[TagWithText("span","video images-kansiosta","")])]);
+
+
+    var klink = TagWithText("input");
+    klink.setAttribute("type","file");
+    klink.addEventListener('change', AddLocalImage, false);
+
+    var optionlist = TagParent("ul",[TagParent("li",[TagWithText("span","Kuva tiedostosta",""),TagParent("span",[klink])]), TagParent("li",[TagWithText("span","YouTube-linkki",""), url,link]),TagParent("li",[TagWithText("span","Kuva linkistä",""),imgurl,image_from_url_link])]);
     var embcontsec = TagParent("section",[TagWithText("h4","Lisää media",""),optionlist],"functionalsection","embcontsec");
 
     var stylelink = TagWithText("a","Seuraava tyyli >>");
@@ -1388,6 +1394,21 @@ function PosFromTop(el){
     return rect.top;
 }
 
+function AddLocalImage(evt) {
+    //http://stackoverflow.com/questions/19005678/how-to-upload-an-image-with-jquery-client-side-and-add-it-to-a-div
+    var input = evt.target;
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            var img = TagParent("img");
+            img.src = e.target.result;
+            Presentations.spontaneous.AddContent(new EmbeddedContent(img, "Kuva"));
+        }
+
+        reader.readAsDataURL(input.files[0]);
+    }
+}
 
 //========================================
 
