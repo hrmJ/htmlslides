@@ -974,6 +974,10 @@ function Screen(newwindow){
         ClearContent(this.itemtitle);
         ClearContent(this.infobox);
         ClearContent(this.creditbox);
+
+        var bsbutton = document.getElementById("utsection");
+        bsbutton.style.background = "rgba(98, 139, 141, 0.32)";
+        bsbutton.style.color = "white";
     };
 
     this.UpdateContent = function(divname, contentitem){
@@ -1182,8 +1186,8 @@ function AddFunctionalitySection(){
     var embcontsec = TagParent("section",[TagWithText("h4","Lisää media",""),optionlist],"functionalsection","embcontsec");
 
     var blink = TagWithText("a","Blank screen");
-    blink.addEventListener('click', BlankScreen, false);
     var utilities = TagParent("section",[blink],"functionalsection","utsection");
+    utilities.addEventListener('click', BlankScreen, false);
 
     var stylelink = TagWithText("a","Seuraava tyyli >>");
     stylelink.addEventListener('click', ApplyStyles, false);
@@ -1213,11 +1217,6 @@ function AddFunctionalitySection(){
     biblenavi.id = 'biblenavi';
     document.body.appendChild(biblenavi);
     return TagParent("section",[TagWithText("h3","Toiminnot",""), utilities,textcontsec, songcontsec, bibcontsec, embcontsec],"functions_section");
-}
-
-function BlankScreen(){
-    var div = TagWithText("div","","blankscreen");
-    Presentations.screen.doc.getElementById('prescont').appendChild(div);
 }
 
 function SongListDropDown(){
@@ -1448,9 +1447,30 @@ function AddLocalImage(evt) {
     }
 }
 
+
+//========================================
+
 function NextSlide(){
         Presentations[Presentations.current].Move('increment');
 }
+
+function BlankScreen(){
+    var div = TagWithText("div","","blankscreen");
+    div.id = "blankbox";
+    Presentations.screen.doc.getElementById('prescont').appendChild(div);
+    var bsbutton = document.getElementById("utsection");
+    if (bsbutton.style.background == "white"){
+        bsbutton.style.background = "rgba(98, 139, 141, 0.32)";
+        bsbutton.style.color = "white";
+        Presentations[Presentations.current].Move('increment');
+        Presentations[Presentations.current].Move('decrement');
+    }
+    else{
+        bsbutton.style.background = "white";
+        bsbutton.style.color = "black";
+    }
+}
+
 
 //========================================
 

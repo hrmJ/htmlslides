@@ -543,3 +543,8 @@ nav#sitems li {
     cursor:pointer;
     border:2px solid yellow;
 }
+
+#utsection{
+    width:100%;
+    text-align:center;
+}
