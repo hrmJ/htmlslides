@@ -1171,6 +1171,10 @@ function AddFunctionalitySection(){
     klink.setAttribute("type","file");
     klink.addEventListener('change', AddLocalImage, false);
 
+    var vlink = TagWithText("input");
+    vlink.setAttribute("type","file");
+    vlink.addEventListener('change', AddLocalVideo, false);
+
     var optionlist = TagParent("ul",[TagParent("li",[TagWithText("span","Kuva tiedostosta",""),TagParent("span",[klink])]), TagParent("li",[TagWithText("span","YouTube-linkki",""), url,link]),TagParent("li",[TagWithText("span","Kuva linkistä",""),imgurl,image_from_url_link])]);
     var embcontsec = TagParent("section",[TagWithText("h4","Lisää media",""),optionlist],"functionalsection","embcontsec");
 
@@ -1394,6 +1398,28 @@ function PosFromTop(el){
     return rect.top;
 }
 
+function AddLocalVideo(evt) {
+    var input = evt.target;
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            //var video = TagWithText("source");
+            //video.src = e.target.result;
+            //<video controls="" autoplay="" name="media"><source src="file:///media/juho/LACIE%20SHARE/Arkisto/videot/lapset/sasun_sanomat.mp4" type="video/mp4"></video>
+            //var vparent = TagParent("video",[video]);
+            //vparent.setAttribute("controls","");
+            //vparent.setAttribute("name","");
+            var div = TagWithText("div","");
+            div.innerHTML = '<video controls="" autoplay="" name="media"><source src="file:///media/juho/LACIE%20SHARE/Arkisto/videot/lapset/sasun_sanomat.mp4" type="video/mp4"></video>';
+            div.children[0].children[0].src = e.target.result;
+            Presentations.spontaneous.AddContent(new EmbeddedContent(div, "Video"));
+        }
+
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
 function AddLocalImage(evt) {
     //http://stackoverflow.com/questions/19005678/how-to-upload-an-image-with-jquery-client-side-and-add-it-to-a-div
     var input = evt.target;
@@ -1401,7 +1427,7 @@ function AddLocalImage(evt) {
         var reader = new FileReader();
 
         reader.onload = function (e) {
-            var img = TagParent("img");
+            var img = TagWithText("img","","embeddedimg");
             img.src = e.target.result;
             Presentations.spontaneous.AddContent(new EmbeddedContent(img, "Kuva"));
         }
