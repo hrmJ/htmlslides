@@ -646,21 +646,24 @@ this.UpdatePreview = function(){
         //If this is a song, update the preview window
         //TODO: add something for other types as well
         case "song":
-        var verselist = CreateTag("div","", document, "");
-        for (var verse_idx in this.items){
-            var thisverse = this.items[verse_idx].cloneNode(true);
-            thisverse.setAttribute('pointerpos',verse_idx);
-            thisverse.addEventListener('click',VerseMover,false);
-            //ListToLink(this_li, section_idx, 0);
-            //highlight the current:
-            if (verse_idx == this.pointer.position){
-                thisverse.className = 'hlverse';
+            var verselist = CreateTag("div","", document, "");
+            for (var verse_idx in this.items){
+                var thisverse = this.items[verse_idx].cloneNode(true);
+                thisverse.setAttribute('pointerpos',verse_idx);
+                thisverse.addEventListener('click',VerseMover,false);
+                //ListToLink(this_li, section_idx, 0);
+                //highlight the current:
+                if (verse_idx == this.pointer.position){
+                    thisverse.className = 'hlverse';
+                }
+                verselist.appendChild(thisverse);
             }
-            verselist.appendChild(thisverse);
-        }
-        prevsec.appendChild(verselist);
-        break;
+            prevsec.appendChild(verselist);
+            break;
         default:
+            var link = TagWithText("a","Seuraava dia >>","");
+            link.addEventListener('click', NextSlide, false);
+            document.getElementById("previewer").appendChild(link);
         break;
     }
     document.body.style.overflow="auto";
@@ -1178,6 +1181,10 @@ function AddFunctionalitySection(){
     var optionlist = TagParent("ul",[TagParent("li",[TagWithText("span","Kuva tiedostosta",""),TagParent("span",[klink])]), TagParent("li",[TagWithText("span","YouTube-linkki",""), url,link]),TagParent("li",[TagWithText("span","Kuva linkistä",""),imgurl,image_from_url_link])]);
     var embcontsec = TagParent("section",[TagWithText("h4","Lisää media",""),optionlist],"functionalsection","embcontsec");
 
+    var blink = TagWithText("a","Blank screen");
+    blink.addEventListener('click', BlankScreen, false);
+    var utilities = TagParent("section",[blink],"functionalsection","utsection");
+
     var stylelink = TagWithText("a","Seuraava tyyli >>");
     stylelink.addEventListener('click', ApplyStyles, false);
     var stylesec = TagParent("section",[TagWithText("h4","Muuta tyylejä",""), stylelink],"functionalsection","stylesec");
@@ -1205,7 +1212,12 @@ function AddFunctionalitySection(){
     var biblenavi = TagWithText("iframe","","biblenavi");
     biblenavi.id = 'biblenavi';
     document.body.appendChild(biblenavi);
-    return TagParent("section",[TagWithText("h3","Toiminnot",""), textcontsec, songcontsec, bibcontsec, embcontsec],"functions_section");
+    return TagParent("section",[TagWithText("h3","Toiminnot",""), utilities,textcontsec, songcontsec, bibcontsec, embcontsec],"functions_section");
+}
+
+function BlankScreen(){
+    var div = TagWithText("div","","blankscreen");
+    Presentations.screen.doc.getElementById('prescont').appendChild(div);
 }
 
 function SongListDropDown(){
@@ -1434,6 +1446,10 @@ function AddLocalImage(evt) {
 
         reader.readAsDataURL(input.files[0]);
     }
+}
+
+function NextSlide(){
+        Presentations[Presentations.current].Move('increment');
 }
 
 //========================================

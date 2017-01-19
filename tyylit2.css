@@ -189,6 +189,7 @@ iframe{
 
 .unhlpresentation{
     border:none;
+    padding:1em;
 }
 
 .hlpresentation{
@@ -518,4 +519,27 @@ nav#sitems li {
 .embeddedimg{
     max-width:90%;
     max-height:90%;
+}
+
+#section_nav li:hover,#section_nav a:hover, #previewer p:hover,.functionalsection a:hover {
+    cursor:pointer;
+}
+
+#previewer a:hover{
+    cursor:pointer;
+    color:yellow;
+}
+
+.blankscreen{
+    position:fixed;
+    top:-3px;
+    left:-3px;
+    width:3000px;
+    height:2000px;
+    background:black;
+}
+
+#section_nav h3:hover, #addedcontentparent h3:hover{
+    cursor:pointer;
+    border:2px solid yellow;
 }
