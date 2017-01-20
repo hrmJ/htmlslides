@@ -60,21 +60,24 @@ function Presentation(){
 
                 //then, make a song object from it
                 var songname = structure.childNodes[i].textContent.toLowerCase();
-                songname = songname.replace(/\s+/,' ');
-                var songdata = allsongs[songname];
-                if (songdata == undefined){
-                    window.alert('Problem with song "' + songname + '"!');
-                }
+                if (songname !== ""){
+                    songname = songname.replace(/\s+/,' ');
+                    var songdata = allsongs[songname];
+                    if (songdata == undefined){
+                        //window.alert('Problem with song "' + songname + '"!');
+                        console.log(">>" + typeof songname + "<<");
+                    }
 
-                //Special attributes:
-                if (['Jumalan karitsa','Pyhä-hymni'].indexOf(role)>-1){ 
-                    var song = new SongContent('', songdata.content);
+                    //Special attributes:
+                    if (['Jumalan karitsa','Pyhä-hymni'].indexOf(role)>-1){ 
+                        var song = new SongContent('', songdata.content);
+                    }
+                    else{
+                        var song = new SongContent(songdata.title, songdata.content);
+                    }
+                    //Add the song to a structured list
+                    this.songs[role].push(song);
                 }
-                else{
-                    var song = new SongContent(songdata.title, songdata.content);
-                }
-                //Add the song to a structured list
-                this.songs[role].push(song);
             }
         }
         //Remove the information from html
@@ -139,7 +142,13 @@ function Presentation(){
                     this_subli.textContent = thissubsec.name;
                     if (thissubsec.itemtype == 'song'){
                         //TODO: get rid of the magic number
-                        this_subli.textContent += ': ' + thissubsec.items[1].titleslide.titletext;
+                        try{
+                            this_subli.textContent += ': ' + thissubsec.items[1].titleslide.titletext;
+                        }
+                        catch(error){
+                            console.log("Tyhjä elementti: ");
+                            console.log(thissubsec.items[0]);
+                        }
                     }
                     subsectionlist.appendChild(this_subli);
                     ListToLink(this_subli, section_idx, subsection_idx);
@@ -588,6 +597,13 @@ function ScreenContent(){
             //Add or remove content from te navigator
             this.UpdatePreview();
 
+            if(Presentations.screen.blankscreenactive){
+                //Make sure that the blank screen stays active if turned on
+                var div = TagWithText("div","","blankscreen");
+                div.id = "blankbox";
+                Presentations.screen.doc.getElementById('prescont').appendChild(div);
+            }
+            
         };
 
 
@@ -958,6 +974,7 @@ function Screen(newwindow){
     this.sitems = CreateTag("nav", "sitems", thisdocument);
     this.itemtitle = CreateTag("div", "itemtitle", thisdocument);
     this.doc = thisdocument;
+    this.blankscreenactive = false;
 
     //For the navigation window
     this.sectionlinks = CreateTag("div", "sectionlinks", thisdocument);
@@ -974,10 +991,6 @@ function Screen(newwindow){
         ClearContent(this.itemtitle);
         ClearContent(this.infobox);
         ClearContent(this.creditbox);
-
-        var bsbutton = document.getElementById("utsection");
-        bsbutton.style.background = "rgba(98, 139, 141, 0.32)";
-        bsbutton.style.color = "white";
     };
 
     this.UpdateContent = function(divname, contentitem){
@@ -1459,7 +1472,8 @@ function BlankScreen(){
     div.id = "blankbox";
     Presentations.screen.doc.getElementById('prescont').appendChild(div);
     var bsbutton = document.getElementById("utsection");
-    if (bsbutton.style.background == "white"){
+    if (Presentations.screen.blankscreenactive == true){
+        Presentations.screen.blankscreenactive = false;
         bsbutton.style.background = "rgba(98, 139, 141, 0.32)";
         bsbutton.style.color = "white";
         Presentations[Presentations.current].Move('increment');
@@ -1468,6 +1482,7 @@ function BlankScreen(){
     else{
         bsbutton.style.background = "white";
         bsbutton.style.color = "black";
+        Presentations.screen.blankscreenactive = true;
     }
 }
 
