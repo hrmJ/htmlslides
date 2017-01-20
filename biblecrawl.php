@@ -53,11 +53,6 @@ function FetchBibleContent($chapteraddress, $verseaddress){
         echo "<script>alert('Raamattuosoite " . $chapteraddress . " ei kelpaa. Hyväksytyt kirjojen lyhenteet ovat: " . implode($booknames,", ") . " ')</script>";
         return "Raamatuntekstiä ei löytynyt. Sori siitä! (niin kuin sanonta kuuluu).";
     }
-    //if(!in_array($address["book"],$booknames)){
-    //    $msg = "<p style='width:40em;'>Raamattutekstin hakeminen ei onnistu, koska ohjelma ei tunnista kirjaa <strong>". $address["book"] . "</strong>. Hyväksytyt kirjojen lyhenteet ovat: <strong>" . implode($booknames,", ") . "</strong>. Käy korjaamassa Raamattuviittaus portaalin messukohtaisessa näkymässä ja päivitä tämä sivu.</p>";
-    //    die($msg);
-    //};
-    die($chapteraddress);
     $pageDom = GetHtml("http://raamattu.fi/1992/" . $chapteraddress . ".html");
     $headertexts = GetHeaders($pageDom);
     foreach ($pageDom->childNodes as $item){

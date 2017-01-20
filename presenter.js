@@ -158,7 +158,7 @@ function Presentation(){
             sectionlist.appendChild(this_li);
         }
         if(prestype=='default'){
-            var linkheader = TagWithText("h3","Sisältö","unhlpresentation");
+            var linkheader = TagWithText("h3","Sisältö","hlpresentation");
             linkheader.id = 'defaultcontentheader';
             linkheader.addEventListener('click',SwitchToDefault,false);
             contentlist.appendChild(linkheader);
@@ -284,6 +284,7 @@ function MultiSong(songlist, songrole, header, constantinfo){
     var wscounter = 1;
     for(var songidx in songlist[songrole]){
         var wsong = songlist[songrole][songidx];
+        wsong.songnumber = wscounter;
         songs.push(['Laulu: ' +  wsong.titletext, wsong, songrole]);
         if(constantinfo!==undefined){
             if (songidx < songlist[songrole].length -1 ){
@@ -581,6 +582,18 @@ function ScreenContent(){
                     }
                     //Adjust the Section headings to the center
                     AdjustHeadings(PresScreen);
+
+                    // Update the tracker. TODO only do this if wanted:
+                    if(this.mysection.current.itemtype=="Ylistys- ja rukouslauluja"){
+                        UpdateTracker("ylistyslaulu"+this.mysection.current.items[1].songnumber);
+                    }
+                    else if(this.mysection.current.itemtype=="Ehtoollislauluja"){
+                        UpdateTracker("ehtoollislaulu"+this.mysection.current.items[1].songnumber);
+                    }
+                    else{
+                        //Muut laulut yms. identifioidaan tyypin mukaan
+                        UpdateTracker(this.mysection.current.name);
+                    }
                     break;
                 case "info":
                     //Think about songtitles also as not part of a special sectioned service
@@ -1486,6 +1499,19 @@ function BlankScreen(){
     }
 }
 
+function UpdateTracker(identifier){
+        var biblenavi = document.getElementById("biblenavi");
+        ClearContent(biblenavi.contentWindow.document);
+        biblenavi.src = 'updatetracker.php?identifier=' + identifier;
+        console.log("Updated the tracker...");
+        //checkIframeLoaded();
+//    catch (error) {
+//      alert("Raamattusisällön lisääminen toimii vain palvelimelta ajattuna (vähintään localhost)");
+//      return false;
+//    }
+
+
+}
 
 //========================================
 

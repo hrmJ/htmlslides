@@ -548,3 +548,24 @@ nav#sitems li {
     width:100%;
     text-align:center;
 }
+
+#trackersection{
+    font-family: 'Quicksand';
+    max-width:50em;
+    margin:auto;
+    overflow:auto;
+}
+
+#trackersection > ul{
+    padding-top:0.7em;
+    overflow:auto;
+}
+
+@media only screen and (max-device-width: 481px) {
+    #trackersection li{
+        margin-top:0.1em;
+        font-size:110%;
+    }
+}
+
+
