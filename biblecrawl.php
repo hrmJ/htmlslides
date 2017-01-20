@@ -48,6 +48,16 @@ function AddVerseContent($versenumber, $verselist, $content){
 
 
 function FetchBibleContent($chapteraddress, $verseaddress){
+    $booknames = Array('Matt', 'Mark', 'Luuk', 'Joh', 'Apt', 'Room', '1Kor', '2Kor', 'Gal', 'Ef', 'Fil', 'Kol', '1Tess', '2Tess', '1Tim', '2Tim', 'Tit', 'Filem', 'Hepr', 'Jaak', '1Piet', '2Piet', '1Joh', '2Joh', '3Joh', 'Juud', 'Ilm','1Moos', '2Moos', '3Moos', '4Moos', '5Moos', 'Joos', 'Tuom', 'Ruut', '1Sam', '2Sam', '1Kun', '2Kun', '1Aik', '2Aik', 'Esra', 'Neh', 'Est', 'Job', 'Ps', 'Sananl', 'Saarn', 'Laull', 'Jes', 'Jer', 'Valit', 'Hes', 'Dan', 'Hoos', 'Joel', 'Aam', 'Ob', 'Joona', 'Miika', 'Nah', 'Hab', 'Sef', 'Hagg', 'Sak', 'Mal');
+    if(preg_match("(" . implode($booknames,"|") . ")", $chapteraddress)==0){
+        echo "<script>alert('Raamattuosoite " . $chapteraddress . " ei kelpaa. Hyväksytyt kirjojen lyhenteet ovat: " . implode($booknames,", ") . " ')</script>";
+        return "Raamatuntekstiä ei löytynyt. Sori siitä! (niin kuin sanonta kuuluu).";
+    }
+    //if(!in_array($address["book"],$booknames)){
+    //    $msg = "<p style='width:40em;'>Raamattutekstin hakeminen ei onnistu, koska ohjelma ei tunnista kirjaa <strong>". $address["book"] . "</strong>. Hyväksytyt kirjojen lyhenteet ovat: <strong>" . implode($booknames,", ") . "</strong>. Käy korjaamassa Raamattuviittaus portaalin messukohtaisessa näkymässä ja päivitä tämä sivu.</p>";
+    //    die($msg);
+    //};
+    die($chapteraddress);
     $pageDom = GetHtml("http://raamattu.fi/1992/" . $chapteraddress . ".html");
     $headertexts = GetHeaders($pageDom);
     foreach ($pageDom->childNodes as $item){
