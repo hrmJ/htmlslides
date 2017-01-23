@@ -620,83 +620,96 @@ function ScreenContent(){
         };
 
 
-this.UpdatePreview = function(){
-    var prevsec = document.getElementById('previewer');
-    var thispres = Presentations[Presentations.current];
-    // Update section highlighters
-    if (Presentations.current == 'default'){
-        var navsection = document.getElementById('navigator_sectionlist');
-    }
-    else{
-        var navsection = document.getElementById('addedcontent_sectionlist');
-    }
+    this.UpdatePreview = function(){
+        var prevsec = document.getElementById('previewer');
+        var thispres = Presentations[Presentations.current];
+        // Update section highlighters
+        if (Presentations.current == 'default'){
+            var navsection = document.getElementById('navigator_sectionlist');
+        }
+        else{
+            var navsection = document.getElementById('addedcontent_sectionlist');
+        }
 
-    for (var navel_idx in navsection.children){
-        if (isNumber(navel_idx)){
-            var this_item = navsection.children[navel_idx];
-            if (this_item.children.length>0){
-                var subitems = this_item.children[0].children;
-                this_item.className = "unhlsection";
-                if(this_item.getAttribute("sectionidx")==thispres.current.sec_idx){
-                    this_item.className = "sectionnavhl";
-                }
-            }
-            else{
-                //If this is not a sectioned but a flat presentation
-                if(this_item.getAttribute("sectionidx")==thispres.current.sec_idx){
-                    this_item.className = "sectionnavhl";
+        for (var navel_idx in navsection.children){
+            if (isNumber(navel_idx)){
+                var this_item = navsection.children[navel_idx];
+                if (this_item.children.length>0){
+                    var subitems = this_item.children[0].children;
+                    this_item.className = "unhlsection";
+                    if(this_item.getAttribute("sectionidx")==thispres.current.sec_idx){
+                        this_item.className = "sectionnavhl";
+                    }
                 }
                 else{
-                    this_item.className = "unhlsection";
+                    //If this is not a sectioned but a flat presentation
+                    if(this_item.getAttribute("sectionidx")==thispres.current.sec_idx){
+                        this_item.className = "sectionnavhl";
+                    }
+                    else{
+                        this_item.className = "unhlsection";
+                    }
                 }
             }
-        }
-        if(subitems!==undefined){
-            for (var subitem_idx in subitems){
-                //subsection headers
-                if (isNumber(subitem_idx)){
-                    var this_subitem = subitems[subitem_idx];
-                    this_subitem.className = "unhlsection";
-                    if(this_subitem.getAttribute("sectionidx")==thispres.current.sec_idx){
-                        this_subitem.className = "sectionnavhl";
-                        if(this_subitem.getAttribute("secitemidx")==thispres.current.pointer.position){
-                            this_subitem.className = "subsectionnavhl";
+            if(subitems!==undefined){
+                for (var subitem_idx in subitems){
+                    //subsection headers
+                    if (isNumber(subitem_idx)){
+                        var this_subitem = subitems[subitem_idx];
+                        this_subitem.className = "unhlsection";
+                        if(this_subitem.getAttribute("sectionidx")==thispres.current.sec_idx){
+                            this_subitem.className = "sectionnavhl";
+                            if(this_subitem.getAttribute("secitemidx")==thispres.current.pointer.position){
+                                this_subitem.className = "subsectionnavhl";
+                            }
                         }
                     }
                 }
             }
         }
-    }
-    //thispres.chain
+        //thispres.chain
 
-    //Remove existing (verse etc) content
-    ClearContent(prevsec);
-    switch (this.content_type){ 
-        //If this is a song, update the preview window
-        //TODO: add something for other types as well
-        case "song":
-            var verselist = CreateTag("div","", document, "");
-            for (var verse_idx in this.items){
-                var thisverse = this.items[verse_idx].cloneNode(true);
-                thisverse.setAttribute('pointerpos',verse_idx);
-                thisverse.addEventListener('click',VerseMover,false);
-                //ListToLink(this_li, section_idx, 0);
-                //highlight the current:
-                if (verse_idx == this.pointer.position){
-                    thisverse.className = 'hlverse';
-                }
-                verselist.appendChild(thisverse);
+        //Remove existing (verse etc) content
+        ClearContent(prevsec);
+        if(this.content_type=='song' || this.content_type == 'info'){
+            var content_type = this.content_type;
+        }
+        else if(this.mysection.current.items.length>1 & this.content_type=='sectiontitle'){
+            if(this.mysection.current.items[1].content_type=='song'){
+                //If this is a title for a song i.e. the next item to be shown will be a song
+                content_type = 'song';
+                var song = this.mysection.current.items[1];
             }
-            prevsec.appendChild(verselist);
+        }
+        switch (content_type){ 
+            //If this is a song, update the preview window
+            //TODO: add something for other types as well
+            case "song":
+                var verselist = CreateTag("div","", document, "");
+                if(this.content_type=='song'){
+                    var song = this;
+                }
+                for (var verse_idx in song.items){
+                    var thisverse = song.items[verse_idx].cloneNode(true);
+                    thisverse.setAttribute('pointerpos',verse_idx);
+                    thisverse.addEventListener('click',VerseMover,false);
+                    //ListToLink(this_li, section_idx, 0);
+                    //highlight the current:
+                    if (verse_idx == song.pointer.position){
+                        thisverse.className = 'hlverse';
+                    }
+                    verselist.appendChild(thisverse);
+                }
+                prevsec.appendChild(verselist);
+                break;
+            default:
+                var link = TagWithText("a","Seuraava dia >>","");
+                link.addEventListener('click', NextSlide, false);
+                document.getElementById("previewer").appendChild(link);
             break;
-        default:
-            var link = TagWithText("a","Seuraava dia >>","");
-            link.addEventListener('click', NextSlide, false);
-            document.getElementById("previewer").appendChild(link);
-        break;
-    }
-    document.body.style.overflow="auto";
-};
+        }
+        document.body.style.overflow="auto";
+    };
 
 }
 
