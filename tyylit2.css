@@ -521,8 +521,21 @@ nav#sitems li {
     max-height:90%;
 }
 
-#section_nav li:hover,#section_nav a:hover, #previewer p:hover,.functionalsection a:hover {
+#section_nav li:hover,#section_nav a:hover, #previewer p:hover,.functionalsection a:hover, #previewer h2:hover{
     cursor:pointer;
+}
+
+#previewer h2, #previewer p{
+    padding-left:0.3em;
+}
+
+#previewer h2:hover, #previewer p:hover{
+    border-left:2px solid yellow;
+
+}
+
+.hlverse h2{
+    color:yellow !important;
 }
 
 #previewer a:hover{

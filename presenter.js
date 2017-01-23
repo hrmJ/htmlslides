@@ -528,13 +528,19 @@ function Mover(evt){
 }
 
 function VerseMover(evt){
-    //TODO: make this a way of jumping from a song's verse to another by clicking thee verrse 
-    //in the navigator window (started 29.9.2016)
     var tag = evt.target;
     var thispres = Presentations[Presentations.current];
     //Find the current song on display
     thispres.GetContentChain();
-    var thissong = thispres.chain[thispres.chain.length-1];
+    if (thispres.current.current.current.content_type=='sectiontitle'){
+        //If the user has clicked on a verse before the song has begun
+        //i.e. (only the sectiontitle of the song is active)
+        //in this case the song is se second item of the items array
+        var thissong = thispres.current.current.items[1];
+    }
+    else{
+        var thissong = thispres.chain[thispres.chain.length-1];
+    }
     thissong.pointer.position = tag.getAttribute('pointerpos');
     while(thissong.pointer.position == undefined){
         tag = tag.parentNode;
@@ -696,7 +702,10 @@ function ScreenContent(){
                     //ListToLink(this_li, section_idx, 0);
                     //highlight the current:
                     if (verse_idx == song.pointer.position){
-                        thisverse.className = 'hlverse';
+                        if(this.content_type=='song'){
+                            //only highlight zero if the song has actually been  started
+                            thisverse.className = 'hlverse';
+                        }
                     }
                     verselist.appendChild(thisverse);
                 }
@@ -1513,10 +1522,20 @@ function BlankScreen(){
 }
 
 function UpdateTracker(identifier){
-        var biblenavi = document.getElementById("biblenavi");
+    var biblenavi = document.getElementById("biblenavi");
+    try{
         ClearContent(biblenavi.contentWindow.document);
+    }
+    catch(error){
+        console.log('problem with tracker..');
+    }
+    try{
         biblenavi.src = 'updatetracker.php?identifier=' + identifier;
         console.log("Updated the tracker...");
+    }
+    catch(error){
+        console.log('Unable to update the tracker (=no such file as kulku.php).');
+    }
         //checkIframeLoaded();
 //    catch (error) {
 //      alert("Raamattusisällön lisääminen toimii vain palvelimelta ajattuna (vähintään localhost)");
