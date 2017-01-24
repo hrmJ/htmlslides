@@ -492,6 +492,12 @@ function Mover(evt){
     var sectiontarget = evt.target.getAttribute('sectionidx');
     //The latter is for songs, speeches etc i.e. subitems of sections
     var secitemtarget = evt.target.getAttribute('secitemidx');
+    if (event.target.parentNode.id=='addedcontent_sectionlist' & Presentations.current=='default'){
+        SwitchToSpontaneous();
+    }
+    else if(event.target.parentNode.id!='addedcontent_sectionlist' & Presentations.current!='default'){
+        SwitchToDefault();
+    }
 
     //TODO: abstract this!
     var currentpres = Presentations[Presentations.current];
@@ -532,7 +538,11 @@ function VerseMover(evt){
     var thispres = Presentations[Presentations.current];
     //Find the current song on display
     thispres.GetContentChain();
-    if (thispres.current.current.current.content_type=='sectiontitle'){
+    if(Presentations.current == 'spontaneous'){
+        //Songs in the spontaneous moed have no section titles
+        var thissong = thispres.chain[thispres.chain.length-1];
+    }
+    else if (thispres.current.current.current.content_type=='sectiontitle'){
         //If the user has clicked on a verse before the song has begun
         //i.e. (only the sectiontitle of the song is active)
         //in this case the song is se second item of the items array
@@ -677,7 +687,7 @@ function ScreenContent(){
 
         //Remove existing (verse etc) content
         ClearContent(prevsec);
-        if(this.content_type=='song' || this.content_type == 'info'){
+        if(!this.hasOwnProperty("mysection")){
             var content_type = this.content_type;
         }
         else if(this.mysection.current.items.length>1 & this.content_type=='sectiontitle'){
