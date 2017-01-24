@@ -110,9 +110,6 @@ body {
     color:white;
 }
 
-#previewer p:not(.hlverse){
-    color:white;
-}
 
 #previewer p{
     text-align:left;
@@ -125,7 +122,7 @@ body {
 }
 
 .hlverse{
-    color:yellow;
+    color:yellow!important;
 }
 
 .biblenavi{

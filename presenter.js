@@ -691,7 +691,7 @@ function ScreenContent(){
             var content_type = this.content_type;
         }
         else if(this.mysection.current.items.length>1 & this.content_type=='sectiontitle'){
-            if(this.mysection.current.items[1].content_type=='song'){
+            if(['song','bibletime'].indexOf(this.mysection.current.items[1].content_type)>-1){
                 //If this is a title for a song i.e. the next item to be shown will be a song
                 content_type = 'song';
                 var song = this.mysection.current.items[1];
@@ -701,8 +701,9 @@ function ScreenContent(){
             //If this is a song, update the preview window
             //TODO: add something for other types as well
             case "song":
+            case "bibletime":
                 var verselist = CreateTag("div","", document, "");
-                if(this.content_type=='song'){
+                if(['song','bibletime'].indexOf(this.content_type)>-1){
                     var song = this;
                 }
                 for (var verse_idx in song.items){
@@ -712,7 +713,7 @@ function ScreenContent(){
                     //ListToLink(this_li, section_idx, 0);
                     //highlight the current:
                     if (verse_idx == song.pointer.position){
-                        if(this.content_type=='song'){
+                        if(['song','bibletime'].indexOf(this.content_type)>-1){
                             //only highlight zero if the song has actually been  started
                             thisverse.className = 'hlverse';
                         }
@@ -950,6 +951,19 @@ function ClearContent(myNode){
     //see also http://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript
     while (myNode.firstChild) {
         myNode.removeChild(myNode.firstChild);
+    }
+}
+
+//Remove by id:
+//http://stackoverflow.com/questions/3387427/remove-element-by-id
+Element.prototype.remove = function() {
+    this.parentElement.removeChild(this);
+}
+NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+    for(var i = this.length - 1; i >= 0; i--) {
+        if(this[i] && this[i].parentElement) {
+            this[i].parentElement.removeChild(this[i]);
+        }
     }
 }
 
@@ -1513,18 +1527,19 @@ function NextSlide(){
 }
 
 function BlankScreen(){
-    var div = TagWithText("div","","blankscreen");
-    div.id = "blankbox";
-    Presentations.screen.doc.getElementById('prescont').appendChild(div);
     var bsbutton = document.getElementById("utsection");
     if (Presentations.screen.blankscreenactive == true){
+        Presentations.screen.doc.getElementById('blankbox').remove();
+        //Presentations.screen.doc.getElementById('blankbox').style.display="none";
         Presentations.screen.blankscreenactive = false;
         bsbutton.style.background = "rgba(98, 139, 141, 0.32)";
         bsbutton.style.color = "white";
-        Presentations[Presentations.current].Move('increment');
-        Presentations[Presentations.current].Move('decrement');
+        Presentations.screen.blankscreenactive = false;
     }
     else{
+        var div = TagWithText("div","","blankscreen");
+        div.id = "blankbox";
+        Presentations.screen.doc.getElementById('prescont').appendChild(div);
         bsbutton.style.background = "white";
         bsbutton.style.color = "black";
         Presentations.screen.blankscreenactive = true;
