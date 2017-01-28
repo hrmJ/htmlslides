@@ -563,7 +563,13 @@ nav#sitems li {
     font-family: 'Quicksand';
     max-width:50em;
     margin:auto;
-    overflow:auto;
+    position: absolute;
+    top: 10px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: scroll;
+    padding: 0.8em;
 }
 
 #trackersection > ul{
@@ -578,4 +584,11 @@ nav#sitems li {
     }
 }
 
+
+@media (min-width:1025px) { 
+    #trackersection{
+        overflow:auto;
+        padding:2em;
+    }
+}
 
