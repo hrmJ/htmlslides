@@ -1481,6 +1481,16 @@ function PosFromTop(el){
     return rect.top;
 }
 
+
+
+function IncreasePresFont(){
+    //Presentations.screen.preswindow.document.body.style.fontSize="400%";
+}
+
+function DecreasePresFont(){
+    //Presentations.screen.preswindow.document.body.style.fontSize="400%";
+}
+
 function AddLocalVideo(evt) {
     var input = evt.target;
     if (input.files && input.files[0]) {
