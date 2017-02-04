@@ -122,10 +122,7 @@ function FetchBibleContent($chapteraddress, $verseaddress){
 
 if(!isset($embed)){
 
-    #$selectedverses = FetchBibleContent($_GET["chap"], $_GET["verses"]);
-    $selectedverses = FetchBibleContent("Luuk.2", "22-32");
-    var_dump($selectedverses);
-    die();
+    $selectedverses = FetchBibleContent($_GET["chap"], $_GET["verses"]);
 
     ?>
 
