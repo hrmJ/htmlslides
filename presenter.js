@@ -625,6 +625,8 @@ function ScreenContent(){
             }
             //Add or remove content from te navigator
             this.UpdatePreview();
+            //Make sure the presentation is the screen that is currently visible
+            Presentations.screen.preswindow.focus();
 
             if(Presentations.screen.blankscreenactive){
                 //Make sure that the blank screen stays active if turned on
@@ -1172,6 +1174,7 @@ function PresentationContainer(){
     this.default = new MajakkaMessu();
     this.spontaneous =  new Presentation();
     this.current = 'default';
+    this.secondbrowser = null;
 
 }
 
@@ -1257,6 +1260,14 @@ function AddFunctionalitySection(){
     var optionlist = TagParent("ul",[TagParent("li",[TagWithText("span","Kuva tiedostosta",""),TagParent("span",[klink])]), TagParent("li",[TagWithText("span","YouTube-linkki",""), url,link]),TagParent("li",[TagWithText("span","Kuva linkistä",""),imgurl,image_from_url_link])]);
     var embcontsec = TagParent("section",[TagWithText("h4","Lisää media",""),optionlist],"functionalsection","embcontsec");
 
+
+    var bslink = TagWithText("a","Avaa toinen selain","");
+    var bsurl = TagParent("input",[],"","bsurl");
+    bsurl.setAttribute("type","text");
+    bsurl.setAttribute("placeholder","kirjoita Internet-osoite");
+    bslink.addEventListener('click', AddSecondBrowser, false);
+    var browsersec = TagParent("section",[bsurl, bslink],"functionalsection","browsersec");
+
     var blink = TagWithText("a","Blank screen");
     var utilities = TagParent("section",[blink],"functionalsection","utsection");
     utilities.addEventListener('click', BlankScreen, false);
@@ -1288,7 +1299,7 @@ function AddFunctionalitySection(){
     var biblenavi = TagWithText("iframe","","biblenavi");
     biblenavi.id = 'biblenavi';
     document.body.appendChild(biblenavi);
-    return TagParent("section",[TagWithText("h3","Toiminnot",""), utilities,textcontsec, songcontsec, bibcontsec, embcontsec],"functions_section");
+    return TagParent("section",[TagWithText("h3","Toiminnot",""), utilities,textcontsec, songcontsec, bibcontsec, embcontsec, browsersec],"functions_section");
 }
 
 function SongListDropDown(){
@@ -1519,6 +1530,21 @@ function AddLocalImage(evt) {
     }
 }
 
+function AddSecondBrowser(){
+
+    var address = document.getElementById("bsurl").value;
+    if(address.indexOf("http://")==-1 &&  address.indexOf("https://")==-1){
+        address = "http://" + address;
+    }
+    if(Presentations.secondbrowser == null){
+        Presentations.secondbrowser = window.open(address,'_blank', 'toolbar=0,location=0,menubar=0');
+    } 
+    else{
+        Presentations.secondbrowser.location = address;
+        Presentations.secondbrowser.focus();
+    }
+
+}
 
 //========================================
 

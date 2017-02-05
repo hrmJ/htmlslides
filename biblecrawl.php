@@ -53,8 +53,7 @@ function FetchBibleContent($chapteraddress, $verseaddress){
         echo "<script>alert('Raamattuosoite " . $chapteraddress . " ei kelpaa. Hyväksytyt kirjojen lyhenteet ovat: " . implode($booknames,", ") . " ')</script>";
         return "Raamatuntekstiä ei löytynyt. Sori siitä! (niin kuin sanonta kuuluu).";
     }
-    #$pageDom = GetHtml("http://raamattu.fi/1992/" . $chapteraddress . ".html");
-    $pageDom = GetHtml("luuk2.html");
+    $pageDom = GetHtml("http://raamattu.fi/1992/" . $chapteraddress . ".html");
     $headertexts = GetHeaders($pageDom);
     foreach ($pageDom->childNodes as $item){
         $text = $item->textContent;
