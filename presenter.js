@@ -1261,9 +1261,14 @@ function AddFunctionalitySection(){
     var utilities = TagParent("section",[blink],"functionalsection","utsection");
     utilities.addEventListener('click', BlankScreen, false);
 
-    var stylelink = TagWithText("a","Seuraava tyyli >>");
-    stylelink.addEventListener('click', ApplyStyles, false);
-    var stylesec = TagParent("section",[TagWithText("h4","Muuta tyylejä",""), stylelink],"functionalsection","stylesec");
+
+    var fsbigger = TagWithText("a","Suurenna fonttia");
+    var stylesec = TagParent("section",[fsbigger],"functionalsection","stylesection");
+    fsbigger.addEventListener('click', IncreasePresFont, false);
+
+    //var stylelink = TagWithText("a","Seuraava tyyli >>");
+    //stylelink.addEventListener('click', ApplyStyles, false);
+    //var stylesec = TagParent("section",[TagWithText("h4","Muuta tyylejä",""), stylelink],"functionalsection","stylesec");
 
 
     var link = TagWithText("a","Lisää","");
