@@ -73,13 +73,17 @@ function FetchBibleContent($chapteraddress, $verseaddress){
         $wantednum = ($currentverse + 1);
         $matchbeginning = "/(.*)\\b($wantednum)(\\s+)(.*)/u";
         preg_match($matchbeginning, trim($line), $groups);
-        if(sizeof($groups)>0){
+        while(sizeof($groups)>0){
+            #Jos jaesisältöä löytyi
             $currentverse++;
             $line = $groups[4];
             if(strlen($groups[1])>0){
                 #Jos samalla rivillä kahta jaetta:
                 $verses[sizeof($verses)] .= $groups[1];
             }
+            $wantednum = ($currentverse + 1);
+            $matchbeginning = "/(.*)\\b($wantednum)(\\s+)(.*)/u";
+            preg_match($matchbeginning, trim($line), $groups);
         }
         if($currentverse>0)
             $verses = AddVerseContent($currentverse, $verses, $line);
@@ -99,7 +103,8 @@ function FetchBibleContent($chapteraddress, $verseaddress){
         $start = $groups[1];
         $end = $groups[2];
         for($i=$start;$i<=$end;$i++){
-            $selectedverses[] = $verses[$i];
+            if(isset($verses[$i]))
+                $selectedverses[] = $verses[$i];
         }
     }
     elseif($verseaddress=="" or $verseaddress=="jae/jakeet"){
