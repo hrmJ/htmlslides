@@ -592,3 +592,52 @@ nav#sitems li {
     }
 }
 
+/* Isommille näytöille fontteja suuremmiksi: */
+
+@media only screen and (min-device-width: 1200px) { 
+
+    #heading h2 {
+        font-size: 750%;
+    }
+
+    .songtitlediv h3 {
+        margin-top: 1em;
+    }
+
+    #textcontent > .songtitlediv h2 {
+        font-size:400%;
+    }
+
+    #prescont > #textcontent .verse{
+        font-size:400%;
+    }
+
+    #prescont > #textcontent .bibleverse {
+        font-size: 250%;
+        padding-left: 8em;
+        padding-right: 9em;
+    }
+
+    #heading h3 {
+        margin-bottom: 2em;
+        margin-top: 1em;
+        position: relative;
+        /* display: inline-block; */
+        /* left: -50%; */
+        /* font-style: italic; */
+    }
+
+    #sitems{
+        font-size:250%;
+    }
+
+    #sections {
+        font-size: 180%;
+    }
+
+    .infocontent{
+        font-size: 270%;
+    }
+
+}
+
