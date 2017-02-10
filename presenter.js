@@ -72,8 +72,11 @@ function Presentation(){
                     if (['Jumalan karitsa','Pyhä-hymni'].indexOf(role)>-1){ 
                         var song = new SongContent('', songdata.content);
                     }
-                    else{
+                    else if(songdata!==undefined){
                         var song = new SongContent(songdata.title, songdata.content);
+                    }
+                    else if(songdata==undefined){
+                        var song = new SongContent(songname + " (ei sanoja)", "");
                     }
                     //Add the song to a structured list
                     this.songs[role].push(song);
