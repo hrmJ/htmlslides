@@ -1263,18 +1263,24 @@ function AddFunctionalitySection(){
 
     var bslink = TagWithText("a","Avaa toinen selain","");
     var bsurl = TagParent("input",[],"","bsurl");
+    bslink.id = "sbrowserlink";
     bsurl.setAttribute("type","text");
     bsurl.setAttribute("placeholder","kirjoita Internet-osoite");
+    bsurl.id="bsurl";
     bslink.addEventListener('click', AddSecondBrowser, false);
-    var browsersec = TagParent("section",[bsurl, bslink],"functionalsection","browsersec");
+    var browsersec = TagParent("section",[bsurl, bslink, TagWithText("p","(palaa esitykseen klikkaamalla mitä tahansa otsikkoa)")],"functionalsection","browsersec");
 
     var blink = TagWithText("a","Blank screen");
     var utilities = TagParent("section",[blink],"functionalsection","utsection");
     utilities.addEventListener('click', BlankScreen, false);
 
-    var stylelink = TagWithText("a","Seuraava tyyli >>");
-    stylelink.addEventListener('click', ApplyStyles, false);
-    var stylesec = TagParent("section",[TagWithText("h4","Muuta tyylejä",""), stylelink],"functionalsection","stylesec");
+    var stylelink = TagWithText("a","Suurenna fonttia");
+    stylelink.id = "fontplus";
+    stylelink.addEventListener('click', FontIncrease, false);
+    var stylelink2 = TagWithText("a","Pienennä fonttia");
+    stylelink2.id = "fontminus";
+    stylelink2.addEventListener('click', FontIncrease, false);
+    var stylesec = TagParent("section",[TagParent("p",[stylelink]),TagParent("p",[stylelink2])],"functionalsection","stylesec");
 
 
     var link = TagWithText("a","Lisää","");
@@ -1299,7 +1305,7 @@ function AddFunctionalitySection(){
     var biblenavi = TagWithText("iframe","","biblenavi");
     biblenavi.id = 'biblenavi';
     document.body.appendChild(biblenavi);
-    return TagParent("section",[TagWithText("h3","Toiminnot",""), utilities,textcontsec, songcontsec, bibcontsec, embcontsec, browsersec],"functions_section");
+    return TagParent("section",[TagWithText("h3","Toiminnot",""), utilities,textcontsec, songcontsec, bibcontsec, embcontsec, browsersec, stylesec],"functions_section");
 }
 
 function SongListDropDown(){
@@ -1530,17 +1536,50 @@ function AddLocalImage(evt) {
     }
 }
 
+function FontIncrease(evt){
+    var link = evt.target;
+    var fs = Presentations.screen.doc.body.style.fontSize;
+
+    if (link.id == "fontplus"){
+        if(fs==""){
+            Presentations.screen.doc.body.style.fontSize="110%";
+        }
+        else{
+            var percentage =  fs.substr(0, fs.indexOf("%")) * 1;
+            Presentations.screen.doc.body.style.fontSize = (percentage + 10) + "%";
+        }
+    }
+    if (link.id == "fontminus"){
+        if(fs==""){
+            Presentations.screen.doc.body.style.fontSize="90%";
+        }
+        else{
+            var percentage =  fs.substr(0, fs.indexOf("%")) * 1;
+            Presentations.screen.doc.body.style.fontSize = (percentage - 10) + "%";
+        }
+    }
+}
+
 function AddSecondBrowser(){
 
+    try{
     var address = document.getElementById("bsurl").value;
-    if(address.indexOf("http://")==-1 &&  address.indexOf("https://")==-1){
+    }
+    catch(error){
+        address = "";
+    }
+    if(address.indexOf("http://")==-1 &&  address.indexOf("https://")==-1 && address != ""){
         address = "http://" + address;
     }
     if(Presentations.secondbrowser == null){
         Presentations.secondbrowser = window.open(address,'_blank', 'toolbar=0,location=0,menubar=0');
+        document.getElementById('sbrowserlink').textContent = "Toinen selainikkuna esiin";
+        document.getElementById('bsurl').outerHTML="";
     } 
     else{
-        Presentations.secondbrowser.location = address;
+        //if(address!=Presentations.secondbrowser.location){
+            //Presentations.secondbrowser.location = address;
+        //}
         Presentations.secondbrowser.focus();
     }
 

@@ -60,6 +60,10 @@ body {
     padding: 5em;
 }
 
+.functions_section a:hover{
+    color:yellow;
+}
+
 #navigatorcontainer h3{
     font-family:'Nothing You Could Do';
     text-align:center;
