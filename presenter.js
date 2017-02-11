@@ -91,13 +91,22 @@ function Presentation(){
     this.CreateNavigation = function(prestype){
         if(prestype=='default'){
             //Create links in the secondary screen for jumping from one section to another
+            
+
             var navigatorcontainer = CreateTag("section","navigatorcontainer",document, "");
+
+
             //This is where the general navigation between sections is
             var contentlist = CreateTag("section","section_nav", document, "navchildsec", navigatorcontainer);
             //This is where the upcoming/previous slides will be presented
             var versepreview = CreateTag("section","previewer", document, "navchildsec", navigatorcontainer);
-            //This is for all the additional functionality such as inserting spontaneous text content, songs, bible slides etc
-            navigatorcontainer.appendChild(AddFunctionalitySection());
+
+            //This is where any spontaneously added slides will be listed
+            var linkheader = TagWithText("h3","Lisätty sisältö","unhlpresentation");
+            linkheader.id = 'addedcontentheader';
+            linkheader.addEventListener('click',SwitchToSpontaneous,false);
+            navigatorcontainer.appendChild(TagParent("div",[linkheader,TagParent("div",[],"","addedcontent")],"","addedcontentparent"));
+
 
             var link1 = TagWithText("a","Avaa esitys","switchlink");
             link1.href = '#';
@@ -161,6 +170,9 @@ function Presentation(){
             sectionlist.appendChild(this_li);
         }
         if(prestype=='default'){
+            //This is for all the additional functionality such as inserting spontaneous text content, songs, bible slides etc
+            contentlist.appendChild(AddFunctionalitySection());
+
             var linkheader = TagWithText("h3","Sisältö","hlpresentation");
             linkheader.id = 'defaultcontentheader';
             linkheader.addEventListener('click',SwitchToDefault,false);
@@ -169,11 +181,6 @@ function Presentation(){
             contentlist.appendChild(link);
             contentlist.appendChild(sectionlist);
 
-            //This is where any spontaneously added slides will be listed
-            var linkheader = TagWithText("h3","Lisätty sisältö","unhlpresentation");
-            linkheader.id = 'addedcontentheader';
-            linkheader.addEventListener('click',SwitchToSpontaneous,false);
-            contentlist.appendChild(TagParent("div",[linkheader,TagParent("div",[],"","addedcontent")],"","addedcontentparent"));
 
             document.body.appendChild(navigatorcontainer);
             document.body.style.overflow="auto";
@@ -1283,7 +1290,7 @@ function AddFunctionalitySection(){
     var stylelink2 = TagWithText("a","Pienennä fonttia");
     stylelink2.id = "fontminus";
     stylelink2.addEventListener('click', FontIncrease, false);
-    var stylesec = TagParent("section",[TagParent("p",[stylelink]),TagParent("p",[stylelink2])],"functionalsection","stylesec");
+    var stylesec = TagParent("section",[TagParent("span",[stylelink]),TagParent("span",[stylelink2])],"functionalsection","stylesec");
 
 
     var link = TagWithText("a","Lisää","");
@@ -1308,7 +1315,11 @@ function AddFunctionalitySection(){
     var biblenavi = TagWithText("iframe","","biblenavi");
     biblenavi.id = 'biblenavi';
     document.body.appendChild(biblenavi);
-    return TagParent("section",[TagWithText("h3","Toiminnot",""), utilities,textcontsec, songcontsec, bibcontsec, embcontsec, browsersec, stylesec],"functions_section");
+
+    var hiddenfunctions = TagParent("section",[textcontsec, songcontsec, bibcontsec, embcontsec, browsersec],"functions_section");
+    hiddenfunctions.id = "hiddenfunctions";
+    document.getElementById("functionalmenu").appendChild(hiddenfunctions);
+    return TagParent("section",[utilities, stylesec],"functions_section");
 }
 
 function SongListDropDown(){
@@ -1588,6 +1599,26 @@ function AddSecondBrowser(){
 
 }
 
+function OpenFunctionMenu(){
+    console.log("moro vaan.");
+    var section = document.getElementById('functionalmenu');
+    var h = window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight||0;
+    var newheight = h;
+    section.style.marginTop = document.getElementById('leftbanner').offsetHeight;
+    if (section.style.height == '' || section.style.height == '0px'){
+        section.style.height= newheight + "px";
+        document.getElementById('openfunctlink').style.background = 'white';
+        document.getElementById('openfunctlink').style.color = 'black';
+        document.getElementById('hiddenfunctions').style.display = 'block';
+    }
+    else{
+        document.getElementById('hiddenfunctions').style.display = 'none';
+        section.style.height = "0px";
+        document.getElementById('openfunctlink').style.background = 'none';
+        document.getElementById('openfunctlink').style.color = 'white';
+    }
+}
+
 //========================================
 
 function NextSlide(){
@@ -1600,7 +1631,7 @@ function BlankScreen(){
         Presentations.screen.doc.getElementById('blankbox').remove();
         //Presentations.screen.doc.getElementById('blankbox').style.display="none";
         Presentations.screen.blankscreenactive = false;
-        bsbutton.style.background = "rgba(98, 139, 141, 0.32)";
+        bsbutton.style.background = "rgba(139, 144, 144, 0.32)";
         bsbutton.style.color = "white";
         Presentations.screen.blankscreenactive = false;
     }
