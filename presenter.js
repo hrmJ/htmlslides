@@ -248,6 +248,7 @@ function MajakkaMessu(){
     var wsinfo  = new InfoContent('Ylistys- ja rukousosio', ['Ylistys- ja rukouslaulujen aikana voit kirjoittaa omia  rukousaiheitasi ja hiljentyä sivualttarin luona.', ' Rukouspalvelu hiljaisessa huoneessa. ' + rukouscredits]);
     var worshipsongs = MultiSong(this.songs,"Ylistys- ja rukouslauluja", "Ylistyslaulu ", ['rukousinfo', wsinfo, 'info']);
     worshipsongs.push(['Esirukous',false,'header']);
+    worshipsongs.unshift(['rukousinfo', wsinfo, 'info']);
 
 
     //2. Combine all the sections
