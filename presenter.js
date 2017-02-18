@@ -1,14 +1,38 @@
 /**
+ *
+ * Represents a container for the two parallel slide shows that each
+ * presentation consists of: the structured slide show (default) and
+ * the slide show for the spontaneously added content (spontaneous). Both of these
+ * are objects of the Presentation class.
+ *
+ * @constructor
+ * @property {Presentation}  default         - a Presentation object containing the actual structured slide show
+ * @property {Presentation}  spontaneous     - a Presentation object containing the slide show for the spontaneously added content
+ * @property {string}  current               - a string ("default" or "spontaneous") indicating, which of the two slide shows is currently active
+ *
+ */
+function PresentationContainer(){
+
+    this.default = new MajakkaMessu();
+    this.spontaneous =  new Presentation();
+    this.current = 'default';
+    this.secondbrowser = null;
+
+}
+
+
+
+/**
  * Represents coherent sets of slide shows. Practically, every  slide show
  * created with this software consists of two Presentation objects: One for
  * the actual structured slide show (i.e. the worship service and all of its 
  * related structure - pre-specified information slides, sermon, information about
- * people involved in making the service etc.)
+ * people involved in making the service etc.) and the other for spontaneously
+ * added content.
  *
  * @constructor
  */
 function Presentation(){
-    // PRESENTATION is the class that wraps different content and decides what to show
 
     // The pointer is set to the id of the 
     // songcontent object currently set as active
@@ -18,19 +42,15 @@ function Presentation(){
     //A try to make jumping in the presentation easier
     this.flatsructure = [];
 
-    this.GetContentChain = function(){
-            //Go down the section/sectionitem/songverse etc chain as deep as needed
-            //and compile a chain of contents
-            thisobject = this;
-            this.chain = [thisobject];
-            while (thisobject.hasOwnProperty('current')){
-                thisobject=thisobject.current;
-                this.chain.push(thisobject);
-            }
-    };
-
+    /** 
+     * Processes the call from the user to move to the next or to the previous
+     * slide.
+     *
+     * @param {string} movetype - either "decrement" or "increment" 
+     * 
+     */
     this.Move = function(movetype){
-            //Make sure hte presentation is marked as started
+            //Make sure the presentation is marked as started
             this.pointer.started = true;
             //increment pointers
             chain_idx = this.chain.length - 1;
@@ -50,9 +70,39 @@ function Presentation(){
             this.GetContentChain();
     }
 
+
+    /** 
+     * Iterates through the structure of the presentation from top to bottom.
+     * Starts with the actual instance of the presentation class, then
+     * moves down to the subitem currently active in the parent item
+     * until there no longer are any subitems. A typical chain looks like this:
+     *
+     * 1. Presentation
+     * 2. Section (Introduction, Worship and prayer...)
+     * 3. Song
+     * 4. Verse
+     *
+     */
+    this.GetContentChain = function(){
+            //
+            //
+            thisobject = this;
+            this.chain = [thisobject];
+            while (thisobject.hasOwnProperty('current')){
+                thisobject=thisobject.current;
+                this.chain.push(thisobject);
+            }
+    };
+
+
+
+    /**
+     * Extracts the structure of the slide show from a pre-generated (e.g. by diat.php)
+     * html document. Pulls out information on each song that should be part of the service
+     * as well as what role the song has (worship song, communion song "song of the day" etc.)
+     *
+     */
     this.GetSongs= function (){
-        //If there is a predefined structure for the presantation
-        //this function extracts it
         var structure = document.getElementById("structure");
         this.songs = {};
         for (var i=0;i<structure.childNodes.length;i++){
@@ -91,11 +141,19 @@ function Presentation(){
                 }
             }
         }
-        //Remove the information from html
-        //ClearContent(document.getElementById("structure"));
         return 0;
     };
 
+    /**
+     *
+     * Creates and formats the navigator screen, i.e. the window, by which the
+     * user navigates the slide show, including the table of contents, preview
+     * of the songs' words and the functionality to add spontaneous content. 
+     *
+     * @param {string} prestype - "spontaneous" or "default": whether this is for the spontaneous
+     * presentation content or the actual structured worship service
+     *
+     */
     this.CreateNavigation = function(prestype){
         if(prestype=='default'){
             //Create links in the secondary screen for jumping from one section to another
@@ -201,6 +259,15 @@ function Presentation(){
 
     };
 
+    /**
+     *
+     * Adds new content to the presentation. NOTE: at the moment
+     * only works for a flat presentation, i.e. the presentation object for
+     * spontaneous content.
+     *
+     * @param {ScreenContent} newcontent - a ScreenContent object (song, information slide, bible slide, header, image...)
+     *
+     */
     this.AddContent = function(newcontent){
             this.items.push(newcontent);
             this.current = this.items[0];
@@ -212,6 +279,13 @@ function Presentation(){
             SetPointers(this, true);
     }
 }
+
+/*
+ *
+ *
+ * @extends Presentation
+ *
+ */
 
 function MajakkaMessu(){
     //Pre-defined services...
@@ -1188,14 +1262,6 @@ function OpenPres(pres){
     document.onkeydown = checkKey;
 }
 
-function PresentationContainer(){
-
-    this.default = new MajakkaMessu();
-    this.spontaneous =  new Presentation();
-    this.current = 'default';
-    this.secondbrowser = null;
-
-}
 
 //========================================
 //
@@ -1441,15 +1507,6 @@ function AddSongSlide(){
     song.items.unshift(div);
     SetPointers(song,false);
     Presentations.spontaneous.AddContent(song);
-}
-
-function AddTextSlide(){
-    var addedtext = document.getElementById('added_text_content').value;
-    var addedtextheader = addedtext;
-    if(addedtext.length>20){
-        addedtextheader = addedtext.substr(0,20) + "...";
-    }
-    Presentations.spontaneous.AddContent(new InfoContent('', addedtext, addedtextheader));
 }
 
 function AddTextSlide(){
