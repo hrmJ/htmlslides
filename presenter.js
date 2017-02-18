@@ -1,4 +1,12 @@
-
+/**
+ * Represents coherent sets of slide shows. Practically, every  slide show
+ * created with this software consists of two Presentation objects: One for
+ * the actual structured slide show (i.e. the worship service and all of its 
+ * related structure - pre-specified information slides, sermon, information about
+ * people involved in making the service etc.)
+ *
+ * @constructor
+ */
 function Presentation(){
     // PRESENTATION is the class that wraps different content and decides what to show
 
