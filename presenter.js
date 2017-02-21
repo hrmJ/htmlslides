@@ -12,12 +12,10 @@
  *
  */
 function PresentationContainer(){
-
     this.default = new MajakkaMessu();
     this.spontaneous =  new Presentation();
     this.current = 'default';
     this.secondbrowser = null;
-
 }
 
 
@@ -33,7 +31,6 @@ function PresentationContainer(){
  * @constructor
  */
 function Presentation(){
-
     // The pointer is set to the id of the 
     // songcontent object currently set as active
     this.items = [];
@@ -281,16 +278,16 @@ function Presentation(){
 }
 
 /*
- *
+ * Represents a pre-defined (hard-coded) worship service. 
+ * This can be used as a model for making new specific
+ * service types. This should only be a temporary solution, so 
+ * that these hard-coded presentations would be replaced by
+ * e.g. separate configuration files.
  *
  * @extends Presentation
  *
  */
-
 function MajakkaMessu(){
-    //Pre-defined services...
-    //These inherit from the general presentation class
-
     this.GetCredits = function (){
                 var vastuut = document.getElementsByClassName("vastuudata");
                 var vastuulist = [];
@@ -365,13 +362,18 @@ function MajakkaMessu(){
     }
     SetPointers(this, true);
     this.GetContentChain();
-
-
 }
 
 MajakkaMessu.prototype = new Presentation();
 MajakkaMessu.prototype.constructor = MajakkaMessu;
 
+/*
+ * A wrapper for inserting multiple songs (of the same type) into a structured
+ * service.
+ *
+ * @param {Array} songlist - 
+ *
+ */
 function MultiSong(songlist, songrole, header, constantinfo){
     songs = [];
     var wscounter = 1;
