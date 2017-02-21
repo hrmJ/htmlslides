@@ -31,13 +31,9 @@ function PresentationContainer(){
  * @constructor
  */
 function Presentation(){
-    // The pointer is set to the id of the 
-    // songcontent object currently set as active
     this.items = [];
     // This might be unnecessary:
     this.current = undefined;
-    //A try to make jumping in the presentation easier
-    this.flatsructure = [];
 
     /** 
      * Processes the call from the user to move to the next or to the previous
@@ -275,9 +271,35 @@ function Presentation(){
             }
             SetPointers(this, true);
     }
+
+    /**
+     * A wrapper for inserting multiple songs (of the same type) into a structured
+     * service.
+     *
+     * @param {string} songrole - the type, e.g. "Worship song" or "Communion song", of the songs to be inserted
+     * @param {array} constantinfo - A {@link SectionItem} (usually of the type {@link InfoContent}). This is an array of exactly 3 items with the structure [name of content,  {@link ScreenContent} item, type of content ]
+     *
+     */
+    this.MultiSong =function MultiSong(songrole, constantinfo){
+        songs = [];
+        var wscounter = 1;
+        for(var songidx in this.songs[songrole]){
+            var wsong = this.songs[songrole][songidx];
+            wsong.songnumber = wscounter;
+            songs.push(['Laulu: ' +  wsong.titletext, wsong, songrole]);
+            if(constantinfo!==undefined){
+                if (songidx < this.songs[songrole].length -1 ){
+                    //Don't add the info after the last song
+                    songs.push(constantinfo);
+                }
+            }
+            wscounter++;
+        }
+        return songs
+    }
 }
 
-/*
+/**
  * Represents a pre-defined (hard-coded) worship service. 
  * This can be used as a model for making new specific
  * service types. This should only be a temporary solution, so 
@@ -316,7 +338,7 @@ function MajakkaMessu(){
     var credits1 = new CreditContent('', this.GetCredits());
     //TODO: make creating these sections simpler
     //1. Collect all worship songs and make them into a section
-    var communionsongs = MultiSong(this.songs,"Ehtoollislauluja", "Ehtoollislaulu ");
+    var communionsongs = this.MultiSong("Ehtoollislauluja");
     var lapsicredits = "Pyhistä vetää tänään " + this.credits["Pyhis"] + ", klubissa " + this.credits["Klubi"];
     var info1 = new InfoContent('Lapsille ja lapsiperheille', ['Päivän laulun aikana 3-6-vuotiaat lapset voivat siirtyä pyhikseen ja yli 6-vuotiaat klubiin.', 'Seuraa vetäjiä - tunnistat heidät lyhdyistä!', lapsicredits]);
     var ehtoollisinfo  = new InfoContent('Ehtoolliskäytännöistä', ['Voit tulla ehtoolliselle jo Jumalan karitsa -hymnin aikana', 'Halutessasi voit jättää kolehdin ehtoolliselle tullessasi oikealla olevaan koriin.']);
@@ -325,7 +347,7 @@ function MajakkaMessu(){
     var rukouscredits = "Rukouspalvelijana tänään " + this.credits["Rukouspalvelu"] + ". ";
     //TODO: Hae esirukoilijatieto autom.
     var wsinfo  = new InfoContent('Ylistys- ja rukousosio', ['Ylistys- ja rukouslaulujen aikana voit kirjoittaa omia  rukousaiheitasi ja hiljentyä sivualttarin luona.', ' Rukouspalvelu hiljaisessa huoneessa. ' + rukouscredits]);
-    var worshipsongs = MultiSong(this.songs,"Ylistys- ja rukouslauluja", "Ylistyslaulu ", ['rukousinfo', wsinfo, 'info']);
+    var worshipsongs = this.MultiSong("Ylistys- ja rukouslauluja", ['rukousinfo', wsinfo, 'info']);
     worshipsongs.push(['Esirukous',false,'header']);
     worshipsongs.unshift(['rukousinfo', wsinfo, 'info']);
 
@@ -367,30 +389,6 @@ function MajakkaMessu(){
 MajakkaMessu.prototype = new Presentation();
 MajakkaMessu.prototype.constructor = MajakkaMessu;
 
-/*
- * A wrapper for inserting multiple songs (of the same type) into a structured
- * service.
- *
- * @param {Array} songlist - 
- *
- */
-function MultiSong(songlist, songrole, header, constantinfo){
-    songs = [];
-    var wscounter = 1;
-    for(var songidx in songlist[songrole]){
-        var wsong = songlist[songrole][songidx];
-        wsong.songnumber = wscounter;
-        songs.push(['Laulu: ' +  wsong.titletext, wsong, songrole]);
-        if(constantinfo!==undefined){
-            if (songidx < songlist[songrole].length -1 ){
-                //Don't add the info after the last song
-                songs.push(constantinfo);
-            }
-        }
-        wscounter++;
-    }
-    return songs
-}
 
 function Pointer(pointed){
     //Pointers keep track of a set of contents in order to show them on the screen 
@@ -457,6 +455,13 @@ function Pointer(pointed){
     }
 }
 
+/**
+ *
+ * Represents the basic building block of a section.
+ *
+ * @constructor
+ *
+ **/
 function SectionItem(thissection, name, contentobject,itemtype, item_idx){
     this.name = name;
     this.itemtype = itemtype;
@@ -481,7 +486,6 @@ function SectionItem(thissection, name, contentobject,itemtype, item_idx){
             else{
             }
             this.items.push(contentobject);
-            thissection.mypresentation.flatsructure.push(contentobject);
         }
     }
     
@@ -654,6 +658,15 @@ function VerseMover(evt){
     thissong.Show();
 }
 
+/**
+ *
+ * Represents a basic object, e.g. a song, an information slide, a header etc.,
+ * that can be displayed on the screen. This is the very basic building block
+ * of the presentation.
+ *
+ * @constructor
+ *
+ **/
 function ScreenContent(){
     // Screencontent is the class that contains the actual data to be shown
 
@@ -827,7 +840,6 @@ function ScreenContent(){
         }
         document.body.style.overflow="auto";
     };
-
 }
 
 function AdjustHeadings(screen){
@@ -926,7 +938,6 @@ function SectionTitleContent(section,curitem){
     this.content_type = "sectiontitle";
     this.items = [];
     SetPointers(this, false);
-    section.mypresentation.flatsructure.push(this);
     return 0;
 }
 SectionTitleContent.prototype = new ScreenContent();
@@ -985,6 +996,16 @@ function BibleContent(address, content, content_name){
 BibleContent.prototype = new ScreenContent();
 BibleContent.prototype.constructor = BibleContent;
 
+
+/**
+ *
+ * This is a specific type of {@link ScreenContent}, used for presenting simple
+ * textual information on the screen.
+ *
+ * @constructor
+ * @extends ScreenContent
+ *
+ **/
 function InfoContent(headertext, infotext, content_name){
     this.id = CreateUid();
     this.content_type="info";
