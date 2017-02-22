@@ -390,56 +390,71 @@ MajakkaMessu.prototype = new Presentation();
 MajakkaMessu.prototype.constructor = MajakkaMessu;
 
 
+/**
+ * Pointers keep track of a set of contents in order to show them on the screen 
+ * on the right moment. Classes {@link Presentation} and {@link ScreenContent}
+ * have pointers. Basically, the simplest way to use a pointer is to move one slide
+ * forward or backward in the presentation. The usefulness of pointers is best demonstrated,
+ * when the presentation is a structured one, i.e. has nested contents. Having pointers as 
+ * a separate class is what makes the presentation non-linear, i.e. makes jumping and linkking 
+ * possible.
+ *
+ * @constructor
+ *
+ **/
 function Pointer(pointed){
-    //Pointers keep track of a set of contents in order to show them on the screen 
-    //on the right moment
     this.max  = pointed.items.length;
     this.pointed = pointed;
     this.started = false;
     this.position = 0;
+    /**
+     *
+     * @param {string} movetype - "increment", "decrement" or "unchanged"
+     *
+     **/
     this.Move = function(movetype){
         var returnvalue = false;
         //Make sure the value is interpreted corretly after jumping from links etc
         this.position = parseInt(this.position);
-        if (movetype == "increment"){
-
-            if(this.position +1 < this.max){
-                this.position++;
-                this.started = true;
-                returnvalue =  "incremented";
-            }
-            else{
-                if(!this.started){
+        switch(movetype){
+            case "increment":
+                if(this.position +1 < this.max){
+                    this.position++;
                     this.started = true;
-                    if (typeof this.pointed.Show === 'undefined'){
-                        //if only one content object and this object not showable
-                        returnvalue =  false;
-                    }
-                    else{
-                        returnvalue =  "started";
+                    returnvalue =  "incremented";
+                }
+                else{
+                    if(!this.started){
+                        this.started = true;
+                        if (typeof this.pointed.Show === 'undefined'){
+                            //if only one content object and this object not showable
+                            returnvalue =  false;
+                        }
+                        else{
+                            returnvalue =  "started";
+                        }
                     }
                 }
-            }
-
-        }
-        else if (movetype == "decrement"){
-
-            if(this.position -1 >= 0){
-                this.position--;
-                returnvalue = "decremented";
-            }
-            else{
-                returnvalue = false;
-            }
-        
-        }
-        else if (movetype == "unchanged"){
-            returnvalue = "started";
+                break;
+            case "decrement":
+                if(this.position -1 >= 0){
+                    this.position--;
+                    returnvalue = "decremented";
+                }
+                else{
+                    returnvalue = false;
+                }
+                break;
+            case "unchanged":
+                returnvalue = "started";
+                break;
+            default:
+                break;
         }
 
         //Set the parent object's currently active element
         if (this.pointed.hasOwnProperty('current')){
-            pointed.current = pointed.items[this.position];
+            this.pointed.current = this.pointed.items[this.position];
         }
         return returnvalue;
     };
@@ -646,6 +661,9 @@ function VerseMover(evt){
         //i.e. (only the sectiontitle of the song is active)
         //in this case the song is se second item of the items array
         var thissong = thispres.current.current.items[1];
+        //Make sure the presentation updates its currently displayed item to be the song
+        thispres.current.current.current = thissong;
+        thispres.GetContentChain();
     }
     else{
         var thissong = thispres.chain[thispres.chain.length-1];
@@ -1321,6 +1339,12 @@ function ApplyStyles(){
 
 }
 
+/**
+ *
+ * Creates the functionality for adding spontaneous content and for some other
+ * functions such as the second browser functionality.
+ *
+ **/
 function AddFunctionalitySection(){
     var textarea = TagWithText("textarea","Kirjoita tähän tekstiä, jonka haluat näyttää skriinillä","contentinsert");
     textarea.id = 'added_text_content';
@@ -1688,8 +1712,15 @@ function AddSecondBrowser(){
 
 }
 
+/**
+ *
+ * Opens the functional menu on the top bar. The functional menu contains 
+ * controls mainly for adding spontaneous content such as songs or bible verses
+ * not mentioned in the predefined service manuscript. The actual functionality
+ * of the menu is created by function {@link AddFunctionalitySection}
+ *
+ **/
 function OpenFunctionMenu(){
-    console.log("moro vaan.");
     var section = document.getElementById('functionalmenu');
     var h = window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight||0;
     var newheight = h;
@@ -1710,10 +1741,21 @@ function OpenFunctionMenu(){
 
 //========================================
 
+/**
+ *
+ * This function is rarely used. The only purpose is to provide a target for the 
+ * "Next slide" -link displayed on the navigator.
+ *
+ **/
 function NextSlide(){
         Presentations[Presentations.current].Move('increment');
 }
 
+/**
+ *
+ * Cover the presentation screen with a black box to hide the presentation.
+ *
+ **/
 function BlankScreen(){
     var bsbutton = document.getElementById("utsection");
     if (Presentations.screen.blankscreenactive == true){
