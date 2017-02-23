@@ -37,7 +37,32 @@ function Presentation(){
 
     /** 
      * Processes the call from the user to move to the next or to the previous
-     * slide.
+     * slide. 
+     *
+     * The function starts from the last item of the content chain (marked by
+     * the {@link GetContentChain} function).  "The last item of the chain"
+     * here means the lowest element in the current hierarchy. For example:
+     *
+     * The user is currently viewing a song in the "worship songs" -section. 
+     *
+     * That is, the chain is an array of this form:
+     * [{@link MajakkaMessu}, {@link Section}, {@link SectionItem}, {@link SongContent}]
+     *
+     * 1. The Song is an iterable content, that iterates throug verses
+     * 2. The SectionItem is also iterable, it's the container of the song, consisting of the Songs's title slide and the song
+     * 3. The Section is the "ylistyslaulut" section of the service, also iterable (consists of multiple SectionItems)
+     * 4. Finally, the MajakkaMessu item is also iterable, consisting of multiple sections
+     *
+     * So, when moving, the program needs to first move the lowest element in
+     * the direction specified by the user. If the direction is "increment" and we come to the 
+     * last verse and after that try to move forward, the function will recognize, that
+     * instead of moving the lowest element in the hierarchy, it now has to move the next item.
+     * Now, when the song has ended, the Mover tries to increment the section item instead.
+     * Since the song was also the last element of the section item (consisting
+     * of the Song's header and the song), the Mover continues up in the hierarchy and tries to
+     * move the pointer in the Section. if this isn't the last song, the pointer will now, finally,
+     * move forward.
+     *
      *
      * @param {string} movetype - either "decrement" or "increment" 
      * 
@@ -507,6 +532,13 @@ function SectionItem(thissection, name, contentobject,itemtype, item_idx){
     SetPointers(this, true);
 }
 
+/**
+ *
+ * The structured service consists of sections.
+ *
+ * @constructor
+ *
+ **/
 function Section(mypresentation, name, items, sec_idx){
     //The presentation may be divided into sections
     this.sec_idx = undefined;
@@ -883,6 +915,16 @@ function AdjustHeadings(screen){
 }
 
 
+/**
+ *
+ * 
+ * Songs are stored in SongContent objects.
+ *
+ *
+ * @constructor
+ * @extends ScreenContent
+ *
+ **/
 function SongContent(title, songtexts){
     // Songcontent is a class for the actual songs
 
