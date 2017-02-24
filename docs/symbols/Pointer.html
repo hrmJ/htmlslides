@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - _global_</title>
+		<title>JsDoc Reference - Pointer</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -216,7 +216,7 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Built-In Namespace _global_
+				Class Pointer
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
@@ -227,9 +227,33 @@ ul.inheritsList
 				
 				
 				
+					<br /><i>Defined in: </i> <a href="../symbols/src/presenter.js.html">presenter.js</a>.
+				
 			</p>
 
 <!-- ============================== constructor summary ==================== -->			
+			
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Pointer.">
+				<caption>Class Summary</caption>
+				<thead>
+					<tr>
+						<th scope="col">Constructor Attributes</th>
+						<th scope="col">Constructor Name and Description</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td class="attributes">&nbsp;</td>
+						<td class="nameDescription" >
+							<div class="fixedFont">
+								<b><a href="../symbols/Pointer.html#constructor">Pointer</a></b>(pointed)
+							</div>
+							<div class="description">Pointers keep track of a set of contents in order to show them on the screen 
+on the right moment.</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
 			
 
 <!-- ============================== properties summary ===================== -->
@@ -239,7 +263,7 @@ ul.inheritsList
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class _global_.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class Pointer.">
 					<caption>Method Summary</caption>
 					<thead>
 						<tr>
@@ -252,55 +276,9 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/_global_.html#AddFunctionalitySection">AddFunctionalitySection</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/Pointer.html#Move">Move</a></b>(movetype)
 								</div>
-								<div class="description">Creates the functionality for adding spontaneous content and for some other
-functions such as the second browser functionality.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/_global_.html#BlankScreen">BlankScreen</a></b>()
-								</div>
-								<div class="description">Cover the presentation screen with a black box to hide the presentation.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/_global_.html#MajakkaMessu">MajakkaMessu</a></b>()
-								</div>
-								<div class="description">Represents a pre-defined (hard-coded) worship service.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/_global_.html#Mover">Mover</a></b>(evt)
-								</div>
-								<div class="description">This function is the target of the navigation links.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/_global_.html#NextSlide">NextSlide</a></b>()
-								</div>
-								<div class="description">This function is rarely used.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/_global_.html#OpenFunctionMenu">OpenFunctionMenu</a></b>()
-								</div>
-								<div class="description">Opens the functional menu on the top bar.</div>
+								<div class="description"></div>
 							</td>
 						</tr>
 					
@@ -315,6 +293,50 @@ functions such as the second browser functionality.</div>
 
 <!-- ============================== constructor details ==================== -->		
 			
+			<div class="details"><a name="constructor"> </a>
+				<div class="sectionTitle">
+					Class Detail
+				</div>
+				
+				<div class="fixedFont">
+						<b>Pointer</b>(pointed)
+				</div>
+				
+				<div class="description">
+					Pointers keep track of a set of contents in order to show them on the screen 
+on the right moment. Classes <a href="../symbols/Presentation.html">Presentation</a> and <a href="../symbols/ScreenContent.html">ScreenContent</a>
+have pointers. Basically, the simplest way to use a pointer is to move one slide
+forward or backward in the presentation. The usefulness of pointers is best demonstrated,
+when the presentation is a structured one, i.e. has nested contents. Having pointers as 
+a separate class is what makes the presentation non-linear, i.e. makes jumping and linkking 
+possible.
+					
+				</div>
+				
+				
+				
+				
+					
+						<dl class="detailList">
+						<dt class="heading">Parameters:</dt>
+						
+							<dt>
+								 <b>pointed</b>
+								
+							</dt>
+								<dd></dd>
+						
+						</dl>
+					
+					
+					
+					
+					
+					
+					
+
+			</div>
+			
 
 <!-- ============================== field details ========================== -->		
 			
@@ -325,110 +347,15 @@ functions such as the second browser functionality.</div>
 					Method Detail
 				</div>
 				
-					<a name="AddFunctionalitySection"> </a>
+					<a name="Move"> </a>
 					<div class="fixedFont">
 					
 					
-					<b>AddFunctionalitySection</b>()
+					<b>Move</b>(movetype)
 					
 					</div>
 					<div class="description">
-						Creates the functionality for adding spontaneous content and for some other
-functions such as the second browser functionality.
 						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/presenter.js.html">presenter.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="BlankScreen"> </a>
-					<div class="fixedFont">
-					
-					
-					<b>BlankScreen</b>()
-					
-					</div>
-					<div class="description">
-						Cover the presentation screen with a black box to hide the presentation.
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/presenter.js.html">presenter.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="MajakkaMessu"> </a>
-					<div class="fixedFont">
-					
-					
-					<b>MajakkaMessu</b>()
-					
-					</div>
-					<div class="description">
-						Represents a pre-defined (hard-coded) worship service. 
-This can be used as a model for making new specific
-service types. This should only be a temporary solution, so 
-that these hard-coded presentations would be replaced by
-e.g. separate configuration files.
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/presenter.js.html">presenter.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="Mover"> </a>
-					<div class="fixedFont">
-					
-					
-					<b>Mover</b>(evt)
-					
-					</div>
-					<div class="description">
-						This function is the target of the navigation links.
-The function picks the target the user wants to jump to,
-finds the relevant <a href="../symbols/ScreenContent.html">ScreenContent</a> object and
-trigger's the object's Show function
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/presenter.js.html">presenter.js</a>.
 						
 						
 					</div>
@@ -440,72 +367,12 @@ trigger's the object's Show function
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{object}</span> <b>evt</b>
+									<span class="light fixedFont">{string}</span> <b>movetype</b>
 									
 								</dt>
-								<dd>- the event that fired the function</dd>
+								<dd>- "increment", "decrement" or "unchanged"</dd>
 							
 							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="NextSlide"> </a>
-					<div class="fixedFont">
-					
-					
-					<b>NextSlide</b>()
-					
-					</div>
-					<div class="description">
-						This function is rarely used. The only purpose is to provide a target for the 
-"Next slide" -link displayed on the navigator.
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/presenter.js.html">presenter.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="OpenFunctionMenu"> </a>
-					<div class="fixedFont">
-					
-					
-					<b>OpenFunctionMenu</b>()
-					
-					</div>
-					<div class="description">
-						Opens the functional menu on the top bar. The functional menu contains 
-controls mainly for adding spontaneous content such as songs or bible verses
-not mentioned in the predefined service manuscript. The actual functionality
-of the menu is created by function <a href="../symbols/_global_.html#AddFunctionalitySection">AddFunctionalitySection</a>
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/presenter.js.html">presenter.js</a>.
-						
-						
-					</div>
-					
-					
-					
 						
 						
 						

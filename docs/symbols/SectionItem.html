@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - PresentationContainer</title>
+		<title>JsDoc Reference - SectionItem</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -216,7 +216,7 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Class PresentationContainer
+				Class SectionItem
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
@@ -233,7 +233,7 @@ ul.inheritsList
 
 <!-- ============================== constructor summary ==================== -->			
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class PresentationContainer.">
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class SectionItem.">
 				<caption>Class Summary</caption>
 				<thead>
 					<tr>
@@ -246,11 +246,9 @@ ul.inheritsList
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/PresentationContainer.html#constructor">PresentationContainer</a></b>()
+								<b><a href="../symbols/SectionItem.html#constructor">SectionItem</a></b>(thissection, name, contentobject, itemtype, item_idx)
 							</div>
-							<div class="description">Represents a container for the two parallel slide shows that each
-presentation consists of: the structured slide show (default) and
-the slide show for the spontaneously added content (spontaneous).</div>
+							<div class="description">Represents the basic building block of a section.</div>
 						</td>
 					</tr>
 				</tbody>
@@ -258,54 +256,6 @@ the slide show for the spontaneously added content (spontaneous).</div>
 			
 
 <!-- ============================== properties summary ===================== -->
-			
-				
-				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class PresentationContainer.">
-					<caption>Field Summary</caption>
-					<thead>
-						<tr>
-							<th scope="col">Field Attributes</th>
-							<th scope="col">Field Name and Description</th>
-						</tr>
-					</thead>
-					<tbody>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/PresentationContainer.html#current">current</a></b>
-								</div>
-								<div class="description">- a string ("default" or "spontaneous") indicating, which of the two slide shows is currently active</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/PresentationContainer.html#default">default</a></b>
-								</div>
-								<div class="description">- a Presentation object containing the actual structured slide show</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/PresentationContainer.html#spontaneous">spontaneous</a></b>
-								</div>
-								<div class="description">- a Presentation object containing the slide show for the spontaneously added content</div>
-							</td>
-						</tr>
-					
-					</tbody>
-				</table>
-				
-				
-				
 			
 
 <!-- ============================== methods summary ======================== -->
@@ -321,20 +271,52 @@ the slide show for the spontaneously added content (spontaneous).</div>
 				</div>
 				
 				<div class="fixedFont">
-						<b>PresentationContainer</b>()
+						<b>SectionItem</b>(thissection, name, contentobject, itemtype, item_idx)
 				</div>
 				
 				<div class="description">
-					Represents a container for the two parallel slide shows that each
-presentation consists of: the structured slide show (default) and
-the slide show for the spontaneously added content (spontaneous). Both of these
-are objects of the Presentation class.
+					Represents the basic building block of a section.
 					
 				</div>
 				
 				
 				
 				
+					
+						<dl class="detailList">
+						<dt class="heading">Parameters:</dt>
+						
+							<dt>
+								 <b>thissection</b>
+								
+							</dt>
+								<dd></dd>
+						
+							<dt>
+								 <b>name</b>
+								
+							</dt>
+								<dd></dd>
+						
+							<dt>
+								 <b>contentobject</b>
+								
+							</dt>
+								<dd></dd>
+						
+							<dt>
+								 <b>itemtype</b>
+								
+							</dt>
+								<dd></dd>
+						
+							<dt>
+								 <b>item_idx</b>
+								
+							</dt>
+								<dd></dd>
+						
+						</dl>
 					
 					
 					
@@ -347,77 +329,6 @@ are objects of the Presentation class.
 			
 
 <!-- ============================== field details ========================== -->		
-			
-				<div class="sectionTitle">
-					Field Detail
-				</div>
-				
-					<a name="current"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{string}</span>
-					<b>current</b>
-					
-					</div>
-					<div class="description">
-						- a string ("default" or "spontaneous") indicating, which of the two slide shows is currently active
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="default"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{<a href="../symbols/Presentation.html">Presentation</a>}</span>
-					<b>default</b>
-					
-					</div>
-					<div class="description">
-						- a Presentation object containing the actual structured slide show
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="spontaneous"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{<a href="../symbols/Presentation.html">Presentation</a>}</span>
-					<b>spontaneous</b>
-					
-					</div>
-					<div class="description">
-						- a Presentation object containing the slide show for the spontaneously added content
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					
-				
 			
 
 <!-- ============================== method details ========================= -->		

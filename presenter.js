@@ -634,6 +634,17 @@ function Section(mypresentation, name, items, sec_idx){
     SetPointers(this, true);
 }
 
+/**
+ *
+ * This function is the target of the navigation links.
+ * The function picks the target the user wants to jump to,
+ * finds the relevant {@link ScreenContent} object and
+ * trigger's the object's Show function
+ *
+ * 
+ * @param {object}  evt - the event that fired the function
+ *
+ **/
 function Mover(evt){
     var sectiontarget = evt.target.getAttribute('sectionidx');
     //The latter is for songs, speeches etc i.e. subitems of sections
