@@ -1,28 +1,74 @@
+/**
+ *
+ * Represents a container for the two parallel slide shows that each
+ * presentation consists of: the structured slide show (default) and
+ * the slide show for the spontaneously added content (spontaneous). Both of these
+ * are objects of the Presentation class.
+ *
+ * @constructor
+ * @property {Presentation}  default         - a Presentation object containing the actual structured slide show
+ * @property {Presentation}  spontaneous     - a Presentation object containing the slide show for the spontaneously added content
+ * @property {string}  current               - a string ("default" or "spontaneous") indicating, which of the two slide shows is currently active
+ *
+ */
+function PresentationContainer(){
+    this.default = new MajakkaMessu();
+    this.spontaneous =  new Presentation();
+    this.current = 'default';
+    this.secondbrowser = null;
+}
 
+
+
+/**
+ * Represents coherent sets of slide shows. Practically, every  slide show
+ * created with this software consists of two Presentation objects: One for
+ * the actual structured slide show (i.e. the worship service and all of its 
+ * related structure - pre-specified information slides, sermon, information about
+ * people involved in making the service etc.) and the other for spontaneously
+ * added content.
+ *
+ * @constructor
+ */
 function Presentation(){
-    // PRESENTATION is the class that wraps different content and decides what to show
-
-    // The pointer is set to the id of the 
-    // songcontent object currently set as active
     this.items = [];
     // This might be unnecessary:
     this.current = undefined;
-    //A try to make jumping in the presentation easier
-    this.flatsructure = [];
 
-    this.GetContentChain = function(){
-            //Go down the section/sectionitem/songverse etc chain as deep as needed
-            //and compile a chain of contents
-            thisobject = this;
-            this.chain = [thisobject];
-            while (thisobject.hasOwnProperty('current')){
-                thisobject=thisobject.current;
-                this.chain.push(thisobject);
-            }
-    };
-
+    /** 
+     * Processes the call from the user to move to the next or to the previous
+     * slide. 
+     *
+     * The function starts from the last item of the content chain (marked by
+     * the {@link GetContentChain} function).  "The last item of the chain"
+     * here means the lowest element in the current hierarchy. For example:
+     *
+     * The user is currently viewing a song in the "worship songs" -section. 
+     *
+     * That is, the chain is an array of this form:
+     * [{@link MajakkaMessu}, {@link Section}, {@link SectionItem}, {@link SongContent}]
+     *
+     * 1. The Song is an iterable content, that iterates throug verses
+     * 2. The SectionItem is also iterable, it's the container of the song, consisting of the Songs's title slide and the song
+     * 3. The Section is the "ylistyslaulut" section of the service, also iterable (consists of multiple SectionItems)
+     * 4. Finally, the MajakkaMessu item is also iterable, consisting of multiple sections
+     *
+     * So, when moving, the program needs to first move the lowest element in
+     * the direction specified by the user. If the direction is "increment" and we come to the 
+     * last verse and after that try to move forward, the function will recognize, that
+     * instead of moving the lowest element in the hierarchy, it now has to move the next item.
+     * Now, when the song has ended, the Mover tries to increment the section item instead.
+     * Since the song was also the last element of the section item (consisting
+     * of the Song's header and the song), the Mover continues up in the hierarchy and tries to
+     * move the pointer in the Section. if this isn't the last song, the pointer will now, finally,
+     * move forward.
+     *
+     *
+     * @param {string} movetype - either "decrement" or "increment" 
+     * 
+     */
     this.Move = function(movetype){
-            //Make sure hte presentation is marked as started
+            //Make sure the presentation is marked as started
             this.pointer.started = true;
             //increment pointers
             chain_idx = this.chain.length - 1;
@@ -42,9 +88,39 @@ function Presentation(){
             this.GetContentChain();
     }
 
+
+    /** 
+     * Iterates through the structure of the presentation from top to bottom.
+     * Starts with the actual instance of the presentation class, then
+     * moves down to the subitem currently active in the parent item
+     * until there no longer are any subitems. A typical chain looks like this:
+     *
+     * 1. Presentation
+     * 2. Section (Introduction, Worship and prayer...)
+     * 3. Song
+     * 4. Verse
+     *
+     */
+    this.GetContentChain = function(){
+            //
+            //
+            thisobject = this;
+            this.chain = [thisobject];
+            while (thisobject.hasOwnProperty('current')){
+                thisobject=thisobject.current;
+                this.chain.push(thisobject);
+            }
+    };
+
+
+
+    /**
+     * Extracts the structure of the slide show from a pre-generated (e.g. by diat.php)
+     * html document. Pulls out information on each song that should be part of the service
+     * as well as what role the song has (worship song, communion song "song of the day" etc.)
+     *
+     */
     this.GetSongs= function (){
-        //If there is a predefined structure for the presantation
-        //this function extracts it
         var structure = document.getElementById("structure");
         this.songs = {};
         for (var i=0;i<structure.childNodes.length;i++){
@@ -72,29 +148,49 @@ function Presentation(){
                     if (['Jumalan karitsa','Pyhä-hymni'].indexOf(role)>-1){ 
                         var song = new SongContent('', songdata.content);
                     }
-                    else{
+                    else if(songdata!==undefined){
                         var song = new SongContent(songdata.title, songdata.content);
+                    }
+                    else if(songdata==undefined){
+                        var song = new SongContent(songname + " (ei sanoja)", "");
                     }
                     //Add the song to a structured list
                     this.songs[role].push(song);
                 }
             }
         }
-        //Remove the information from html
-        //ClearContent(document.getElementById("structure"));
         return 0;
     };
 
+    /**
+     *
+     * Creates and formats the navigator screen, i.e. the window, by which the
+     * user navigates the slide show, including the table of contents, preview
+     * of the songs' words and the functionality to add spontaneous content. 
+     *
+     * @param {string} prestype - "spontaneous" or "default": whether this is for the spontaneous
+     * presentation content or the actual structured worship service
+     *
+     */
     this.CreateNavigation = function(prestype){
         if(prestype=='default'){
             //Create links in the secondary screen for jumping from one section to another
+            
+
             var navigatorcontainer = CreateTag("section","navigatorcontainer",document, "");
+
+
             //This is where the general navigation between sections is
             var contentlist = CreateTag("section","section_nav", document, "navchildsec", navigatorcontainer);
             //This is where the upcoming/previous slides will be presented
             var versepreview = CreateTag("section","previewer", document, "navchildsec", navigatorcontainer);
-            //This is for all the additional functionality such as inserting spontaneous text content, songs, bible slides etc
-            navigatorcontainer.appendChild(AddFunctionalitySection());
+
+            //This is where any spontaneously added slides will be listed
+            var linkheader = TagWithText("h3","Lisätty sisältö","unhlpresentation");
+            linkheader.id = 'addedcontentheader';
+            linkheader.addEventListener('click',SwitchToSpontaneous,false);
+            navigatorcontainer.appendChild(TagParent("div",[linkheader,TagParent("div",[],"","addedcontent")],"","addedcontentparent"));
+
 
             var link1 = TagWithText("a","Avaa esitys","switchlink");
             link1.href = '#';
@@ -158,6 +254,9 @@ function Presentation(){
             sectionlist.appendChild(this_li);
         }
         if(prestype=='default'){
+            //This is for all the additional functionality such as inserting spontaneous text content, songs, bible slides etc
+            contentlist.appendChild(AddFunctionalitySection());
+
             var linkheader = TagWithText("h3","Sisältö","hlpresentation");
             linkheader.id = 'defaultcontentheader';
             linkheader.addEventListener('click',SwitchToDefault,false);
@@ -166,11 +265,6 @@ function Presentation(){
             contentlist.appendChild(link);
             contentlist.appendChild(sectionlist);
 
-            //This is where any spontaneously added slides will be listed
-            var linkheader = TagWithText("h3","Lisätty sisältö","unhlpresentation");
-            linkheader.id = 'addedcontentheader';
-            linkheader.addEventListener('click',SwitchToSpontaneous,false);
-            contentlist.appendChild(TagParent("div",[linkheader,TagParent("div",[],"","addedcontent")],"","addedcontentparent"));
 
             document.body.appendChild(navigatorcontainer);
             document.body.style.overflow="auto";
@@ -183,6 +277,15 @@ function Presentation(){
 
     };
 
+    /**
+     *
+     * Adds new content to the presentation. NOTE: at the moment
+     * only works for a flat presentation, i.e. the presentation object for
+     * spontaneous content.
+     *
+     * @param {ScreenContent} newcontent - a ScreenContent object (song, information slide, bible slide, header, image...)
+     *
+     */
     this.AddContent = function(newcontent){
             this.items.push(newcontent);
             this.current = this.items[0];
@@ -193,12 +296,45 @@ function Presentation(){
             }
             SetPointers(this, true);
     }
+
+    /**
+     * A wrapper for inserting multiple songs (of the same type) into a structured
+     * service.
+     *
+     * @param {string} songrole - the type, e.g. "Worship song" or "Communion song", of the songs to be inserted
+     * @param {array} constantinfo - A {@link SectionItem} (usually of the type {@link InfoContent}). This is an array of exactly 3 items with the structure [name of content,  {@link ScreenContent} item, type of content ]
+     *
+     */
+    this.MultiSong =function MultiSong(songrole, constantinfo){
+        songs = [];
+        var wscounter = 1;
+        for(var songidx in this.songs[songrole]){
+            var wsong = this.songs[songrole][songidx];
+            wsong.songnumber = wscounter;
+            songs.push(['Laulu: ' +  wsong.titletext, wsong, songrole]);
+            if(constantinfo!==undefined){
+                if (songidx < this.songs[songrole].length -1 ){
+                    //Don't add the info after the last song
+                    songs.push(constantinfo);
+                }
+            }
+            wscounter++;
+        }
+        return songs
+    }
 }
 
+/**
+ * Represents a pre-defined (hard-coded) worship service. 
+ * This can be used as a model for making new specific
+ * service types. This should only be a temporary solution, so 
+ * that these hard-coded presentations would be replaced by
+ * e.g. separate configuration files.
+ *
+ * @extends Presentation
+ *
+ */
 function MajakkaMessu(){
-    //Pre-defined services...
-    //These inherit from the general presentation class
-
     this.GetCredits = function (){
                 var vastuut = document.getElementsByClassName("vastuudata");
                 var vastuulist = [];
@@ -227,7 +363,7 @@ function MajakkaMessu(){
     var credits1 = new CreditContent('', this.GetCredits());
     //TODO: make creating these sections simpler
     //1. Collect all worship songs and make them into a section
-    var communionsongs = MultiSong(this.songs,"Ehtoollislauluja", "Ehtoollislaulu ");
+    var communionsongs = this.MultiSong("Ehtoollislauluja");
     var lapsicredits = "Pyhistä vetää tänään " + this.credits["Pyhis"] + ", klubissa " + this.credits["Klubi"];
     var info1 = new InfoContent('Lapsille ja lapsiperheille', ['Päivän laulun aikana 3-6-vuotiaat lapset voivat siirtyä pyhikseen ja yli 6-vuotiaat klubiin.', 'Seuraa vetäjiä - tunnistat heidät lyhdyistä!', lapsicredits]);
     var ehtoollisinfo  = new InfoContent('Ehtoolliskäytännöistä', ['Voit tulla ehtoolliselle jo Jumalan karitsa -hymnin aikana', 'Halutessasi voit jättää kolehdin ehtoolliselle tullessasi oikealla olevaan koriin.']);
@@ -236,8 +372,9 @@ function MajakkaMessu(){
     var rukouscredits = "Rukouspalvelijana tänään " + this.credits["Rukouspalvelu"] + ". ";
     //TODO: Hae esirukoilijatieto autom.
     var wsinfo  = new InfoContent('Ylistys- ja rukousosio', ['Ylistys- ja rukouslaulujen aikana voit kirjoittaa omia  rukousaiheitasi ja hiljentyä sivualttarin luona.', ' Rukouspalvelu hiljaisessa huoneessa. ' + rukouscredits]);
-    var worshipsongs = MultiSong(this.songs,"Ylistys- ja rukouslauluja", "Ylistyslaulu ", ['rukousinfo', wsinfo, 'info']);
+    var worshipsongs = this.MultiSong("Ylistys- ja rukouslauluja", ['rukousinfo', wsinfo, 'info']);
     worshipsongs.push(['Esirukous',false,'header']);
+    worshipsongs.unshift(['rukousinfo', wsinfo, 'info']);
 
 
     //2. Combine all the sections
@@ -272,81 +409,77 @@ function MajakkaMessu(){
     }
     SetPointers(this, true);
     this.GetContentChain();
-
-
 }
 
 MajakkaMessu.prototype = new Presentation();
 MajakkaMessu.prototype.constructor = MajakkaMessu;
 
-function MultiSong(songlist, songrole, header, constantinfo){
-    songs = [];
-    var wscounter = 1;
-    for(var songidx in songlist[songrole]){
-        var wsong = songlist[songrole][songidx];
-        wsong.songnumber = wscounter;
-        songs.push(['Laulu: ' +  wsong.titletext, wsong, songrole]);
-        if(constantinfo!==undefined){
-            if (songidx < songlist[songrole].length -1 ){
-                //Don't add the info after the last song
-                songs.push(constantinfo);
-            }
-        }
-        wscounter++;
-    }
-    return songs
-}
 
+/**
+ * Pointers keep track of a set of contents in order to show them on the screen 
+ * on the right moment. Classes {@link Presentation} and {@link ScreenContent}
+ * have pointers. Basically, the simplest way to use a pointer is to move one slide
+ * forward or backward in the presentation. The usefulness of pointers is best demonstrated,
+ * when the presentation is a structured one, i.e. has nested contents. Having pointers as 
+ * a separate class is what makes the presentation non-linear, i.e. makes jumping and linkking 
+ * possible.
+ *
+ * @constructor
+ *
+ **/
 function Pointer(pointed){
-    //Pointers keep track of a set of contents in order to show them on the screen 
-    //on the right moment
     this.max  = pointed.items.length;
     this.pointed = pointed;
     this.started = false;
     this.position = 0;
+    /**
+     *
+     * @param {string} movetype - "increment", "decrement" or "unchanged"
+     *
+     **/
     this.Move = function(movetype){
         var returnvalue = false;
         //Make sure the value is interpreted corretly after jumping from links etc
         this.position = parseInt(this.position);
-        if (movetype == "increment"){
-
-            if(this.position +1 < this.max){
-                this.position++;
-                this.started = true;
-                returnvalue =  "incremented";
-            }
-            else{
-                if(!this.started){
+        switch(movetype){
+            case "increment":
+                if(this.position +1 < this.max){
+                    this.position++;
                     this.started = true;
-                    if (typeof this.pointed.Show === 'undefined'){
-                        //if only one content object and this object not showable
-                        returnvalue =  false;
-                    }
-                    else{
-                        returnvalue =  "started";
+                    returnvalue =  "incremented";
+                }
+                else{
+                    if(!this.started){
+                        this.started = true;
+                        if (typeof this.pointed.Show === 'undefined'){
+                            //if only one content object and this object not showable
+                            returnvalue =  false;
+                        }
+                        else{
+                            returnvalue =  "started";
+                        }
                     }
                 }
-            }
-
-        }
-        else if (movetype == "decrement"){
-
-            if(this.position -1 >= 0){
-                this.position--;
-                returnvalue = "decremented";
-            }
-            else{
-                returnvalue = false;
-            }
-        
-        }
-        else if (movetype == "unchanged"){
-            returnvalue = "started";
+                break;
+            case "decrement":
+                if(this.position -1 >= 0){
+                    this.position--;
+                    returnvalue = "decremented";
+                }
+                else{
+                    returnvalue = false;
+                }
+                break;
+            case "unchanged":
+                returnvalue = "started";
+                break;
+            default:
+                break;
         }
 
         //Set the parent object's currently active element
         if (this.pointed.hasOwnProperty('current')){
-            pointed.current = pointed.items[this.position];
+            this.pointed.current = this.pointed.items[this.position];
         }
         return returnvalue;
     };
@@ -362,6 +495,13 @@ function Pointer(pointed){
     }
 }
 
+/**
+ *
+ * Represents the basic building block of a section.
+ *
+ * @constructor
+ *
+ **/
 function SectionItem(thissection, name, contentobject,itemtype, item_idx){
     this.name = name;
     this.itemtype = itemtype;
@@ -386,13 +526,19 @@ function SectionItem(thissection, name, contentobject,itemtype, item_idx){
             else{
             }
             this.items.push(contentobject);
-            thissection.mypresentation.flatsructure.push(contentobject);
         }
     }
     
     SetPointers(this, true);
 }
 
+/**
+ *
+ * The structured service consists of sections.
+ *
+ * @constructor
+ *
+ **/
 function Section(mypresentation, name, items, sec_idx){
     //The presentation may be divided into sections
     this.sec_idx = undefined;
@@ -488,6 +634,17 @@ function Section(mypresentation, name, items, sec_idx){
     SetPointers(this, true);
 }
 
+/**
+ *
+ * This function is the target of the navigation links.
+ * The function picks the target the user wants to jump to,
+ * finds the relevant {@link ScreenContent} object and
+ * trigger's the object's Show function
+ *
+ * 
+ * @param {object}  evt - the event that fired the function
+ *
+ **/
 function Mover(evt){
     var sectiontarget = evt.target.getAttribute('sectionidx');
     //The latter is for songs, speeches etc i.e. subitems of sections
@@ -547,6 +704,9 @@ function VerseMover(evt){
         //i.e. (only the sectiontitle of the song is active)
         //in this case the song is se second item of the items array
         var thissong = thispres.current.current.items[1];
+        //Make sure the presentation updates its currently displayed item to be the song
+        thispres.current.current.current = thissong;
+        thispres.GetContentChain();
     }
     else{
         var thissong = thispres.chain[thispres.chain.length-1];
@@ -559,6 +719,15 @@ function VerseMover(evt){
     thissong.Show();
 }
 
+/**
+ *
+ * Represents a basic object, e.g. a song, an information slide, a header etc.,
+ * that can be displayed on the screen. This is the very basic building block
+ * of the presentation.
+ *
+ * @constructor
+ *
+ **/
 function ScreenContent(){
     // Screencontent is the class that contains the actual data to be shown
 
@@ -732,7 +901,6 @@ function ScreenContent(){
         }
         document.body.style.overflow="auto";
     };
-
 }
 
 function AdjustHeadings(screen){
@@ -758,6 +926,16 @@ function AdjustHeadings(screen){
 }
 
 
+/**
+ *
+ * 
+ * Songs are stored in SongContent objects.
+ *
+ *
+ * @constructor
+ * @extends ScreenContent
+ *
+ **/
 function SongContent(title, songtexts){
     // Songcontent is a class for the actual songs
 
@@ -831,7 +1009,6 @@ function SectionTitleContent(section,curitem){
     this.content_type = "sectiontitle";
     this.items = [];
     SetPointers(this, false);
-    section.mypresentation.flatsructure.push(this);
     return 0;
 }
 SectionTitleContent.prototype = new ScreenContent();
@@ -890,6 +1067,16 @@ function BibleContent(address, content, content_name){
 BibleContent.prototype = new ScreenContent();
 BibleContent.prototype.constructor = BibleContent;
 
+
+/**
+ *
+ * This is a specific type of {@link ScreenContent}, used for presenting simple
+ * textual information on the screen.
+ *
+ * @constructor
+ * @extends ScreenContent
+ *
+ **/
 function InfoContent(headertext, infotext, content_name){
     this.id = CreateUid();
     this.content_type="info";
@@ -1169,14 +1356,6 @@ function OpenPres(pres){
     document.onkeydown = checkKey;
 }
 
-function PresentationContainer(){
-
-    this.default = new MajakkaMessu();
-    this.spontaneous =  new Presentation();
-    this.current = 'default';
-    this.secondbrowser = null;
-
-}
 
 //========================================
 //
@@ -1213,6 +1392,12 @@ function ApplyStyles(){
 
 }
 
+/**
+ *
+ * Creates the functionality for adding spontaneous content and for some other
+ * functions such as the second browser functionality.
+ *
+ **/
 function AddFunctionalitySection(){
     var textarea = TagWithText("textarea","Kirjoita tähän tekstiä, jonka haluat näyttää skriinillä","contentinsert");
     textarea.id = 'added_text_content';
@@ -1263,23 +1448,24 @@ function AddFunctionalitySection(){
 
     var bslink = TagWithText("a","Avaa toinen selain","");
     var bsurl = TagParent("input",[],"","bsurl");
+    bslink.id = "sbrowserlink";
     bsurl.setAttribute("type","text");
     bsurl.setAttribute("placeholder","kirjoita Internet-osoite");
+    bsurl.id="bsurl";
     bslink.addEventListener('click', AddSecondBrowser, false);
-    var browsersec = TagParent("section",[bsurl, bslink],"functionalsection","browsersec");
+    var browsersec = TagParent("section",[bsurl, bslink, TagWithText("p","(palaa esitykseen klikkaamalla mitä tahansa otsikkoa)")],"functionalsection","browsersec");
 
     var blink = TagWithText("a","Blank screen");
     var utilities = TagParent("section",[blink],"functionalsection","utsection");
     utilities.addEventListener('click', BlankScreen, false);
 
-
-    var fsbigger = TagWithText("a","Suurenna fonttia");
-    var stylesec = TagParent("section",[fsbigger],"functionalsection","stylesection");
-    fsbigger.addEventListener('click', IncreasePresFont, false);
-
-    //var stylelink = TagWithText("a","Seuraava tyyli >>");
-    //stylelink.addEventListener('click', ApplyStyles, false);
-    //var stylesec = TagParent("section",[TagWithText("h4","Muuta tyylejä",""), stylelink],"functionalsection","stylesec");
+    var stylelink = TagWithText("a","Suurenna fonttia");
+    stylelink.id = "fontplus";
+    stylelink.addEventListener('click', FontIncrease, false);
+    var stylelink2 = TagWithText("a","Pienennä fonttia");
+    stylelink2.id = "fontminus";
+    stylelink2.addEventListener('click', FontIncrease, false);
+    var stylesec = TagParent("section",[TagParent("span",[stylelink]),TagParent("span",[stylelink2])],"functionalsection","stylesec");
 
 
     var link = TagWithText("a","Lisää","");
@@ -1304,7 +1490,11 @@ function AddFunctionalitySection(){
     var biblenavi = TagWithText("iframe","","biblenavi");
     biblenavi.id = 'biblenavi';
     document.body.appendChild(biblenavi);
-    return TagParent("section",[TagWithText("h3","Toiminnot",""), utilities,textcontsec, songcontsec, bibcontsec, embcontsec, browsersec],"functions_section");
+
+    var hiddenfunctions = TagParent("section",[textcontsec, songcontsec, bibcontsec, embcontsec, browsersec],"functions_section");
+    hiddenfunctions.id = "hiddenfunctions";
+    document.getElementById("functionalmenu").appendChild(hiddenfunctions);
+    return TagParent("section",[utilities, stylesec],"functions_section");
 }
 
 function SongListDropDown(){
@@ -1428,15 +1618,6 @@ function AddTextSlide(){
     Presentations.spontaneous.AddContent(new InfoContent('', addedtext, addedtextheader));
 }
 
-function AddTextSlide(){
-    var addedtext = document.getElementById('added_text_content').value;
-    var addedtextheader = addedtext;
-    if(addedtext.length>20){
-        addedtextheader = addedtext.substr(0,20) + "...";
-    }
-    Presentations.spontaneous.AddContent(new InfoContent('', addedtext, addedtextheader));
-}
-
 TagWithText = function(tagname, tagtext, tagclass){
     var tag = document.createElement(tagname);
     tag.textContent = tagtext;
@@ -1545,35 +1726,106 @@ function AddLocalImage(evt) {
     }
 }
 
+function FontIncrease(evt){
+    var link = evt.target;
+    var fs = Presentations.screen.doc.body.style.fontSize;
+
+    if (link.id == "fontplus"){
+        if(fs==""){
+            Presentations.screen.doc.body.style.fontSize="110%";
+        }
+        else{
+            var percentage =  fs.substr(0, fs.indexOf("%")) * 1;
+            Presentations.screen.doc.body.style.fontSize = (percentage + 10) + "%";
+        }
+    }
+    if (link.id == "fontminus"){
+        if(fs==""){
+            Presentations.screen.doc.body.style.fontSize="90%";
+        }
+        else{
+            var percentage =  fs.substr(0, fs.indexOf("%")) * 1;
+            Presentations.screen.doc.body.style.fontSize = (percentage - 10) + "%";
+        }
+    }
+}
+
 function AddSecondBrowser(){
 
+    try{
     var address = document.getElementById("bsurl").value;
-    if(address.indexOf("http://")==-1 &&  address.indexOf("https://")==-1){
+    }
+    catch(error){
+        address = "";
+    }
+    if(address.indexOf("http://")==-1 &&  address.indexOf("https://")==-1 && address != ""){
         address = "http://" + address;
     }
     if(Presentations.secondbrowser == null){
         Presentations.secondbrowser = window.open(address,'_blank', 'toolbar=0,location=0,menubar=0');
+        document.getElementById('sbrowserlink').textContent = "Toinen selainikkuna esiin";
+        document.getElementById('bsurl').outerHTML="";
     } 
     else{
-        Presentations.secondbrowser.location = address;
+        //if(address!=Presentations.secondbrowser.location){
+            //Presentations.secondbrowser.location = address;
+        //}
         Presentations.secondbrowser.focus();
     }
 
 }
 
+/**
+ *
+ * Opens the functional menu on the top bar. The functional menu contains 
+ * controls mainly for adding spontaneous content such as songs or bible verses
+ * not mentioned in the predefined service manuscript. The actual functionality
+ * of the menu is created by function {@link AddFunctionalitySection}
+ *
+ **/
+function OpenFunctionMenu(){
+    var section = document.getElementById('functionalmenu');
+    var h = window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight||0;
+    var newheight = h;
+    section.style.marginTop = document.getElementById('leftbanner').offsetHeight;
+    if (section.style.height == '' || section.style.height == '0px'){
+        section.style.height= newheight + "px";
+        document.getElementById('openfunctlink').style.background = 'white';
+        document.getElementById('openfunctlink').style.color = 'black';
+        document.getElementById('hiddenfunctions').style.display = 'block';
+    }
+    else{
+        document.getElementById('hiddenfunctions').style.display = 'none';
+        section.style.height = "0px";
+        document.getElementById('openfunctlink').style.background = 'none';
+        document.getElementById('openfunctlink').style.color = 'white';
+    }
+}
+
 //========================================
 
+/**
+ *
+ * This function is rarely used. The only purpose is to provide a target for the 
+ * "Next slide" -link displayed on the navigator.
+ *
+ **/
 function NextSlide(){
         Presentations[Presentations.current].Move('increment');
 }
 
+/**
+ *
+ * Cover the presentation screen with a black box to hide the presentation.
+ *
+ **/
 function BlankScreen(){
     var bsbutton = document.getElementById("utsection");
     if (Presentations.screen.blankscreenactive == true){
         Presentations.screen.doc.getElementById('blankbox').remove();
         //Presentations.screen.doc.getElementById('blankbox').style.display="none";
         Presentations.screen.blankscreenactive = false;
-        bsbutton.style.background = "rgba(98, 139, 141, 0.32)";
+        bsbutton.style.background = "rgba(139, 144, 144, 0.32)";
         bsbutton.style.color = "white";
         Presentations.screen.blankscreenactive = false;
     }
