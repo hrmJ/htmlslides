@@ -191,16 +191,6 @@ function Presentation(){
             linkheader.addEventListener('click',SwitchToSpontaneous,false);
             navigatorcontainer.appendChild(TagParent("div",[linkheader,TagParent("div",[],"","addedcontent")],"","addedcontentparent"));
 
-
-            var link1 = TagWithText("a","Avaa esitys","switchlink");
-            link1.href = '#';
-            link1.addEventListener('click',OpenPres,false);
-
-            var link2 = TagWithText("a","Sulje esitys","switchlink");
-            link2.href = '#';
-            link2.addEventListener('click',ClosePres,false);
-
-            var link = TagParent("p",[link1, link2]);
         }
 
 
@@ -255,19 +245,18 @@ function Presentation(){
         }
         if(prestype=='default'){
             //This is for all the additional functionality such as inserting spontaneous text content, songs, bible slides etc
-            contentlist.appendChild(AddFunctionalitySection());
+            versepreview.appendChild(AddFunctionalitySection());
 
             var linkheader = TagWithText("h3","Sisältö","hlpresentation");
             linkheader.id = 'defaultcontentheader';
             linkheader.addEventListener('click',SwitchToDefault,false);
             contentlist.appendChild(linkheader);
 
-            contentlist.appendChild(link);
             contentlist.appendChild(sectionlist);
 
 
             document.body.appendChild(navigatorcontainer);
-            document.body.style.overflow="auto";
+            //document.body.style.overflow="auto";
         }
         else{
             var container = document.getElementById('addedcontent');
@@ -434,6 +423,8 @@ function Pointer(pointed){
     this.position = 0;
     /**
      *
+     * Moves the pointer forward or backward, if possible.
+     *
      * @param {string} movetype - "increment", "decrement" or "unchanged"
      *
      **/
@@ -598,8 +589,13 @@ function Section(mypresentation, name, items, sec_idx){
         return leftbanner;
     };
 
+    /**
+     *
+     * Prints a list of section names on the presentation screen and highlights
+     * the current one.
+     *
+     **/
     this.PrintSectionName = function(){
-        //Print a list of section names and highlight the current one
         //TODO: COmbine this and Create left banner
         var sectionbanner = document.createElement('ul');
         //How many preceding / upcoming sections will be shown in the list
@@ -690,6 +686,17 @@ function Mover(evt){
     targetcontent.Show();
 }
 
+
+
+/**
+ *
+ *
+ * This function is the target of the navigation links for jumping between
+ * verses.   
+ *
+ * @param {object}  evt - the event (the target verse) that fired the function
+ *
+ **/
 function VerseMover(evt){
     var tag = evt.target;
     var thispres = Presentations[Presentations.current];
@@ -729,16 +736,17 @@ function VerseMover(evt){
  *
  **/
 function ScreenContent(){
-    // Screencontent is the class that contains the actual data to be shown
-
     this.custombg="";
     this.content_type = "";
-    // item here means the content blocks divided into 
-    // parts that will be shown at the time
     this.items = [];
+    /**
+     *
+     * Prints the content on the screen
+     *
+     **/
     this.Show = function(){
         
-            //Print the content of this object to screen
+            
 
             PresScreen = Presentations.screen;
             //1. Clear the layout of the screen
@@ -858,6 +866,7 @@ function ScreenContent(){
 
         //Remove existing (verse etc) content
         ClearContent(prevsec);
+        prevsec.appendChild(AddFunctionalitySection());
         if(!this.hasOwnProperty("mysection")){
             var content_type = this.content_type;
         }
@@ -873,7 +882,7 @@ function ScreenContent(){
             //TODO: add something for other types as well
             case "song":
             case "bibletime":
-                var verselist = CreateTag("div","", document, "");
+                var verselist = CreateTag("div","", document, "previewedverses");
                 if(['song','bibletime'].indexOf(this.content_type)>-1){
                     var song = this;
                 }
@@ -896,13 +905,22 @@ function ScreenContent(){
             default:
                 var link = TagWithText("a","Seuraava dia >>","");
                 link.addEventListener('click', NextSlide, false);
-                document.getElementById("previewer").appendChild(link);
+                document.getElementById("previewer").appendChild(TagParent("div",[link]));
             break;
         }
-        document.body.style.overflow="auto";
+        //document.body.style.overflow="auto";
     };
 }
 
+
+/**
+ *
+ * Fixes the layout of the headers by slightly adjusting the height and margin
+ * of the elements.
+ *
+ * @param {object}  screen -  a {@link Screen} object
+ *
+ **/
 function AdjustHeadings(screen){
     //Get seciton item list position and height
     var sitemspos = PosFromTop(screen.sitems);
@@ -1203,6 +1221,14 @@ function CreateUid(){
 
 
 
+/**
+ *
+ *
+ * Represents the browser window where the actual slides are shown.
+ *
+ * @constructor
+ *
+ **/
 function Screen(newwindow){
     var thisdocument = newwindow.document;
     this.preswindow = newwindow;
@@ -1228,6 +1254,11 @@ function Screen(newwindow){
     this.sectionlinks = CreateTag("div", "sectionlinks", thisdocument);
     thisdocument.body.appendChild(this.prescont);
 
+    /**
+     *
+     * Empties the contents of the presenter screen.
+     *
+     **/
     this.Refresh = function(){
         //TODO Make this a LOOP!
         ClearContent(this.prescont);
@@ -1241,8 +1272,16 @@ function Screen(newwindow){
         ClearContent(this.creditbox);
     };
 
+    /**
+     *
+     * Attaches content to the presenter screen by converting the content items
+     * to the specified html elements.
+     *
+     * @param {string} divname - the name  of the target object where the content will be placed
+     * @param {html DOM object} contentitem - the content to be shown. This can be a verse, the text of an info slide etc. The elements are HTML nodes.
+     *
+     **/
     this.UpdateContent = function(divname, contentitem){
-        //contentitem is a screencontent object
         this[divname].appendChild(contentitem);
         if(divname != "textcontent"){
             //upadting the navigation
