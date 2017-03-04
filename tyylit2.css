@@ -717,6 +717,10 @@ nav#sitems li {
 }
 
 
+#updaterframe{
+    width:0px;
+    height:0px;
+}
 
 #menu ul{
     margin-left: 0px;

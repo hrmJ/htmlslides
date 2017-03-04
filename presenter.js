@@ -12,7 +12,7 @@
  *
  */
 function PresentationContainer(){
-    this.default = new MajakkaMessu();
+    this.default = new MajakkaMessu(document);
     this.spontaneous =  new Presentation();
     this.current = 'default';
     this.secondbrowser = null;
@@ -106,9 +106,15 @@ function Presentation(){
             //
             thisobject = this;
             this.chain = [thisobject];
-            while (thisobject.hasOwnProperty('current')){
-                thisobject=thisobject.current;
-                this.chain.push(thisobject);
+            try{
+                while (thisobject.hasOwnProperty('current')){
+                    thisobject=thisobject.current;
+                    this.chain.push(thisobject);
+                }
+            }
+            catch(error){
+                alert("Moro");
+                console.log(error);
             }
     };
 
@@ -119,9 +125,12 @@ function Presentation(){
      * html document. Pulls out information on each song that should be part of the service
      * as well as what role the song has (worship song, communion song "song of the day" etc.)
      *
+     *
+     * @param doc {DOM Document object} - where to get the structure from 
+     *
      */
-    this.GetSongs= function (){
-        var structure = document.getElementById("structure");
+    this.GetSongs= function (doc){
+        var structure = doc.getElementById("structure");
         this.songs = {};
         for (var i=0;i<structure.childNodes.length;i++){
             if (structure.childNodes[i].nodeName!=="#text"){
@@ -173,23 +182,31 @@ function Presentation(){
      *
      */
     this.CreateNavigation = function(prestype){
+        var updated = false;
         if(prestype=='default'){
             //Create links in the secondary screen for jumping from one section to another
             
 
-            var navigatorcontainer = CreateTag("section","navigatorcontainer",document, "");
+            var contentlist = document.getElementById("section_nav");
+            if(contentlist == undefined){
+                var navigatorcontainer = CreateTag("section","navigatorcontainer",document, "");
 
 
-            //This is where the general navigation between sections is
-            var contentlist = CreateTag("section","section_nav", document, "navchildsec", navigatorcontainer);
-            //This is where the upcoming/previous slides will be presented
-            var versepreview = CreateTag("section","previewer", document, "navchildsec", navigatorcontainer);
+                //This is where the general navigation between sections is
+                var contentlist = CreateTag("section","section_nav", document, "navchildsec", navigatorcontainer);
+                //This is where the upcoming/previous slides will be presented
+                var versepreview = CreateTag("section","previewer", document, "navchildsec", navigatorcontainer);
 
-            //This is where any spontaneously added slides will be listed
-            var linkheader = TagWithText("h3","Lisätty sisältö","unhlpresentation");
-            linkheader.id = 'addedcontentheader';
-            linkheader.addEventListener('click',SwitchToSpontaneous,false);
-            navigatorcontainer.appendChild(TagParent("div",[linkheader,TagParent("div",[],"","addedcontent")],"","addedcontentparent"));
+                //This is where any spontaneously added slides will be listed
+                var linkheader = TagWithText("h3","Lisätty sisältö","unhlpresentation");
+                linkheader.id = 'addedcontentheader';
+                linkheader.addEventListener('click',SwitchToSpontaneous,false);
+                navigatorcontainer.appendChild(TagParent("div",[linkheader,TagParent("div",[],"","addedcontent")],"","addedcontentparent"));
+            }
+            else{
+                ClearContent(contentlist);
+                updated = true;
+            }
 
         }
 
@@ -246,6 +263,9 @@ function Presentation(){
         if(prestype=='default'){
             //This is for all the additional functionality such as inserting spontaneous text content, songs, bible slides etc
             //versepreview.appendChild(AddFunctionalitySection());
+            if (updated == false){
+                AddFunctionalitySection();
+            }
 
             var linkheader = TagWithText("h3","Sisältö","hlpresentation");
             linkheader.id = 'defaultcontentheader';
@@ -255,8 +275,10 @@ function Presentation(){
             contentlist.appendChild(sectionlist);
 
 
-            document.body.appendChild(navigatorcontainer);
-            //document.body.style.overflow="auto";
+            if(updated==false){
+                document.body.appendChild(navigatorcontainer);
+                //document.body.style.overflow="auto";
+            }
         }
         else{
             var container = document.getElementById('addedcontent');
@@ -323,9 +345,9 @@ function Presentation(){
  * @extends Presentation
  *
  */
-function MajakkaMessu(){
-    this.GetCredits = function (){
-                var vastuut = document.getElementsByClassName("vastuudata");
+function MajakkaMessu(doc){
+    this.GetCredits = function (doc){
+                var vastuut = doc.getElementsByClassName("vastuudata");
                 var vastuulist = [];
                 //Save the credits to be referenced elswhere, too
                 this.credits = {};
@@ -345,11 +367,11 @@ function MajakkaMessu(){
                 return vastuulist;
             };
 
-    this.GetSongs();
+    this.GetSongs(doc);
     this.showtype = "majakka";
     //TODO: import this from structure html
     this.title = document.getElementById('messutitle').textContent;
-    var credits1 = new CreditContent('', this.GetCredits());
+    var credits1 = new CreditContent('', this.GetCredits(doc));
     //TODO: make creating these sections simpler
     //1. Collect all worship songs and make them into a section
     var communionsongs = this.MultiSong("Ehtoollislauluja");
@@ -867,6 +889,7 @@ function ScreenContent(){
         //Remove existing (verse etc) content
         ClearContent(prevsec);
         //prevsec.appendChild(AddFunctionalitySection());
+        AddFunctionalitySection();
         if(!this.hasOwnProperty("mysection")){
             var content_type = this.content_type;
         }
@@ -1572,6 +1595,38 @@ function CreateBookSelect(){
 
 }
 
+
+function checkUpdaterframeLoaded() {
+    //http://stackoverflow.com/questions/9249680/how-to-check-if-iframe-is-loaded-or-it-has-a-content
+    var iframe = document.getElementById('updaterframe');
+    var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    if (  iframeDoc.getElementById('structure')  !== null) {
+        GetUpdatedStructure();
+        document.getElementById('logger').textContent = '';
+        return;
+    } 
+    document.getElementById('logger').textContent = 'Ladataan sisältöä, odota hetki';
+    window.setTimeout('checkUpdaterframeLoaded();', 200);
+}
+
+/**
+ *
+ * Fetch the updated service structure from the iframe loaded by 
+ * {@link UpdateStructure} and {@link checkUpdaterframeLoaded}
+ *
+ **/
+function GetUpdatedStructure(){
+    for(i=0;i<1;i++){
+        //Hack! = Run the update twice to make sure it succeeds
+        var newdoc = document.getElementById('updaterframe').contentWindow.document;
+        Presentations.default = new MajakkaMessu(newdoc);
+        Presentations.default.GetContentChain();
+        //Remove the old navigation elements
+        ClearContent(document.getElementById("section_nav"));
+        Presentations.default.CreateNavigation("default");
+    }
+}
+
 function checkIframeLoaded() {
     //http://stackoverflow.com/questions/9249680/how-to-check-if-iframe-is-loaded-or-it-has-a-content
     var iframe = document.getElementById('biblenavi');
@@ -1581,7 +1636,7 @@ function checkIframeLoaded() {
         document.getElementById('logger').textContent = '';
         return;
     } 
-    document.getElementById('logger').textContent = 'Ladataan raaamattu sisältöä, odota hetki';
+    document.getElementById('logger').textContent = 'Ladataan sisältöä, odota hetki';
     window.setTimeout('checkIframeLoaded();', 200);
 }
 
@@ -1814,7 +1869,7 @@ function AddSecondBrowser(){
 }
 
 /**
- *
+*
  * Opens the functional menu on the top bar. The functional menu contains 
  * controls mainly for adding spontaneous content such as songs or bible verses
  * not mentioned in the predefined service manuscript. The actual functionality
@@ -1909,21 +1964,11 @@ function UpdateTracker(identifier){
  * (the {@link Presentation} object) . Also updates the navigator screen 
  *
  **/
-function UpdateStructure(identifier){
-    var biblenavi = document.getElementById("biblenavi");
-    try{
-        ClearContent(biblenavi.contentWindow.document);
-    }
-    catch(error){
-        console.log('problem updating the structure...');
-    }
-    try{
-        biblenavi.src = 'updatestructure.php?id=' + identifier;
-        console.log("Updated the structure...");
-    }
-    catch(error){
-        console.log('Unable to update the structure!');
-    }
+function UpdateStructure(){
+    var frame = document.getElementById("updaterframe");
+    //ClearContent(frame.contentWindow.document);
+    frame.src = 'updatestructure.php?id=69' ;
+    checkUpdaterframeLoaded();
 }
 
 //========================================
