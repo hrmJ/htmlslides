@@ -245,7 +245,7 @@ function Presentation(){
         }
         if(prestype=='default'){
             //This is for all the additional functionality such as inserting spontaneous text content, songs, bible slides etc
-            versepreview.appendChild(AddFunctionalitySection());
+            //versepreview.appendChild(AddFunctionalitySection());
 
             var linkheader = TagWithText("h3","Sisältö","hlpresentation");
             linkheader.id = 'defaultcontentheader';
@@ -866,7 +866,7 @@ function ScreenContent(){
 
         //Remove existing (verse etc) content
         ClearContent(prevsec);
-        prevsec.appendChild(AddFunctionalitySection());
+        //prevsec.appendChild(AddFunctionalitySection());
         if(!this.hasOwnProperty("mysection")){
             var content_type = this.content_type;
         }
@@ -1494,17 +1494,17 @@ function AddFunctionalitySection(){
     bslink.addEventListener('click', AddSecondBrowser, false);
     var browsersec = TagParent("section",[bsurl, bslink, TagWithText("p","(palaa esitykseen klikkaamalla mitä tahansa otsikkoa)")],"functionalsection","browsersec");
 
-    var blink = TagWithText("a","Blank screen");
-    var utilities = TagParent("section",[blink],"functionalsection","utsection");
-    utilities.addEventListener('click', BlankScreen, false);
+    //var blink = TagWithText("a","Blank screen");
+    //var utilities = TagParent("section",[blink],"functionalsection","utsection");
+    //utilities.addEventListener('click', BlankScreen, false);
 
-    var stylelink = TagWithText("a","Suurenna fonttia");
-    stylelink.id = "fontplus";
-    stylelink.addEventListener('click', FontIncrease, false);
-    var stylelink2 = TagWithText("a","Pienennä fonttia");
-    stylelink2.id = "fontminus";
-    stylelink2.addEventListener('click', FontIncrease, false);
-    var stylesec = TagParent("section",[TagParent("span",[stylelink]),TagParent("span",[stylelink2])],"functionalsection","stylesec");
+    //var stylelink = TagWithText("a","Suurenna fonttia");
+    //stylelink.id = "fontplus";
+    //stylelink.addEventListener('click', FontIncrease, false);
+    //var stylelink2 = TagWithText("a","Pienennä fonttia");
+    //stylelink2.id = "fontminus";
+    //stylelink2.addEventListener('click', FontIncrease, false);
+    //var stylesec = TagParent("section",[TagParent("span",[stylelink]),TagParent("span",[stylelink2])],"functionalsection","stylesec");
 
 
     var link = TagWithText("a","Lisää","");
@@ -1533,7 +1533,7 @@ function AddFunctionalitySection(){
     var hiddenfunctions = TagParent("section",[textcontsec, songcontsec, bibcontsec, embcontsec, browsersec],"functions_section");
     hiddenfunctions.id = "hiddenfunctions";
     document.getElementById("functionalmenu").appendChild(hiddenfunctions);
-    return TagParent("section",[utilities, stylesec],"functions_section");
+    //return TagParent("section",[utilities],"functions_section");
 }
 
 function SongListDropDown(){
@@ -1765,8 +1765,7 @@ function AddLocalImage(evt) {
     }
 }
 
-function FontIncrease(evt){
-    var link = evt.target;
+function FontIncrease(link){
     var fs = Presentations.screen.doc.body.style.fontSize;
 
     if (link.id == "fontplus"){
@@ -1859,21 +1858,21 @@ function NextSlide(){
  *
  **/
 function BlankScreen(){
-    var bsbutton = document.getElementById("utsection");
+    var bsbutton = document.getElementById("blanklink");
     if (Presentations.screen.blankscreenactive == true){
         Presentations.screen.doc.getElementById('blankbox').remove();
         //Presentations.screen.doc.getElementById('blankbox').style.display="none";
         Presentations.screen.blankscreenactive = false;
-        bsbutton.style.background = "rgba(139, 144, 144, 0.32)";
-        bsbutton.style.color = "white";
+        bsbutton.style.background = "white";
+        bsbutton.style.color = "black";
         Presentations.screen.blankscreenactive = false;
     }
     else{
         var div = TagWithText("div","","blankscreen");
         div.id = "blankbox";
         Presentations.screen.doc.getElementById('prescont').appendChild(div);
-        bsbutton.style.background = "white";
-        bsbutton.style.color = "black";
+        bsbutton.style.background = "black";
+        bsbutton.style.color = "white";
         Presentations.screen.blankscreenactive = true;
     }
 }
@@ -1900,6 +1899,31 @@ function UpdateTracker(identifier){
 //    }
 
 
+}
+
+
+/**
+ * Loads a separate php script (updater.php) on a hidden iframe in order
+ * to check, whether the structure/content of the service has been changed.
+ * If changes have occured, updates the javascript representation of structure
+ * (the {@link Presentation} object) . Also updates the navigator screen 
+ *
+ **/
+function UpdateStructure(identifier){
+    var biblenavi = document.getElementById("biblenavi");
+    try{
+        ClearContent(biblenavi.contentWindow.document);
+    }
+    catch(error){
+        console.log('problem updating the structure...');
+    }
+    try{
+        biblenavi.src = 'updatestructure.php?id=' + identifier;
+        console.log("Updated the structure...");
+    }
+    catch(error){
+        console.log('Unable to update the structure!');
+    }
 }
 
 //========================================

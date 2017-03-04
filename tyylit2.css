@@ -834,6 +834,20 @@ nav#sitems li {
     padding:1em;
 }
 
+#addedcontent_sectionlist ul{
+    padding-right:0.8em;
+}
+
+#addedcontent_sectionlist li:hover{
+    cursor:pointer;
+}
+
+#blanklink{
+    color:black;
+    background:white;
+}
+
+
 @media only screen and (max-device-width: 481px) {
     #trackersection li{
         margin-top:0.1em;
@@ -848,6 +862,8 @@ nav#sitems li {
         padding:2em;
     }
 }
+
+
 
 /* Isommill näytöille fontteja suuremmiksi: */
 
