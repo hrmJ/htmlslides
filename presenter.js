@@ -155,7 +155,12 @@ function Presentation(){
 
                     //Special attributes:
                     if (['Jumalan karitsa','Pyhä-hymni'].indexOf(role)>-1){ 
-                        var song = new SongContent('', songdata.content);
+                        try{
+                            var song = new SongContent('', songdata.content);
+                        }
+                        catch(error){
+                            console.log(error);
+                        }
                     }
                     else if(songdata!==undefined){
                         var song = new SongContent(songdata.title, songdata.content);
@@ -341,6 +346,8 @@ function Presentation(){
  * service types. This should only be a temporary solution, so 
  * that these hard-coded presentations would be replaced by
  * e.g. separate configuration files.
+ *
+ * @param {DOM document object} doc - the document element to be used (original vs. updated)
  *
  * @extends Presentation
  *
@@ -1207,12 +1214,12 @@ function SetPointers(object, setcurrent){
 
 
 
-function GetSongs(){
+function GetSongs(doc){
     //Fetch the songs from  the html file
 
     var songs = {};
 
-    var songdivs = document.getElementsByClassName("songdata");
+    var songdivs = doc.getElementsByClassName("songdata");
     for(var i=0;i<songdivs.length;i++){
         // Add a new songcontent object to the songs container object
         // todo: composer, writer
@@ -1600,31 +1607,44 @@ function checkUpdaterframeLoaded() {
     //http://stackoverflow.com/questions/9249680/how-to-check-if-iframe-is-loaded-or-it-has-a-content
     var iframe = document.getElementById('updaterframe');
     var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-    if (  iframeDoc.getElementById('structure')  !== null) {
+    if (  iframeDoc.getElementById('updatecompleted')  !== null) {
         GetUpdatedStructure();
         document.getElementById('logger').textContent = '';
         return;
     } 
-    document.getElementById('logger').textContent = 'Ladataan sisältöä, odota hetki';
-    window.setTimeout('checkUpdaterframeLoaded();', 200);
+    var previewer = document.getElementById("previewer");
+    ClearContent(previewer);
+    previewer.appendChild(TagWithText("p","Ladataan päivitystä...",""));
+    window.setTimeout('checkUpdaterframeLoaded();', 500);
 }
 
 /**
- *
- * Fetch the updated service structure from the iframe loaded by 
- * {@link UpdateStructure} and {@link checkUpdaterframeLoaded}
- *
- **/
+*
+* Fetch the updated service structure from the iframe loaded by 
+* {@link UpdateStructure} and {@link checkUpdaterframeLoaded}
+*
+**/
 function GetUpdatedStructure(){
-    for(i=0;i<1;i++){
-        //Hack! = Run the update twice to make sure it succeeds
-        var newdoc = document.getElementById('updaterframe').contentWindow.document;
-        Presentations.default = new MajakkaMessu(newdoc);
-        Presentations.default.GetContentChain();
-        //Remove the old navigation elements
-        ClearContent(document.getElementById("section_nav"));
-        Presentations.default.CreateNavigation("default");
+    var newdoc = document.getElementById('updaterframe').contentWindow.document;
+    //Update the list of songs...
+    allsongs = GetSongs(newdoc);
+    Presentations.default = new MajakkaMessu(newdoc);
+    Presentations.default.GetContentChain();
+    //Remove the old navigation elements
+    ClearContent(document.getElementById("section_nav"));
+    Presentations.default.CreateNavigation("default");
+    ClearContent(document.getElementById("previewer"));
+    //empty the contents to make further updates possible:
+    var frame = document.getElementById("updaterframe");
+    frame.src = 'empty.html' ;
+    //Start the presentation again from the start
+    thisobject = Presentations.default;
+    while(typeof thisobject.Show === 'undefined'){
+        //Iterating down to first showable content
+        thisobject = thisobject.current;
     }
+    thisobject.Show();
+    Presentations.default.GetContentChain();
 }
 
 function checkIframeLoaded() {
@@ -1966,17 +1986,19 @@ function UpdateTracker(identifier){
  **/
 function UpdateStructure(){
     var frame = document.getElementById("updaterframe");
+    frame.src="";
     //ClearContent(frame.contentWindow.document);
     frame.src = 'updatestructure.php?id=69' ;
     checkUpdaterframeLoaded();
 }
+
 
 //========================================
 
 
 //If a new document opened, these variables take care of it
 var preswindow = undefined;
-var allsongs = GetSongs();
+var allsongs = GetSongs(document);
 
 
 
