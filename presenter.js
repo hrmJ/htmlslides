@@ -520,6 +520,8 @@ function Pointer(pointed){
  * Represents the basic building block of a section.
  *
  * @constructor
+ * @param {string} name - The title of the section item
+ * @param {string} itemtype - "info", "Worship song" etc.
  *
  **/
 function SectionItem(thissection, name, contentobject,itemtype, item_idx){
@@ -1988,7 +1990,8 @@ function UpdateStructure(){
     var frame = document.getElementById("updaterframe");
     frame.src="";
     //ClearContent(frame.contentWindow.document);
-    frame.src = 'updatestructure.php?id=69' ;
+    var id = window.location.search.substring(window.location.search.search("id=")+3);
+    frame.src = 'updatestructure.php?id=' + id;
     checkUpdaterframeLoaded();
 }
 
