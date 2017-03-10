@@ -283,7 +283,27 @@ of the elements.</div>
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/_global_.html#MajakkaMessu">MajakkaMessu</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/_global_.html#GetCredits">GetCredits</a></b>(doc)
+								</div>
+								<div class="description">Retrieves the names of the people involved in making this service from
+the html template created by diat.php</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/_global_.html#GetUpdatedStructure">GetUpdatedStructure</a></b>()
+								</div>
+								<div class="description">Fetch the updated service structure from the iframe loaded by 
+<a href="../symbols/_global_.html#UpdateStructure">UpdateStructure</a> and checkUpdaterframeLoaded</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/_global_.html#MajakkaMessu">MajakkaMessu</a></b>(doc)
 								</div>
 								<div class="description">Represents a pre-defined (hard-coded) worship service.</div>
 							</td>
@@ -313,6 +333,16 @@ of the elements.</div>
 								<div class="fixedFont"><b><a href="../symbols/_global_.html#OpenFunctionMenu">OpenFunctionMenu</a></b>()
 								</div>
 								<div class="description">Opens the functional menu on the top bar.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/_global_.html#UpdateStructure">UpdateStructure</a></b>()
+								</div>
+								<div class="description">Loads a separate php script (updater.php) on a hidden iframe in order
+to check, whether the structure/content of the service has been changed.</div>
 							</td>
 						</tr>
 					
@@ -444,11 +474,80 @@ of the elements.
 
 					<hr />
 				
+					<a name="GetCredits"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>GetCredits</b>(doc)
+					
+					</div>
+					<div class="description">
+						Retrieves the names of the people involved in making this service from
+the html template created by diat.php
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/presenter.js.html">presenter.js</a>.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{DOM document}</span> <b>doc</b>
+									
+								</dt>
+								<dd>- where to fetch the information about the credits. Either from the actual document, or a separate updater document (check {@link })</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="GetUpdatedStructure"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>GetUpdatedStructure</b>()
+					
+					</div>
+					<div class="description">
+						Fetch the updated service structure from the iframe loaded by 
+<a href="../symbols/_global_.html#UpdateStructure">UpdateStructure</a> and checkUpdaterframeLoaded
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/presenter.js.html">presenter.js</a>.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
 					<a name="MajakkaMessu"> </a>
 					<div class="fixedFont">
 					
 					
-					<b>MajakkaMessu</b>()
+					<b>MajakkaMessu</b>(doc)
 					
 					</div>
 					<div class="description">
@@ -466,6 +565,17 @@ e.g. separate configuration files.
 					
 					
 					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{DOM document object}</span> <b>doc</b>
+									
+								</dt>
+								<dd>- the document element to be used (original vs. updated)</dd>
+							
+							</dl>
 						
 						
 						
@@ -578,6 +688,37 @@ of the menu is created by function <a href="../symbols/_global_.html#AddFunction
 
 					<hr />
 				
+					<a name="UpdateStructure"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>UpdateStructure</b>()
+					
+					</div>
+					<div class="description">
+						Loads a separate php script (updater.php) on a hidden iframe in order
+to check, whether the structure/content of the service has been changed.
+If changes have occured, updates the javascript representation of structure
+(the <a href="../symbols/Presentation.html">Presentation</a> object) . Also updates the navigator screen
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/presenter.js.html">presenter.js</a>.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
 					<a name="VerseMover"> </a>
 					<div class="fixedFont">
 					
@@ -630,7 +771,7 @@ verses.
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Mon Feb 27 2017 20:23:35 GMT+0200 (EET)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Mar 10 2017 21:21:08 GMT+0200 (EET)
 		</div>
 	</body>
 </html>

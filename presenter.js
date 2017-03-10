@@ -29,6 +29,9 @@ function PresentationContainer(){
  * added content.
  *
  * @constructor
+ * @property {object} current - Which subelement is currently being active, e.g. a {@link Section}.
+ * @property {Array} items - an array of subitems, in the case of the Presentation class usually Section objects.
+ *
  */
 function Presentation(){
     this.items = [];
@@ -353,6 +356,14 @@ function Presentation(){
  *
  */
 function MajakkaMessu(doc){
+    /** 
+     *
+     * Retrieves the names of the people involved in making this service from
+     * the html template created by diat.php
+     *
+     * @param {DOM document} doc - where to fetch the information about the credits. Either from the actual document, or a separate updater document (check {@link })
+     *
+     **/
     this.GetCredits = function (doc){
                 var vastuut = doc.getElementsByClassName("vastuudata");
                 var vastuulist = [];
