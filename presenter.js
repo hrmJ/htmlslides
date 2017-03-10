@@ -350,11 +350,13 @@ function Presentation(){
  * that these hard-coded presentations would be replaced by
  * e.g. separate configuration files.
  *
+ * @constructor
+ *
  * @param {DOM document object} doc - the document element to be used (original vs. updated)
  *
  * @extends Presentation
  *
- **/
+ */
 function MajakkaMessu(doc){
     /** 
      *
@@ -363,7 +365,7 @@ function MajakkaMessu(doc){
      *
      * @param {DOM document} doc - where to fetch the information about the credits. Either from the actual document, or a separate updater document (check {@link })
      *
-     **/
+     */
     this.GetCredits = function (doc){
                 var vastuut = doc.getElementsByClassName("vastuudata");
                 var vastuulist = [];
