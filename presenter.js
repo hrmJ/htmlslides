@@ -354,7 +354,7 @@ function Presentation(){
  *
  * @extends Presentation
  *
- */
+ **/
 function MajakkaMessu(doc){
     /** 
      *
