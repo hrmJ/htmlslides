@@ -354,6 +354,9 @@ function Presentation(){
  *
  * @param {DOM document object} doc - the document element to be used (original vs. updated)
  *
+ * @param {string} title - The title of the service. Retrieved from the html template.
+ * @param {string} showtype - If multiple different structures, here's where to specify the right one
+ *
  * @extends Presentation
  *
  */
@@ -1012,7 +1015,6 @@ function SongContent(title, songtexts){
             console.log(origtitle);
         }
     }
-    this.id = CreateUid();
     this.content_type = "song";
     this.titleslide = new SongTitleContent(title);
     this.titletext = title;
@@ -1046,13 +1048,19 @@ function SongContent(title, songtexts){
 SongContent.prototype = new ScreenContent();
 SongContent.prototype.constructor = SongContent;
 
+/**
+ *
+ * Represents the slide containing the title of the song.
+ * Notice, that the songs' titles are not a part of the 
+ * {@link SongContent} objects' items array, but rather a separate object,
+ * linked to the song by the songs "titleslide" porperty.
+ *
+ *
+ * @constructor 
+ * @param {string} title - the text displayed
+ *
+ */
 function SongTitleContent(title){
-    //Notice, that the songs titles are not a part of the 
-    //songs "items" array, but rather a separate object,
-    //linked to the song by the songs "titleslide" porperty.
-    //The titles are printed ONLY as parts of a presentation
-    //
-    this.id = CreateUid();
     this.content_type="songtitle";
     el = document.createElement('p');
     el.className = 'songtitle';
@@ -1067,7 +1075,6 @@ SongTitleContent.prototype.constructor = SongTitleContent;
 function SectionTitleContent(section,curitem){
     // Section Titles list the elements (songs, speeches etc) in the current section and 
     // show the current item as highlighted
-    this.id = CreateUid();
     this.mysection = section;
     this.content_type = "sectiontitle";
     this.items = [];
@@ -1078,7 +1085,6 @@ SectionTitleContent.prototype = new ScreenContent();
 SectionTitleContent.prototype.constructor = SectionTitleContent;
 
 function CreditContent(headertext, infotext, content_name){
-    this.id = CreateUid();
     this.content_type="credits";
     if (content_name!==undefined){
         this.name = content_name;
@@ -1104,7 +1110,6 @@ CreditContent.prototype.constructor = CreditContent;
 
 
 function BibleContent(address, content, content_name){
-    this.id = CreateUid();
     this.content_type="bibletime";
     if (content_name!==undefined){
         this.name = content_name;
@@ -1141,7 +1146,6 @@ BibleContent.prototype.constructor = BibleContent;
  *
  **/
 function InfoContent(headertext, infotext, content_name){
-    this.id = CreateUid();
     this.content_type="info";
     if (content_name!==undefined){
         this.name = content_name;
@@ -1180,7 +1184,6 @@ InfoContent.prototype.constructor = InfoContent;
 
 function EmbeddedContent(EmbeddedElement, content_name){
     //EmbeddedElement iframe-elementti, videotägi yms...
-    this.id = CreateUid();
     this.content_type="info";
     if (content_name!==undefined){
         this.name = content_name;
