@@ -1057,7 +1057,8 @@ SongContent.prototype.constructor = SongContent;
  *
  *
  * @constructor 
- * @param {string} title - the text displayed
+ * @param {string} title - the text that is displayed as the songs title
+ * @property {string} className - the text displayed
  *
  */
 function SongTitleContent(title){

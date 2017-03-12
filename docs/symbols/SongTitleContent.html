@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - MajakkaMessu</title>
+		<title>JsDoc Reference - SongTitleContent</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -222,14 +222,12 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Class MajakkaMessu
+				Class SongTitleContent
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
 			<p class="description">
 				
-				<br />Extends
-					<a href="../symbols/Presentation.html">Presentation</a>.<br />
 				
 			
 				
@@ -241,7 +239,7 @@ ul.inheritsList
 
 <!-- ============================== constructor summary ==================== -->			
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class MajakkaMessu.">
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class SongTitleContent.">
 				<caption>Class Summary</caption>
 				<thead>
 					<tr>
@@ -254,9 +252,9 @@ ul.inheritsList
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/MajakkaMessu.html#constructor">MajakkaMessu</a></b>(doc, title, showtype)
+								<b><a href="../symbols/SongTitleContent.html#constructor">SongTitleContent</a></b>(title)
 							</div>
-							<div class="description">Represents a pre-defined (hard-coded) worship service.</div>
+							<div class="description">Represents the slide containing the title of the song.</div>
 						</td>
 					</tr>
 				</tbody>
@@ -267,24 +265,12 @@ ul.inheritsList
 			
 				
 				
-				
-				
-				<dl class="inheritsList">
-				<dt>Fields borrowed from class <a href="../symbols/Presentation.html">Presentation</a>: </dt><dd><a href="../symbols/Presentation.html#current">current</a>, <a href="../symbols/Presentation.html#items">items</a></dd>
-				</dl>
-				
-			
-
-<!-- ============================== methods summary ======================== -->
-			
-				
-				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class MajakkaMessu.">
-					<caption>Method Summary</caption>
+				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class SongTitleContent.">
+					<caption>Field Summary</caption>
 					<thead>
 						<tr>
-							<th scope="col">Method Attributes</th>
-							<th scope="col">Method Name and Description</th>
+							<th scope="col">Field Attributes</th>
+							<th scope="col">Field Name and Description</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -292,10 +278,10 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/MajakkaMessu.html#GetCredits">GetCredits</a></b>(doc)
+								<div class="fixedFont">
+								<b><a href="../symbols/SongTitleContent.html#className">className</a></b>
 								</div>
-								<div class="description">Retrieves the names of the people involved in making this service from
-the html template created by diat.php</div>
+								<div class="description">- the text displayed</div>
 							</td>
 						</tr>
 					
@@ -304,10 +290,9 @@ the html template created by diat.php</div>
 				
 				
 				
-				<dl class="inheritsList">
-				<dt>Methods borrowed from class <a href="../symbols/Presentation.html">Presentation</a>: </dt><dd><a href="../symbols/Presentation.html#AddContent">AddContent</a>, <a href="../symbols/Presentation.html#CreateNavigation">CreateNavigation</a>, <a href="../symbols/Presentation.html#GetContentChain">GetContentChain</a>, <a href="../symbols/Presentation.html#GetSongs">GetSongs</a>, <a href="../symbols/Presentation.html#Move">Move</a>, <a href="../symbols/Presentation.html#MultiSong">MultiSong</a></dd>
-				</dl>
-				
+			
+
+<!-- ============================== methods summary ======================== -->
 			
 <!-- ============================== events summary ======================== -->
 			
@@ -320,15 +305,14 @@ the html template created by diat.php</div>
 				</div>
 				
 				<div class="fixedFont">
-						<b>MajakkaMessu</b>(doc, title, showtype)
+						<b>SongTitleContent</b>(title)
 				</div>
 				
 				<div class="description">
-					Represents a pre-defined (hard-coded) worship service. 
-This can be used as a model for making new specific
-service types. This should only be a temporary solution, so 
-that these hard-coded presentations would be replaced by
-e.g. separate configuration files.
+					Represents the slide containing the title of the song.
+Notice, that the songs' titles are not a part of the 
+<a href="../symbols/SongContent.html">SongContent</a> objects' items array, but rather a separate object,
+linked to the song by the songs "titleslide" porperty.
 					
 				</div>
 				
@@ -340,22 +324,10 @@ e.g. separate configuration files.
 						<dt class="heading">Parameters:</dt>
 						
 							<dt>
-								<span class="light fixedFont">{DOM document object}</span>  <b>doc</b>
-								
-							</dt>
-								<dd>- the document element to be used (original vs. updated)</dd>
-						
-							<dt>
 								<span class="light fixedFont">{string}</span>  <b>title</b>
 								
 							</dt>
-								<dd>- The title of the service. Retrieved from the html template.</dd>
-						
-							<dt>
-								<span class="light fixedFont">{string}</span>  <b>showtype</b>
-								
-							</dt>
-								<dd>- If multiple different structures, here's where to specify the right one</dd>
+								<dd>- the text that is displayed as the songs title</dd>
 						
 						</dl>
 					
@@ -371,43 +343,25 @@ e.g. separate configuration files.
 
 <!-- ============================== field details ========================== -->		
 			
-
-<!-- ============================== method details ========================= -->		
-			
 				<div class="sectionTitle">
-					Method Detail
+					Field Detail
 				</div>
 				
-					<a name="GetCredits"> </a>
+					<a name="className"> </a>
 					<div class="fixedFont">
 					
-					
-					<b>GetCredits</b>(doc)
+					<span class="light">{string}</span>
+					<b>className</b>
 					
 					</div>
 					<div class="description">
-						Retrieves the names of the people involved in making this service from
-the html template created by diat.php
+						- the text displayed
 						
 						
 					</div>
 					
 					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{DOM document}</span> <b>doc</b>
-									
-								</dt>
-								<dd>- where to fetch the information about the credits. Either from the actual document, or a separate updater document (check {@link })</dd>
-							
-							</dl>
-						
-						
-						
+
 						
 						
 						
@@ -415,6 +369,9 @@ the html template created by diat.php
 
 					
 				
+			
+
+<!-- ============================== method details ========================= -->		
 			
 			
 <!-- ============================== event details ========================= -->		
@@ -427,7 +384,7 @@ the html template created by diat.php
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sun Mar 12 2017 13:34:55 GMT+0200 (EET)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sun Mar 12 2017 13:34:56 GMT+0200 (EET)
 		</div>
 	</body>
 </html>
