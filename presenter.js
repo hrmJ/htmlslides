@@ -692,10 +692,10 @@ function Mover(evt){
     var sectiontarget = evt.target.getAttribute('sectionidx');
     //The latter is for songs, speeches etc i.e. subitems of sections
     var secitemtarget = evt.target.getAttribute('secitemidx');
-    if (event.target.parentNode.id=='addedcontent_sectionlist' & Presentations.current=='default'){
+    if (evt.target.parentNode.id=='addedcontent_sectionlist' & Presentations.current=='default'){
         SwitchToSpontaneous();
     }
-    else if(event.target.parentNode.id!='addedcontent_sectionlist' & Presentations.current!='default'){
+    else if(evt.target.parentNode.id!='addedcontent_sectionlist' & Presentations.current!='default'){
         SwitchToDefault();
     }
 
