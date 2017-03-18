@@ -153,8 +153,10 @@ function Presentation(){
                         this.credits[vastuu.id] = vastuu.textContent;
                     }
                 }
+
                 return vastuulist;
     };
+
 
     /**
      * Extracts the structure of the slide show from a pre-generated (e.g. by diat.php)
@@ -823,13 +825,13 @@ function ScreenContent(){
 
             switch (this.content_type){ 
                 case "song":
-                    PresScreen.UpdateContent('textcontent',this.items[this.pointer.position]);
+                    PresScreen.UpdateContent('textcontent',this.items[this.pointer.position],'song');
                     //Set what's seen in the navigator screen
                     break;
                 case "sectiontitle":
                     sitem = this.mysection.current;
-                    PresScreen.UpdateContent('sections',this.mysection.PrintSectionName());
-                    PresScreen.UpdateContent('sitems',this.mysection.CreateLeftbanner(this.mysection.pointer.position));
+                    PresScreen.UpdateContent('sections',this.mysection.PrintSectionName(),'headers');
+                    PresScreen.UpdateContent('sitems',this.mysection.CreateLeftbanner(this.mysection.pointer.position),'headers');
                     if (sitem.itemtype=='song'){
                         //Consider removing the itemtype prop!
                         //Insert the song's title as a content on the right of the screen
@@ -856,14 +858,16 @@ function ScreenContent(){
                     break;
                 case "info":
                     //Think about songtitles also as not part of a special sectioned service
-                    PresScreen.UpdateContent('infobox',this.items[this.pointer.position]);
+                    PresScreen.UpdateContent('infobox',this.items[this.pointer.position],'info');
                     break;
                 case "credits":
                     //Think about songtitles also as not part of a special sectioned service
-                    PresScreen.UpdateContent('creditbox',this.items[this.pointer.position]);
+                    PresScreen.UpdateContent('creditbox',this.items[this.pointer.position],'info');
                     break;
+                case "bibletime":
+                    PresScreen.UpdateContent('textcontent',this.items[this.pointer.position],'bible');
                 default:
-                    PresScreen.UpdateContent('textcontent',this.items[this.pointer.position]);
+                    PresScreen.UpdateContent('textcontent',this.items[this.pointer.position],'info');
                     break;
             }
             //Add or remove content from te navigator
@@ -1301,14 +1305,36 @@ function Screen(newwindow){
 
     /**
      *
+     * Use the structure-containing html document to retrieve information
+     * about styles the user has chosen
+     *
+     */
+    this.GetStyles = function(){
+        this.backgrounds = {"headers":{"url":"images/pp_logo_400.png","position":"top right"},
+                            "info":{"url":"images/pp_logo_400.png","position":"top right"},
+                            "song":{"url":"images/pp-stripe_1800.png","position":"top left"},
+                            "bible":{"url":"images/pp_scripture_400.png","position":"top right"}};
+    }
+
+    /**
+     *
      * Applies presentation specific styles, such as the background of the show
      * etc.
      *
+     * @param {string} styletype - Whether the screen will contain lyrics, info etc..
+     *
      **/
-    this.SetStyles = function(){
+    this.SetStyles = function(styletype){
         //background: url('images/lh_2.png') no-repeat center center fixed;
-        this.prescont.style.backgroundImage = "url('images/testbg.jpg')";
-        this.prescont.style.backgroundSize = "cover";
+        this.doc.body.style.color="black";
+        this.prescont.style.backgroundImage = "url('" +  this.backgrounds[styletype].url + "')";
+        this.prescont.style.backgroundPosition = this.backgrounds[styletype].position;
+        if(styletype=="song"){
+            this.prescont.style.paddingTop = "156px";
+        }
+        else{
+            this.prescont.style.paddingTop = "0px";
+        }
     }
 
     /**
@@ -1338,7 +1364,7 @@ function Screen(newwindow){
      * @param {html DOM object} contentitem - the content to be shown. This can be a verse, the text of an info slide etc. The elements are HTML nodes.
      *
      **/
-    this.UpdateContent = function(divname, contentitem){
+    this.UpdateContent = function(divname, contentitem, styletype){
         this[divname].appendChild(contentitem);
         if(divname != "textcontent"){
             //upadting the navigation
@@ -1360,12 +1386,16 @@ function Screen(newwindow){
         else{
             this.prescont.appendChild(this[divname]);
         }
+        this.SetStyles(styletype);
     }
 
 
 
     var thisdocument = newwindow.document;
     this.preswindow = newwindow;
+
+    this.bgdiv = CreateTag("div", "bgdiv", thisdocument);
+
     this.prescont = CreateTag("div", "prescont", thisdocument);
     this.navwrapper = CreateTag("section", "navwrapper", thisdocument,"",this.prescont);
     this.navcontainer = CreateTag("section", "navcontainer", thisdocument,"",this.navwrapper);
@@ -1375,9 +1405,9 @@ function Screen(newwindow){
     this.creditbox = CreateTag("div", "creditbox", thisdocument);
 
     var heading = CreateTag("h2", "", thisdocument, "",this.heading);
-    heading.textContent = Presentations["default"].maintitle;
+    heading.textContent = Presentations.default.maintitle;
     var subheading = CreateTag("h3", "", thisdocument, "",this.heading);
-    subheading.textContent = Presentations["default"].title;
+    subheading.textContent = Presentations.default.title;
 
     this.sections = CreateTag("nav", "sections", thisdocument);
     this.sitems = CreateTag("nav", "sitems", thisdocument);
@@ -1387,9 +1417,12 @@ function Screen(newwindow){
 
     //For the navigation window
     this.sectionlinks = CreateTag("div", "sectionlinks", thisdocument);
-    thisdocument.body.appendChild(this.prescont);
-    this.SetStyles();
 
+    thisdocument.body.appendChild(this.bgdiv);
+    thisdocument.body.appendChild(this.prescont);
+
+    this.GetStyles();
+    this.SetStyles("headers");
 
 }
 
@@ -1474,7 +1507,7 @@ function ClosePres(pres){
 
 function OpenPres(pres){
     preswindow = window.open('','_blank', 'toolbar=0,location=0,menubar=0');
-    preswindow.document.write('<html lang="fi" style="background:black;" ><head><link href="https://fonts.googleapis.com/css?family=Nothing+You+Could+Do|Quicksand" rel="stylesheet"> <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"><link id="stylesetter" rel="stylesheet" type="text/css" href="tyylit2.css"/></head><body></body>');
+    preswindow.document.write('<html lang="fi" style="background:black;" ><head><link href="https://fonts.googleapis.com/css?family=Nothing+You+Could+Do|Quicksand" rel="stylesheet"> <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"><link id="stylesetter" rel="stylesheet" type="text/css" href="styles.css?id=98798"/></head><body></body>');
     ClearContent(preswindow.document.body);
     ////TODO:this is the key to make separate screen working!
     Presentations.screen = new Screen(preswindow);
@@ -1510,10 +1543,10 @@ function SwitchToSpontaneous(){
 function ApplyStyles(){
     var stylesetter = Presentations.screen.preswindow.document.getElementById("stylesetter");
     if (stylesetter.href!=='tyylit.css'){
-        stylesetter.href = "tyylit2.css";
+        stylesetter.href = "styles.css";
     }
     else{
-        stylesetter.href = "tyylit2.css";
+        stylesetter.href = "styles.css";
     }
 
 }
