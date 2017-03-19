@@ -1,0 +1,936 @@
+html {
+    /*background: radial-gradient(circle, white, darkgrey);*/
+    background: #252323;
+}
+
+body {
+    /* background: #FFFAFD; */
+    /* font-size: 200%; */
+    font-family: 'Merriweather', Georgia, 'Times New Roman', Times, serif;
+    overflow:hidden;
+    color: white;
+}
+
+
+#structure,#evankeliumi,#vastuut,#songs,#messutitle, #messuheader, #messutype{
+    display: block;
+    line-height:0;
+    height: 0;
+    overflow: hidden;
+}
+
+
+.songtitlediv h3{
+    color: rgb(1, 111, 222);
+    font-size: 290%;
+    font-family: 'Quicksand';
+    margin-bottom:2em;
+    margin-top: 0.1em;
+    border-bottom: 2px solid;
+    /* left: -10%; */
+}
+
+#textcontent > .songtitlediv h2{
+    color: #807b7b;
+    font-family: 'Nothing You Could Do',fantasy;
+    font-size: 300%;
+    margin-top:0px
+    /* background: -webkit-linear-gradient(#eee, rgb(217, 247, 128));;
+    /* -webkit-background-clip: text; */
+    /* -webkit-text-fill-color: transparent; */ */;
+}
+
+#creditbox{
+    width: 80%;
+    text-align:left;
+    font-size:50%;
+    background:none;
+} 
+
+#creditbox ul {
+  columns: 2;
+  -webkit-columns: 2;
+  -moz-columns: 2;
+}
+
+/* NAVIGATOR */
+
+.functions_section{
+    /* background: rgba(128, 128, 128, 0.37); */
+    /* height: 100%; */
+    display: inline-block;
+    /* width: 22em; */
+    border-radius: 10px;
+    /* padding: 5em; */
+}
+
+.functions_section a:hover{
+    color:yellow;
+}
+
+#navigatorcontainer h3{
+    font-family:'Nothing You Could Do';
+    text-align:center;
+    /* border-bottom: 1px solid; */
+    font-size: 110%;
+    margin:0px;
+    padding:0px;
+}
+
+
+#navigatorcontainer{
+    font-family:'Quicksand';
+}
+
+#navigator_sectionlist, #addedcontentparent{
+    padding-left: 2em;
+} 
+
+#previewer > .functions_section{
+
+    margin-bottom:2em;
+    border-radius:0px;
+    padding-bottom:2px;
+
+}
+
+.previewedverses{
+    overflow-y:scroll;
+    height:75%;
+}
+
+
+.hlnavsection{
+    background: #1c4b74;
+    padding-left: 2em;
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
+.unhlnavsection{
+    background: #252323;
+    /* color: grey; */
+}
+
+#navigatorcontainer{
+      display: -webkit-box;
+      display: -moz-box;
+      display: -ms-flexbox;
+      display: -webkit-flex;
+      display: flex;
+        flex-direction:row;
+}
+
+#previewer{
+    min-width: 15em;
+    max-width: 25em;
+    padding-left:2em;
+    border-left: 1px dashed #4a4a4a;
+    border-right: 1px dashed #4a4a4a;
+    height:100%;
+    padding-right: 2em;
+}
+
+#previewer h3, #previewer h2 {
+    color: white;
+}
+
+#section_nav{
+    margin-right:4em;
+}
+
+#section_nav ul{
+    color:white;
+}
+
+#section_nav >section{
+    width:100%;
+}
+
+#section_nav > ul{
+    max-height: 500px;
+    overflow-y: auto;
+    padding-top:1em;
+    padding-bottom:1em;
+}
+
+#openlink{
+    padding-left:3px;
+    margin-left:5px;
+    border-left:1px dotted white;
+}
+
+
+#previewer p{
+    text-align:left;
+}
+
+.navchildsec{
+    float:left;
+    margin-right:2em;
+    min-width: 20em;
+}
+
+.hlverse{
+    color:yellow!important;
+}
+
+.biblenavi{
+    width:0px;
+    height:0px;
+    border:none;
+}
+
+
+#ytembedded{
+    width:15em;
+}
+
+iframe{
+    border:0;
+}
+
+.functionalsection h4{
+    margin-top:0px;
+}
+
+.functionalsection input{
+    margin-left:1em;
+    margin-right:1em;
+
+}
+
+.functionalsection li{
+    margin-top:1em;
+    margin-bottom:1em;
+}
+
+.functionalsection{
+    /* border-left:1px dashed white; */
+    /* padding-left:2em; */
+    font-size:80%;
+    /* border-radius: 12px; */
+    padding: 0.9em;
+    margin-top: 1em;
+    /* height:100%; */
+    background: rgba(139, 144, 144, 0.32);
+    /* float:left; */
+    /* margin-left:1em; */
+}
+
+
+.contentinsert {
+    height: 11em;
+    width: 24em;
+}
+
+#addedcontentparent{
+    /* border-top: 1px solid white; */
+    margin-top:0px;
+}
+
+.switchlink{
+    margin-right:2em;
+    color:yellow;
+}
+
+.unhlpresentation{
+    border:none;
+    padding:1em;
+    color:white;
+}
+
+.hlpresentation{
+    color: yellow;
+    padding:1em;
+} 
+
+.bibaddress{
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: row;
+}  
+
+.bibaddress input{
+    margin-left:1em;
+    width:6em;
+}
+
+/*
+    
+https://css-tricks.com/css3-gradients/
+
+    */
+
+/*  Verses etc */
+#prescont > #textcontent .bibleverse{
+
+    font-size: 240%;
+    font-family:'Quicksand';
+    line-height: 1;
+    text-align: justify;
+    /* margin-top: 9em; */
+    padding-left: 4em;
+    padding-right: 3em;
+
+}
+
+h3.bibleheader{
+
+    font-size: 290%;
+    line-height: 1;
+    /* margin-top: 9em; */
+    padding-left: 2em;
+
+}
+
+#prescont > #textcontent .verse{
+    text-align: start;
+    font-size: 310%;
+    line-height:1.5;
+    /*font-family: sans-serif;*/
+    font-family:'Quicksand';
+    /* margin-top: 9em; */
+    margin-top: 0.1em;
+    /* text-shadow: 2px 1px 1px #000; */
+}
+.songtitle{
+    color:black;
+    font-family: 'Nothing You Could Do',fantasy;
+    font-size: 200%;
+    margin-top:0px
+    /* background: -webkit-linear-gradient(#eee, rgb(217, 247, 128)); */
+    /* -webkit-background-clip: text; */
+    /* -webkit-text-fill-color: transparent; */
+}
+
+
+.unlhsection{
+    color:white;
+}
+
+.subsectionnavhl{
+    color:#0DFF28;
+}
+
+.sectionnavhl{
+    color:yellow;
+}
+
+
+/*  The actual contents */
+
+#heading{
+    /* clear:left; */
+    /*background: url('images/otsikko.png')  no-repeat;*/
+    /* position: absolute; */
+    /* left: -50%; */
+    text-align: center;
+    padding-top: 0px;
+    white-space:nowrap;
+}
+
+#heading h3{
+    color: #505861;
+    font-size: 290%;
+    font-family: 'Quicksand';
+    margin-bottom:1em;
+    margin-top: 0.1em;
+    position:relative;
+    /* display: inline-block; */
+    /* left: -50%; */
+    /* font-style: italic; */
+}
+
+#heading h2{
+    color: #016fde;
+    /* background: black; */
+    font-size: 700%;
+    /* font-family: arial, sans-serif; */
+    font-family: 'Nothing You Could Do';
+    /* margin-bottom:2em; */
+    /* display: none; */
+    position: relative;
+    left: -20%;
+    margin-top: 0px;
+    /* font-style: italic; */
+    margin-bottom: 0px;
+    text-shadow: 1px 9px #a0a0ff;
+    border-bottom: 5px solid;
+}
+
+
+#bgdiv{
+    width:100%;
+    height: 100%;
+    top:0;
+    left:0;
+    position:fixed;
+    z-index:-1;
+    background-color:white;
+}
+
+#prescont{
+    z-index:1;
+    width:100%;
+    height: 97%;
+    background:none;
+    background-repeat:no-repeat;
+    overflow:hidden;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+#prescont #navwrapper{
+    /* position: absolute; */
+    /* left: 50%; */
+    /*margin-top: 5%;*/
+    /* display: -webkit-flex; */
+    /* display: flex; */
+    /* flex-direction: row; */
+}
+
+#prescont #navwrapper #navcontainer{
+    position: relative;
+    /* left: -50%; */ 
+    display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+    /* display: flex; */
+    /* -webkit-flex-direction: row; */
+    flex-direction: row;
+}
+
+
+#sections{
+    /* margin-left: 30em; */
+    /* margin-top: 20em; */
+    /* float:left; */
+    padding-right: 12px;
+    color:white;
+    margin-bottom: 4em;
+    font-size: 160%;
+}
+
+#sections ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+#sections li, #sitems li{
+    list-style-type:none;
+    /*white-space: nowrap;*/
+    /* display: inline; */
+}
+
+/*INFO*/
+
+#infobox{
+    margin-top:3em;
+}
+
+.infoheader{
+    margin-top:0px;
+    color: #fbfbfb;
+    font-size: 110%;
+}
+
+.infolist li{
+    margin-top: 1em;
+    list-style-type: none;
+}
+
+.creditcontent{
+    background: linear-gradient(to bottom, rgb(2, 72, 142), rgba(1, 111, 222, 0.54));
+    color: #ececec;
+    font-family: 'Quicksand';
+    padding-top:0.3em;
+    padding-bottom:0.3em;
+    padding-left: 1em;
+    padding-right: 1em;
+    font-size: 300%;
+    border-radius:12px;
+    /* font-family: monospace; */
+}
+
+
+.infocontent{
+    background: #353567;
+    background: linear-gradient(to bottom, rgb(2, 72, 142), rgba(1, 111, 222, 0.42));
+    color: #ececec;
+    padding-top:1em;
+    font-family:'Quicksand';
+    padding-bottom:3em;
+    padding-left: 1em;
+    padding-right: 1em;
+    font-size: 200%;
+    border-radius:12px;
+    /* font-family: monospace; */
+}
+
+/* OSIO-otsikot  */
+
+#sections, #sitems{
+    font-family: 'Quicksand';
+}
+
+#sections li {
+    margin-top: 1em;
+    padding: 1em;
+    border-radius: 12px;
+    /* display: inline; */
+}
+
+#sections li {
+    /*color: rgba(128, 113, 113, 0.51);*/
+    color: #a7a7a7;
+}
+
+#sections li.sectionhl {
+    background: #353567;
+    background: linear-gradient(to bottom, rgb(1, 111, 222), rgb(1, 111, 222));
+    color: white;
+}
+
+
+
+#sitems{
+    /* float: left; */
+    /* margin-top: 20em; */
+    /* border-right: 1px dashed yellow; */
+    border-radius: 12px;
+    color: #ffffff;
+    /* background: rgb(1, 111, 222); */
+    background: linear-gradient(to bottom, rgb(1, 111, 222), rgb(182, 186, 189));
+    padding-right: 22px;
+    padding-left: 22px;
+    /* margin-right: 5em; */
+    margin-left: 2em;
+    font-size: 200%;
+    /* height: 70%; */
+    /* font-family: -webkit-pictograph; */
+    /* box-shadow: 0px -2px 2px rgba(34,34,34,0.6); */
+}
+
+
+nav#sitems li.sectionitemhl {
+    /* background: #353567; */
+    color:  white;
+    border-bottom: 1px solid white;
+    /* border-top: 1px solid white; */
+    list-style-type: amharic-abegede;
+    list-style-image: antiquewhite;
+}
+
+nav#sitems li {
+    /* background: blue; */
+    margin-top: 0.6em;
+    padding-top: 1em;
+    padding-left: 0.5em;
+    /* color: #a7a7a7; */
+}
+
+#sitems ul {
+    /* list-style: none; */
+    margin-top: 0.1em;
+    padding-left: 0;
+}
+
+
+#textcontent{
+    color: black;
+    /* overflow: hidden; */
+}
+
+#itemtitle{
+    /* float:left; */
+    /* margin-top: 10em; */
+    /* margin-right: 12px; */
+    /* padding-left: 5px; */
+    margin-left: 2em;
+    font-size: 150%;
+}
+
+#sectionlinks{
+    float:left;
+    margin-right: 12px;
+    padding-left: 5px;
+    color:white;
+}
+
+.songdata{
+    display:none;
+}
+
+#showstructure{
+    display:none;
+}
+
+
+.embeddedimg{
+    max-width:90%;
+    max-height:90%;
+}
+
+#section_nav li:hover,#section_nav a:hover, #previewer p:hover,.functionalsection a:hover, #previewer h2:hover{
+    cursor:pointer;
+}
+
+#previewer h2, #previewer p{
+    padding-left:0.3em;
+}
+
+#previewer h2:hover, #previewer p:hover{
+    border-left:2px solid yellow;
+
+}
+
+.hlverse h2{
+    color:yellow !important;
+}
+
+#previewer a:hover{
+    cursor:pointer;
+    color:yellow;
+}
+
+.blankscreen{
+    position:fixed;
+    top:-3px;
+    left:-3px;
+    width:3000px;
+    height:2000px;
+    background:black;
+}
+
+#section_nav h3:hover, #addedcontentparent h3:hover{
+    cursor:pointer;
+    color:yellow;
+}
+
+#utsection{
+    width: 100%;
+    margin: auto;
+    text-align:center;
+}
+
+
+#trackersection{
+    font-family: 'Quicksand';
+    max-width:50em;
+    margin:auto;
+    position: absolute;
+    top: 10px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: scroll;
+    padding: 0.8em;
+}
+
+#trackersection > ul{
+    padding-top:0.7em;
+    overflow:auto;
+}
+
+
+#menu a,#menu a:visited, #menu a:active{
+    color:white;
+    text-decoration:none;
+}
+
+#menu a:hover{
+    /*color:yellow;*/
+}
+
+
+#leftbanner {
+    position: fixed;
+    background: rgb(56, 68, 69);
+    color:black;
+    left: 0;
+    display: inline-block;
+    top: 0;
+    width: 100%;
+    height: 2em;
+    white-space: nowrap;
+    overflow: visible;
+    /* padding-left: 1px; */
+    /* padding-left: 0.4em; */
+    padding-top: 0em;
+    overflow: hidden;
+    font-family: 'Quicksand';
+    /* border-bottom: 2px solid black; */
+}
+
+#leftbanner li {
+    display: inline-block;
+    list-style-position:inside;
+    margin-left:0;
+    padding:0;
+    margin-right:0.6em;
+    height: 100%;
+    padding-top: 0.4em;
+    overflow: hidden;
+    height:100%;
+    padding-left:0.3em;
+    padding-right:0.3em;
+}
+
+#leftbanner a, #leftbanner a:visited, #leftbanner a:active{
+    text-decoration: none;
+    color:white;
+    padding:5px;
+}
+
+#leftbanner a:hover{
+    background:white;
+    color:black;
+    /*font-weight:bold;*/
+}
+
+#menu{
+    background: #5d5353;
+    position:fixed;
+    padding-top:2px;
+    color:white;
+    display:none;
+    left:0em;
+    top:2.6em;
+    padding-left:0em
+    padding-right:0em;
+    -webkit-box-shadow: 10px 0px 25px 0px rgba(0,0,0,0.56);
+    -moz-box-shadow: 10px 0px 25px 0px rgba(0,0,0,0.56);
+    box-shadow: 10px 0px 25px 0px rgba(0,0,0,0.56);
+}
+
+#menu li:last-child{
+    border-bottom:none;
+}
+
+
+#menu li:hover{
+    background: cadetblue;
+    cursor: pointer;
+}
+
+#menu li{
+    margin-top: 0em;
+    border-bottom:1px solid white;
+    padding-left:0.5em;
+    padding-right:0.5em; padding-top:1.3em; padding-bottom:1.2em;
+}
+
+
+#updaterframe{
+    width:0px;
+    height:0px;
+}
+
+#menu ul{
+    margin-left: 0px;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+
+.menuleft li{
+    color: #f7cf6d;
+}
+
+.menuright li{
+    color:white;
+}
+
+.menuright img{
+}
+
+.menuright{
+    display: inline-block;
+    padding-right: 0.4em;
+    color: yellow;
+}
+
+
+.menuleft, .righter{
+    display: inline-block;
+    /* float:left; */
+    color: white;
+}
+
+
+#settings{
+    /* padding-top: 0.4em; */
+    /* overflow: hidden; */
+    height: 2em;
+    padding-left:0.3em;
+    padding-right:0.3em;
+}
+
+#settings:hover{
+    background:cadetblue;
+    cursor:pointer;
+}
+
+
+#leftbanner ul {
+    /* color: red; */
+    margin-left: 0px;
+    list-style-type: none;
+    /* display: inline; */
+    height:2em;
+    margin: 0;
+    padding-top: 0.6em;
+    text-indent:none;
+    list-style-position:inside;
+    margin:0;
+    padding:0;
+}
+
+
+#functionalmenu{
+    /*margin-top:2em;*/
+    background: rgba(5, 32, 35, 0.76);
+    width:100%;
+    height:0px;
+    position:fixed;
+    top:0;
+    left:0;
+    transition: all .15s ease-in-out;
+    padding-top: 0;
+    top: 0;
+}
+
+
+#functionalmenu > section{
+    display:none;
+    max-width: 50em;
+    /* margin: auto; */
+}
+
+#functionalmenu .functionalsection {
+    /* border-left: 1px dashed white; */
+    /* padding-left: 2em; */
+    font-size: 80%;
+    border-radius: 0px;
+    padding: 0.9em;
+    margin-top: 0.9em;
+    /* height: 100%; */
+    background: rgb(75, 87, 88);
+    float: left;
+    margin-left: 1em;
+}
+
+
+.functionalsection span:first-child{
+    border-right: 1px solid grey;
+}
+.functionalsection span{
+    /* margin-right:2em; */
+    padding-right: 1em;
+    padding-left: 1em;
+}
+
+#stylesec{
+    width:100%;
+    background: none;
+    margin: auto;
+    border-bottom: 1px solid white;
+}
+
+#addedcontent{
+    padding:1em;
+}
+
+#addedcontent_sectionlist ul{
+    padding-right:0.8em;
+}
+
+#addedcontent_sectionlist li:hover{
+    cursor:pointer;
+}
+
+#blanklink{
+    color:black;
+    background:white;
+}
+
+
+@media only screen and (max-device-width: 481px) {
+    #trackersection li{
+        margin-top:0.1em;
+        font-size:110%;
+    }
+}
+
+
+@media (min-width:1025px) { 
+    #trackersection{
+        overflow:auto;
+        padding:2em;
+    }
+}
+
+
+
+/* Isommill nÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¤ytÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¶ille fontteja suuremmiksi: */
+
+@media only screen and (min-device-width: 1300px) { 
+
+    #heading h2 {
+        font-size: 750%;
+    }
+
+    .songtitlediv h3 {
+        margin-top: 1em;
+    }
+
+    #textcontent > .songtitlediv h2 {
+        font-size:400%;
+    }
+
+    #prescont > #textcontent .verse{
+        font-size:400%;
+    }
+
+    #prescont > #textcontent .bibleverse {
+        font-size: 250%;
+        padding-left: 8em;
+        padding-right: 9em;
+    }
+
+    #heading h3 {
+        margin-bottom: 2em;
+        margin-top: 1em;
+        position: relative;
+        /* display: inline-block; */
+        left: -20%;
+        /* font-style: italic; */
+    }
+
+    #sitems{
+        font-size:250%;
+    }
+
+    #sections {
+        font-size: 180%;
+    }
+
+    .infocontent{
+        font-size: 270%;
+    }
+
+}
+
