@@ -401,12 +401,12 @@ h3.bibleheader{
 
 #prescont #navwrapper #navcontainer{
     position: relative;
-    /* left: -50%; */ 
+    left: -20%;
     display: -webkit-box;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: -webkit-flex;
-  display: flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
     /* display: flex; */
     /* -webkit-flex-direction: row; */
     flex-direction: row;
@@ -414,13 +414,11 @@ h3.bibleheader{
 
 
 #sections{
-    /* margin-left: 30em; */
-    /* margin-top: 20em; */
-    /* float:left; */
     padding-right: 12px;
     color:white;
     margin-bottom: 4em;
     font-size: 160%;
+    margin-left:5em;
 }
 
 #sections ul {
@@ -430,8 +428,6 @@ h3.bibleheader{
 
 #sections li, #sitems li{
     list-style-type:none;
-    /*white-space: nowrap;*/
-    /* display: inline; */
 }
 
 /*INFO*/
@@ -885,7 +881,7 @@ nav#sitems li {
 
 
 
-/* Isommill nÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¤ytÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¶ille fontteja suuremmiksi: */
+/* Isommill nÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¤ytÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¶ille fontteja suuremmiksi: */
 
 @media only screen and (min-device-width: 1300px) { 
 

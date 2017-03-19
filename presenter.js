@@ -965,7 +965,7 @@ function ScreenContent(){
         //Remove existing (verse etc) content
         ClearContent(prevsec);
         //prevsec.appendChild(AddFunctionalitySection());
-        AddFunctionalitySection();
+        //AddFunctionalitySection();
         if(!this.hasOwnProperty("mysection")){
             var content_type = this.content_type;
         }
@@ -1357,11 +1357,34 @@ function Screen(newwindow){
         this.doc.body.style.color="black";
         this.prescont.style.backgroundImage = "url('" +  this.backgrounds[styletype].url + "')";
         this.prescont.style.backgroundPosition = this.backgrounds[styletype].position;
+        this.prescont.style.backgroundSize = "auto";
+        this.prescont.style.backgroundSize = "inherit";
         if(styletype=="song"){
             this.prescont.style.paddingTop = "156px";
         }
         else{
             this.prescont.style.paddingTop = "0px";
+        }
+
+        if(this.backgrounds[styletype].url.indexOf("pp_logo_400")>-1){
+            //this.prescont.style.backgroundPosition = this.backgrounds[styletype].position;
+
+            //Determine maximum size for background
+            
+            //1. Determine, which element present
+            var possibleboxes = [this.sitems, this.creditbox, this.infobox];
+            for(i=0; i<possibleboxes.length;i++){
+                var thisbox = possibleboxes[i];
+                var rect = thisbox.getBoundingClientRect();
+                if(rect.right>0){
+                    break;
+                }
+            }
+            var spaceforlogo = this.doc.body.offsetWidth-rect.right;
+            if (spaceforlogo < 410){
+                this.prescont.style.backgroundSize = (spaceforlogo - 10) + "px " + (spaceforlogo - 10) + "px";
+            }
+            //commentdiv.style.top = rect.top + 5 + "px";
         }
     }
 
@@ -1535,7 +1558,7 @@ function ClosePres(pres){
 
 function OpenPres(pres){
     preswindow = window.open('','_blank', 'toolbar=0,location=0,menubar=0');
-    preswindow.document.write('<html lang="fi" style="background:black;" ><head><link href="https://fonts.googleapis.com/css?family=Nothing+You+Could+Do|Quicksand" rel="stylesheet"> <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"><link id="stylesetter" rel="stylesheet" type="text/css" href="styles.css?id=98798"/></head><body></body>');
+    preswindow.document.write('<html lang="fi" style="background:black;" ><head><link href="https://fonts.googleapis.com/css?family=Nothing+You+Could+Do|Quicksand" rel="stylesheet"> <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"><link id="stylesetter" rel="stylesheet" type="text/css" href="styles.css?id=asdasd98798"/></head><body></body>');
     ClearContent(preswindow.document.body);
     ////TODO:this is the key to make separate screen working!
     Presentations.screen = new Screen(preswindow);
