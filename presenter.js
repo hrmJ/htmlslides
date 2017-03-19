@@ -455,6 +455,33 @@ function StructuredPresentation(doc, showtype){
                           //missä tavallisesti laulun nimi. Muista myös ajatella laulun tekijänoikeuksia.
     }
     else if(showtype=="parkki"){
+        var communionsongs = this.MultiSong("Ehtoollislauluja");
+        var worshipsongs = this.MultiSong("Ylistys- ja rukouslauluja");
+
+        //2. Combine all the sections
+        this.items = [new Section(this, 'Johdanto',           [['Krediitit1',credits1,'info'],
+                                                              ['Alkulaulu',this.songs['Alkulaulu'][0],'song'],
+                                                              ['Alkusanat',false,'header'],
+                                                              ['Seurakuntalaisen sana',false,'header']
+                                                              ]),
+                      new Section(this, 'Sana',               [['Päivän laulu',this.songs['Päivän laulu'][0],'song'],
+                                                              ['Evankeliumi',evankeliumi,'header'],
+                                                              ['Saarna',false,'header'],
+                                                              ['Synnintunnustus',false,'header'],
+                                                              ['Uskontunnustus',new SongContent('', allsongs["uskontunnustus"].content),'song']]),
+                      new Section(this, 'Ylistys ja rukous', worshipsongs),
+                      new Section(this, 'Ehtoollisen asetus', [['Pyhä',this.songs['Pyhä-hymni'][0],'song'], 
+                                                              ['Ehtoollisrukous',false,'header'],
+                                                              ['Isä meidän',new SongContent('', allsongs["isä meidän"].content),'song'],
+                                                              ['Jumalan karitsa',this.songs['Jumalan karitsa'][0],'song']]),
+                      new Section(this, 'Ehtoollisen vietto',   communionsongs),
+                      new Section(this, 'Siunaus ja lähettäminen',  [['Herran siunaus',false,'heading'],
+                                                             ['Loppusanat',false,'heading'],
+                                                             ['Loppulaulu',this.songs['Loppulaulu'][0],'song']
+                                                              ])
+                        ];
+                          //TODO ^^ liittyen ehkä mieti, että näkyviin tulisi sanailijan nimi siihen,
+                          //missä tavallisesti laulun nimi. Muista myös ajatella laulun tekijänoikeuksia.
     }
 
 
@@ -728,7 +755,7 @@ function Mover(evt){
     currentpres.current = currentpres.items[sectiontarget];
     currentpres.pointer.started = true;
 
-    if (currentpres.showtype == 'majakka'){
+    if (currentpres.showtype == 'majakka' || currentpres.showtype == 'parkki'){
                 currentpres.pointer.position = parseInt(sectiontarget);
                 //TODO some more abstraction to this 
                 for (var section_idx in currentpres.items) {
@@ -866,6 +893,7 @@ function ScreenContent(){
                     break;
                 case "bibletime":
                     PresScreen.UpdateContent('textcontent',this.items[this.pointer.position],'bible');
+                    break;
                 default:
                     PresScreen.UpdateContent('textcontent',this.items[this.pointer.position],'info');
                     break;
@@ -1313,7 +1341,7 @@ function Screen(newwindow){
         this.backgrounds = {"headers":{"url":"images/pp_logo_400.png","position":"top right"},
                             "info":{"url":"images/pp_logo_400.png","position":"top right"},
                             "song":{"url":"images/pp-stripe_1800.png","position":"top left"},
-                            "bible":{"url":"images/pp_scripture_400.png","position":"top right"}};
+                            "bible":{"url":"images/sulka_300.png","position":"bottom right"}};
     }
 
     /**
