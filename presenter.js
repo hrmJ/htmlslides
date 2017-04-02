@@ -177,7 +177,7 @@ function Presentation(){
             if (structure.childNodes[i].nodeName!=="#text"){
                 //If the structure div contains tags
                 var role = structure.childNodes[i].getAttribute("role");
-                if(role==null){
+                if(role==null || role=="Laulu"){
                     //Simple songs without any specific role
                     role = "song";
                 }
@@ -463,7 +463,12 @@ function StructuredPresentation(doc, showtype){
     }
     else if(showtype=="parkki"){
         //In the simple case, just insert the songs directly as items
-        this.items = [new InfoContent('Tosi hieno otsikko', '', 'Messun otsikko')];
+        var ohjeet = ["1. Raahaa tämä ikkuna esitysnäyttöön (varmista ensin, ettei näyttöjä ole peilattu, vaan että projektori on oma näyttönsä ja tietokoneen näyttö omansa)",
+                       "2. Aseta tämä ikkuna koko näytön tilaan (useimmissa selaimissa F11-näppäin)",
+                       "3. Paina nuolta oikealle tai klikkaa jotakin alkuperäisessä ikkunassa näkyvistä laulujen nimistä, niin esitys käynnistyy",
+                       "4. Esityksessä liikutaan eteenpäin ja taaksepäin joko nuolinäppäimillä TAI sitten voit klikata laulujen nimiä ja niiden säkeistöjä",
+                       "HUOM! Tämän esityksen päälle kannattaa avata erikseen jollain toimisto-ohjelmalla (PowerPoint/LibreOffice Impress, KeyNote yms.) tehty diaesitys, jossa on muu sisältö kuin laulut. Kun poistut Powerpoint-esityksestä, lauluesityksen pitäisi jäädä näkyviin."];
+        this.items = [new InfoContent('Ohjeita laulujen näyttämiseen', ohjeet, 'Ohjeet diojen näyttäjälle')];
         for(idx in this.songs["song"]){
             var thissong = this.songs["song"][[idx]];
             thissong.items.unshift(thissong.titleslide.items[0]);
@@ -1543,6 +1548,9 @@ function OpenPres(pres){
     Presentations.screen = new Screen(preswindow);
     preswindow.onkeydown = checkKey;
     document.onkeydown = checkKey;
+    //Move to the first actual slide
+    Presentations.default.Move('increment');
+    Presentations.screen.navwrapper.style.width = "90%";
 }
 
 
