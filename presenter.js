@@ -799,8 +799,8 @@ function VerseMover(evt){
     var thispres = Presentations[Presentations.current];
     //Find the current song on display
     thispres.GetContentChain();
-    if(Presentations.current == 'spontaneous'){
-        //Songs in the spontaneous moed have no section titles
+    if(Presentations.current == 'spontaneous' || Presentations.default.showtype !== "majakka"){
+        //Songs in the spontaneous mode have no section titles
         var thissong = thispres.chain[thispres.chain.length-1];
     }
     else if (thispres.current.current.current.content_type=='sectiontitle'){
