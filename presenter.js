@@ -114,10 +114,13 @@ function Presentation(){
                 while (thisobject.hasOwnProperty('current')){
                     thisobject=thisobject.current;
                     this.chain.push(thisobject);
+                    if(thisobject==undefined){
+                        break;
+                    }
                 }
             }
             catch(error){
-                alert("Moro");
+                //alert("Moro");
                 console.log(error);
             }
     };
@@ -174,6 +177,10 @@ function Presentation(){
             if (structure.childNodes[i].nodeName!=="#text"){
                 //If the structure div contains tags
                 var role = structure.childNodes[i].getAttribute("role");
+                if(role==null){
+                    //Simple songs without any specific role
+                    role = "song";
+                }
                 //ADD [here] a test for seeing whether allsongs actually contains something by this name
                 //...
                 // First, create an array if this is the first song if its type
@@ -407,11 +414,11 @@ function StructuredPresentation(doc, showtype){
 
     this.GetSongs(doc);
     this.showtype = showtype;
-    //TODO: import this from structure html
-    var credits1 = new CreditContent('', this.GetCredits(doc));
-    var evankeliumi = new BibleContent(document.getElementById('evankeliumi').getAttribute('address'), document.getElementById('evankeliumi').textContent );
 
     if(showtype=="majakka"){
+        //TODO: import this from structure html
+        var credits1 = new CreditContent('', this.GetCredits(doc));
+        var evankeliumi = new BibleContent(document.getElementById('evankeliumi').getAttribute('address'), document.getElementById('evankeliumi').textContent );
         //TODO: make creating these sections simpler
         //1. Collect all worship songs and make them into a section
         var communionsongs = this.MultiSong("Ehtoollislauluja");
@@ -455,33 +462,14 @@ function StructuredPresentation(doc, showtype){
                           //missä tavallisesti laulun nimi. Muista myös ajatella laulun tekijänoikeuksia.
     }
     else if(showtype=="parkki"){
-        var communionsongs = this.MultiSong("Ehtoollislauluja");
-        var worshipsongs = this.MultiSong("Ylistys- ja rukouslauluja");
-
-        //2. Combine all the sections
-        this.items = [new Section(this, 'Johdanto',           [['Krediitit1',credits1,'info'],
-                                                              ['Alkulaulu',this.songs['Alkulaulu'][0],'song'],
-                                                              ['Alkusanat',false,'header'],
-                                                              ['Seurakuntalaisen sana',false,'header']
-                                                              ]),
-                      new Section(this, 'Sana',               [['Päivän laulu',this.songs['Päivän laulu'][0],'song'],
-                                                              ['Evankeliumi',evankeliumi,'header'],
-                                                              ['Saarna',false,'header'],
-                                                              ['Synnintunnustus',false,'header'],
-                                                              ['Uskontunnustus',new SongContent('', allsongs["uskontunnustus"].content),'song']]),
-                      new Section(this, 'Ylistys ja rukous', worshipsongs),
-                      new Section(this, 'Ehtoollisen asetus', [['Pyhä',this.songs['Pyhä-hymni'][0],'song'], 
-                                                              ['Ehtoollisrukous',false,'header'],
-                                                              ['Isä meidän',new SongContent('', allsongs["isä meidän"].content),'song'],
-                                                              ['Jumalan karitsa',this.songs['Jumalan karitsa'][0],'song']]),
-                      new Section(this, 'Ehtoollisen vietto',   communionsongs),
-                      new Section(this, 'Siunaus ja lähettäminen',  [['Herran siunaus',false,'heading'],
-                                                             ['Loppusanat',false,'heading'],
-                                                             ['Loppulaulu',this.songs['Loppulaulu'][0],'song']
-                                                              ])
-                        ];
-                          //TODO ^^ liittyen ehkä mieti, että näkyviin tulisi sanailijan nimi siihen,
-                          //missä tavallisesti laulun nimi. Muista myös ajatella laulun tekijänoikeuksia.
+        //In the simple case, just insert the songs directly as items
+        this.items = [new InfoContent('Tosi hieno otsikko', '', 'Messun otsikko')];
+        for(idx in this.songs["song"]){
+            var thissong = this.songs["song"][[idx]];
+            thissong.items.unshift(thissong.titleslide.items[0]);
+            thissong.pointer.max += 1;
+            this.items.push(thissong);
+        }
     }
 
 
@@ -737,46 +725,60 @@ function Section(mypresentation, name, items, sec_idx){
  *
  **/
 function Mover(evt){
-    var sectiontarget = evt.target.getAttribute('sectionidx');
-    //The latter is for songs, speeches etc i.e. subitems of sections
-    var secitemtarget = evt.target.getAttribute('secitemidx');
+
+    //Change the active presentation 
     if (evt.target.parentNode.id=='addedcontent_sectionlist' & Presentations.current=='default'){
         SwitchToSpontaneous();
     }
     else if(evt.target.parentNode.id!='addedcontent_sectionlist' & Presentations.current!='default'){
         SwitchToDefault();
     }
-
-    //TODO: abstract this!
     var currentpres = Presentations[Presentations.current];
-    var targetcontent = undefined;
 
-    //TODO make this not specific to majakka presentations
+    //-------------
+    var targetcontent = undefined;
+    //Mark the parent section of the target
+    var sectiontarget = evt.target.getAttribute('sectionidx');
+
     currentpres.current = currentpres.items[sectiontarget];
     currentpres.pointer.started = true;
+    currentpres.pointer.position = parseInt(sectiontarget);
 
-    if (currentpres.showtype == 'majakka' || currentpres.showtype == 'parkki'){
-                currentpres.pointer.position = parseInt(sectiontarget);
-                //TODO some more abstraction to this 
-                for (var section_idx in currentpres.items) {
-                    var thissection = currentpres.items[section_idx];
-                    if (section_idx < sectiontarget){
-                        AdjustPointersFromSectionDown(thissection, 'max', undefined);
-                    }
-                    else if (section_idx == sectiontarget){
-                        var targetcontent = AdjustPointersFromSectionDown(thissection, 'min', secitemtarget);
-                    }
-                    else if (section_idx > sectiontarget){
-                        AdjustPointersFromSectionDown(thissection, 'min', undefined);
-                    }
-                }
+
+    if (currentpres.showtype == 'majakka'){
+        var secitemtarget = evt.target.getAttribute('secitemidx');
     }
-    else{
-        //If this is a flat presentations, just set the pointers right away
-        //TODO: songs
-        targetcontent = currentpres.current;
-        currentpres.pointer.position = secitemtarget;
+
+    for (var section_idx in currentpres.items) {
+        var thissection = currentpres.items[section_idx];
+        if (section_idx < sectiontarget){
+            if (currentpres.showtype=='majakka'){
+                AdjustPointersFromSectionDown(thissection, 'max', undefined);
+            }
+            else{
+                UpdatePointers(thissection, 'max');
+            }
+        }
+        else if (section_idx == sectiontarget){
+            if (currentpres.showtype=='majakka'){
+                var targetcontent = AdjustPointersFromSectionDown(thissection, 'min', secitemtarget);
+            }
+            else{
+                var targetcontent = thissection;
+                //Flate presentations: always reset the song to its beginning
+                UpdatePointers(thissection, 'min');
+            }
+        }
+        else if (section_idx > sectiontarget){
+            if (currentpres.showtype=='majakka'){
+                AdjustPointersFromSectionDown(thissection, 'min', undefined);
+            }
+            else{
+                UpdatePointers(thissection, 'min');
+            }
+        }
     }
+
     currentpres.GetContentChain();
     targetcontent.Show();
 }
@@ -901,7 +903,7 @@ function ScreenContent(){
             //Add or remove content from te navigator
             this.UpdatePreview();
             //Make sure the presentation is the screen that is currently visible
-            Presentations.screen.preswindow.focus();
+            //Presentations.screen.preswindow.focus();
 
             if(Presentations.screen.blankscreenactive){
                 //Make sure that the blank screen stays active if turned on
