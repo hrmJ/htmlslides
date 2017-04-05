@@ -1756,7 +1756,7 @@ function GetUpdatedStructure(){
     var newdoc = document.getElementById('updaterframe').contentWindow.document;
     //Update the list of songs...
     allsongs = GetSongs(newdoc);
-    Presentations.default = new StructuredPresentation(newdoc, "majakka");
+    Presentations.default = new StructuredPresentation(newdoc, "parkki");
     Presentations.default.GetContentChain();
     //Remove the old navigation elements
     ClearContent(document.getElementById("section_nav"));

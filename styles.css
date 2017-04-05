@@ -269,7 +269,7 @@ https://css-tricks.com/css3-gradients/
 /*  Verses etc */
 #prescont > #textcontent .bibleverse{
 
-    font-size: 240%;
+    font-size: 220%;
     font-family:'Quicksand';
     line-height: 1;
     text-align: justify;
@@ -298,10 +298,16 @@ h3.bibleheader{
     margin-top: 0.1em;
     /* text-shadow: 2px 1px 1px #000; */
 }
+
+.previewedverses .songtitle{
+    color:white;
+    font-size: 150%;
+}
+
 .songtitle{
     color:black;
     font-family: 'Nothing You Could Do',fantasy;
-    font-size: 200%;
+    font-size: 300%;
     margin-top:0px
     /* background: -webkit-linear-gradient(#eee, rgb(217, 247, 128)); */
     /* -webkit-background-clip: text; */
@@ -474,7 +480,7 @@ h3.bibleheader{
     padding-bottom:3em;
     padding-left: 1em;
     padding-right: 1em;
-    font-size: 200%;
+    font-size: 150%;
     border-radius:12px;
     /* font-family: monospace; */
 }
@@ -902,7 +908,7 @@ nav#sitems li {
     }
 
     #prescont > #textcontent .verse{
-        font-size:400%;
+        font-size:350%;
     }
 
     #prescont > #textcontent .bibleverse {
