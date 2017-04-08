@@ -21,25 +21,27 @@ body {
 
 
 .songtitlediv h3{
-    color: rgba(239, 226, 41, 0.91);
+    color: rgb(1, 111, 222);
     font-size: 290%;
     font-family: 'Quicksand';
     margin-bottom:2em;
     margin-top: 0.1em;
+    border-bottom: 2px solid;
+    /* left: -10%; */
 }
 
 #textcontent > .songtitlediv h2{
-    color:white;
+    color: #807b7b;
     font-family: 'Nothing You Could Do',fantasy;
     font-size: 300%;
     margin-top:0px
-    /* background: -webkit-linear-gradient(#eee, rgb(217, 247, 128)); */
+    /* background: -webkit-linear-gradient(#eee, rgb(217, 247, 128));;
     /* -webkit-background-clip: text; */
-    /* -webkit-text-fill-color: transparent; */;
+    /* -webkit-text-fill-color: transparent; */ */;
 }
 
 #creditbox{
-    width:100%;
+    width: 80%;
     text-align:left;
     font-size:50%;
     background:none;
@@ -267,7 +269,7 @@ https://css-tricks.com/css3-gradients/
 /*  Verses etc */
 #prescont > #textcontent .bibleverse{
 
-    font-size: 240%;
+    font-size: 220%;
     font-family:'Quicksand';
     line-height: 1;
     text-align: justify;
@@ -294,12 +296,18 @@ h3.bibleheader{
     font-family:'Quicksand';
     /* margin-top: 9em; */
     margin-top: 0.1em;
-    text-shadow: 2px 1px 1px #000;
+    /* text-shadow: 2px 1px 1px #000; */
 }
-.songtitle{
+
+.previewedverses .songtitle{
     color:white;
+    font-size: 150%;
+}
+
+.songtitle{
+    color:black;
     font-family: 'Nothing You Could Do',fantasy;
-    font-size: 200%;
+    font-size: 300%;
     margin-top:0px
     /* background: -webkit-linear-gradient(#eee, rgb(217, 247, 128)); */
     /* -webkit-background-clip: text; */
@@ -333,7 +341,7 @@ h3.bibleheader{
 }
 
 #heading h3{
-    color: rgba(239, 226, 41, 0.91);
+    color: #505861;
     font-size: 290%;
     font-family: 'Quicksand';
     margin-bottom:1em;
@@ -345,28 +353,39 @@ h3.bibleheader{
 }
 
 #heading h2{
-    color: #fbfbfb;
+    color: #016fde;
+    /* background: black; */
     font-size: 700%;
     /* font-family: arial, sans-serif; */
     font-family: 'Nothing You Could Do';
     /* margin-bottom:2em; */
     /* display: none; */
     position: relative;
-    /* left: -50%; */
+    left: -20%;
     margin-top: 0px;
     /* font-style: italic; */
     margin-bottom: 0px;
+    text-shadow: 1px 9px #a0a0ff;
+    border-bottom: 5px solid;
+}
+
+
+#bgdiv{
+    width:100%;
+    height: 100%;
+    top:0;
+    left:0;
+    position:fixed;
+    z-index:-1;
+    background-color:white;
 }
 
 #prescont{
+    z-index:1;
     width:100%;
     height: 97%;
-    background-size: cover;
-    /* background-size: 100% 100%; */
-    /* position: relative; */
-    background: url('images/lh_2.png') no-repeat center center fixed;
-    /* http://st.gde-fon.com/wallpapers_original/574104_ostrova_more_noch_mayak_2048x1360_www.Gde-Fon.com.jpg*/
-    /* background-image: url(images/lh2.png), linear-gradient(rgba(235, 1, 165, 0), #717171); */ /* W3C */
+    background:none;
+    background-repeat:no-repeat;
     overflow:hidden;
     display: -webkit-box;
     display: -moz-box;
@@ -388,12 +407,12 @@ h3.bibleheader{
 
 #prescont #navwrapper #navcontainer{
     position: relative;
-    /* left: -50%; */ 
+    left: -20%;
     display: -webkit-box;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: -webkit-flex;
-  display: flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
     /* display: flex; */
     /* -webkit-flex-direction: row; */
     flex-direction: row;
@@ -401,13 +420,11 @@ h3.bibleheader{
 
 
 #sections{
-    /* margin-left: 30em; */
-    /* margin-top: 20em; */
-    /* float:left; */
     padding-right: 12px;
     color:white;
     margin-bottom: 4em;
     font-size: 160%;
+    margin-left:5em;
 }
 
 #sections ul {
@@ -417,8 +434,6 @@ h3.bibleheader{
 
 #sections li, #sitems li{
     list-style-type:none;
-    /*white-space: nowrap;*/
-    /* display: inline; */
 }
 
 /*INFO*/
@@ -429,7 +444,7 @@ h3.bibleheader{
 
 .infoheader{
     margin-top:0px;
-    color: #E1E17A;
+    color: #fbfbfb;
     font-size: 110%;
 }
 
@@ -439,9 +454,8 @@ h3.bibleheader{
 }
 
 .creditcontent{
-    background: #353567;
-    background: linear-gradient(to bottom, rgb(39, 39, 89), rgba(0, 0, 0, 0));
-    color: white;
+    background: linear-gradient(to bottom, rgb(2, 72, 142), rgba(1, 111, 222, 0.54));
+    color: #ececec;
     font-family: 'Quicksand';
     padding-top:0.3em;
     padding-bottom:0.3em;
@@ -455,14 +469,14 @@ h3.bibleheader{
 
 .infocontent{
     background: #353567;
-    background: linear-gradient(to bottom, rgb(39, 39, 89), rgba(0, 0, 0, 0));
-    color: white;
+    background: linear-gradient(to bottom, rgb(2, 72, 142), rgba(1, 111, 222, 0.42));
+    color: #ececec;
     padding-top:1em;
     font-family:'Quicksand';
     padding-bottom:3em;
     padding-left: 1em;
     padding-right: 1em;
-    font-size: 200%;
+    font-size: 150%;
     border-radius:12px;
     /* font-family: monospace; */
 }
@@ -487,7 +501,7 @@ h3.bibleheader{
 
 #sections li.sectionhl {
     background: #353567;
-    background: linear-gradient(to bottom, rgb(39, 39, 89), rgba(0, 0, 0, 0));
+    background: linear-gradient(to bottom, rgb(1, 111, 222), rgb(1, 111, 222));
     color: white;
 }
 
@@ -499,8 +513,8 @@ h3.bibleheader{
     /* border-right: 1px dashed yellow; */
     border-radius: 12px;
     color: #ffffff;
-    /* background: rgba(53, 53, 103, 0.82); */
-    background: linear-gradient(to bottom, rgba(40, 52, 146, 0.55), rgba(64, 60, 72, 0.13));
+    /* background: rgb(1, 111, 222); */
+    background: linear-gradient(to bottom, rgb(1, 111, 222), rgb(182, 186, 189));
     padding-right: 22px;
     padding-left: 22px;
     /* margin-right: 5em; */
@@ -515,6 +529,10 @@ h3.bibleheader{
 nav#sitems li.sectionitemhl {
     /* background: #353567; */
     color:  white;
+    border-bottom: 1px solid white;
+    /* border-top: 1px solid white; */
+    list-style-type: amharic-abegede;
+    list-style-image: antiquewhite;
 }
 
 nav#sitems li {
@@ -522,7 +540,7 @@ nav#sitems li {
     margin-top: 0.6em;
     padding-top: 1em;
     padding-left: 0.5em;
-    color: #a7a7a7;
+    /* color: #a7a7a7; */
 }
 
 #sitems ul {
@@ -533,7 +551,7 @@ nav#sitems li {
 
 
 #textcontent{
-    color:white;
+    color: black;
     /* overflow: hidden; */
 }
 
@@ -869,7 +887,7 @@ nav#sitems li {
 
 
 
-/* Isommill näytöille fontteja suuremmiksi: */
+/* Isommill nÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¤ytÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¶ille fontteja suuremmiksi: */
 
 @media only screen and (min-device-width: 1300px) { 
 
@@ -886,7 +904,7 @@ nav#sitems li {
     }
 
     #prescont > #textcontent .verse{
-        font-size:400%;
+        font-size:350%;
     }
 
     #prescont > #textcontent .bibleverse {
@@ -900,7 +918,7 @@ nav#sitems li {
         margin-top: 1em;
         position: relative;
         /* display: inline-block; */
-        /* left: -50%; */
+        left: -20%;
         /* font-style: italic; */
     }
 

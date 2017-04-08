@@ -12,7 +12,8 @@
  *
  */
 function PresentationContainer(){
-    this.default = new MajakkaMessu(document);
+    var prestype = document.getElementById("messutype").textContent;
+    this.default = new StructuredPresentation(document, prestype);
     this.spontaneous =  new Presentation();
     this.current = 'default';
     this.secondbrowser = null;
@@ -49,12 +50,12 @@ function Presentation(){
      * The user is currently viewing a song in the "worship songs" -section. 
      *
      * That is, the chain is an array of this form:
-     * [{@link MajakkaMessu}, {@link Section}, {@link SectionItem}, {@link SongContent}]
+     * [{@link StructuredPresentation}, {@link Section}, {@link SectionItem}, {@link SongContent}]
      *
      * 1. The Song is an iterable content, that iterates throug verses
      * 2. The SectionItem is also iterable, it's the container of the song, consisting of the Songs's title slide and the song
      * 3. The Section is the "ylistyslaulut" section of the service, also iterable (consists of multiple SectionItems)
-     * 4. Finally, the MajakkaMessu item is also iterable, consisting of multiple sections
+     * 4. Finally, the StructuredPresentation item is also iterable, consisting of multiple sections
      *
      * So, when moving, the program needs to first move the lowest element in
      * the direction specified by the user. If the direction is "increment" and we come to the 
@@ -113,14 +114,51 @@ function Presentation(){
                 while (thisobject.hasOwnProperty('current')){
                     thisobject=thisobject.current;
                     this.chain.push(thisobject);
+                    if(thisobject==undefined){
+                        break;
+                    }
                 }
             }
             catch(error){
-                alert("Moro");
+                //alert("Moro");
                 console.log(error);
             }
     };
 
+
+    /**
+     *
+     * Fetches the names of people involved in the service
+     * Also sets the title.
+     *
+     * @param {DOM document}  doc - The document including the information about structure
+     *
+     * @property {string} title - The (sub)title of the service
+     *
+     */
+    this.GetCredits = function (doc){
+                this.title = doc.getElementById('messutitle').textContent;
+                this.maintitle = doc.getElementById('messuheader').textContent;
+                var vastuut = doc.getElementsByClassName("vastuudata");
+                var vastuulist = [];
+                //Save the credits to be referenced elswhere, too
+                this.credits = {};
+                for(var i=0;i<vastuut.length;i++){
+                    // Add a new songcontent object to the songs container object
+                    // todo: composer, writer
+                    var vastuu = vastuut[i];
+                    if(vastuu.id=='Sanailija'){
+                        vastuu.id = "Seurakuntalaisen sana";
+                    
+                    }
+                    if (vastuu.id !== 'Saarnateksti'){
+                        vastuulist.push(vastuu.id + ": " + vastuu.textContent);
+                        this.credits[vastuu.id] = vastuu.textContent;
+                    }
+                }
+
+                return vastuulist;
+    };
 
 
     /**
@@ -139,6 +177,10 @@ function Presentation(){
             if (structure.childNodes[i].nodeName!=="#text"){
                 //If the structure div contains tags
                 var role = structure.childNodes[i].getAttribute("role");
+                if(role==null || role=="Laulu"){
+                    //Simple songs without any specific role
+                    role = "song";
+                }
                 //ADD [here] a test for seeing whether allsongs actually contains something by this name
                 //...
                 // First, create an array if this is the first song if its type
@@ -360,7 +402,7 @@ function Presentation(){
  * @extends Presentation
  *
  */
-function MajakkaMessu(doc){
+function StructuredPresentation(doc, showtype){
     /** 
      *
      * Retrieves the names of the people involved in making this service from
@@ -369,74 +411,72 @@ function MajakkaMessu(doc){
      * @param {DOM document} doc - where to fetch the information about the credits. Either from the actual document, or a separate updater document (check {@link })
      *
      */
-    this.GetCredits = function (doc){
-                var vastuut = doc.getElementsByClassName("vastuudata");
-                var vastuulist = [];
-                //Save the credits to be referenced elswhere, too
-                this.credits = {};
-                for(var i=0;i<vastuut.length;i++){
-                    // Add a new songcontent object to the songs container object
-                    // todo: composer, writer
-                    var vastuu = vastuut[i];
-                    if(vastuu.id=='Sanailija'){
-                        vastuu.id = "Seurakuntalaisen sana";
-                    
-                    }
-                    if (vastuu.id !== 'Saarnateksti'){
-                        vastuulist.push(vastuu.id + ": " + vastuu.textContent);
-                        this.credits[vastuu.id] = vastuu.textContent;
-                    }
-                }
-                return vastuulist;
-            };
 
     this.GetSongs(doc);
-    this.showtype = "majakka";
-    //TODO: import this from structure html
-    this.title = document.getElementById('messutitle').textContent;
-    var credits1 = new CreditContent('', this.GetCredits(doc));
-    //TODO: make creating these sections simpler
-    //1. Collect all worship songs and make them into a section
-    var communionsongs = this.MultiSong("Ehtoollislauluja");
-    var lapsicredits = "Pyhistä vetää tänään " + this.credits["Pyhis"] + ", klubissa " + this.credits["Klubi"];
-    var info1 = new InfoContent('Lapsille ja lapsiperheille', ['Päivän laulun aikana 3-6-vuotiaat lapset voivat siirtyä pyhikseen ja yli 6-vuotiaat klubiin.', 'Seuraa vetäjiä - tunnistat heidät lyhdyistä!', lapsicredits]);
-    var ehtoollisinfo  = new InfoContent('Ehtoolliskäytännöistä', ['Voit tulla ehtoolliselle jo Jumalan karitsa -hymnin aikana', 'Halutessasi voit jättää kolehdin ehtoolliselle tullessasi oikealla olevaan koriin.']);
-    var evankeliumi = new BibleContent(document.getElementById('evankeliumi').getAttribute('address'), document.getElementById('evankeliumi').textContent );
+    this.showtype = showtype;
 
-    var rukouscredits = "Rukouspalvelijana tänään " + this.credits["Rukouspalvelu"] + ". ";
-    //TODO: Hae esirukoilijatieto autom.
-    var wsinfo  = new InfoContent('Ylistys- ja rukousosio', ['Ylistys- ja rukouslaulujen aikana voit kirjoittaa omia  rukousaiheitasi ja hiljentyä sivualttarin luona.', ' Rukouspalvelu hiljaisessa huoneessa. ' + rukouscredits]);
-    var worshipsongs = this.MultiSong("Ylistys- ja rukouslauluja", ['rukousinfo', wsinfo, 'info']);
-    worshipsongs.push(['Esirukous',false,'header']);
-    worshipsongs.unshift(['rukousinfo', wsinfo, 'info']);
+    if(showtype=="majakka"){
+        //TODO: import this from structure html
+        var credits1 = new CreditContent('', this.GetCredits(doc));
+        var evankeliumi = new BibleContent(document.getElementById('evankeliumi').getAttribute('address'), document.getElementById('evankeliumi').textContent );
+        //TODO: make creating these sections simpler
+        //1. Collect all worship songs and make them into a section
+        var communionsongs = this.MultiSong("Ehtoollislauluja");
+        var lapsicredits = "Pyhistä vetää tänään " + this.credits["Pyhis"] + ", klubissa " + this.credits["Klubi"];
+        var info1 = new InfoContent('Lapsille ja lapsiperheille', ['Päivän laulun aikana 3-6-vuotiaat lapset voivat siirtyä pyhikseen ja yli 6-vuotiaat klubiin.', 'Seuraa vetäjiä - tunnistat heidät lyhdyistä!', lapsicredits]);
+        var ehtoollisinfo  = new InfoContent('Ehtoolliskäytännöistä', ['Voit tulla ehtoolliselle jo Jumalan karitsa -hymnin aikana', 'Halutessasi voit jättää kolehdin ehtoolliselle tullessasi oikealla olevaan koriin.']);
+
+        var rukouscredits = "Rukouspalvelijana tänään " + this.credits["Rukouspalvelu"] + ". ";
+        //TODO: Hae esirukoilijatieto autom.
+        var wsinfo  = new InfoContent('Ylistys- ja rukousosio', ['Ylistys- ja rukouslaulujen aikana voit kirjoittaa omia  rukousaiheitasi ja hiljentyä sivualttarin luona.', ' Rukouspalvelu hiljaisessa huoneessa. ' + rukouscredits]);
+        var worshipsongs = this.MultiSong("Ylistys- ja rukouslauluja", ['rukousinfo', wsinfo, 'info']);
+        worshipsongs.push(['Esirukous',false,'header']);
+        worshipsongs.unshift(['rukousinfo', wsinfo, 'info']);
 
 
-    //2. Combine all the sections
-    this.items = [new Section(this, 'Johdanto',           [['Krediitit1',credits1,'info'],
-                                                          ['Alkulaulu',this.songs['Alkulaulu'][0],'song'],
-                                                          ['Alkusanat',false,'header'],
-                                                          ['Seurakuntalaisen sana',false,'header'],
-                                                          ['Pyhisinfo',info1,'info']
-                                                          ]),
-                  new Section(this, 'Sana',               [['Päivän laulu',this.songs['Päivän laulu'][0],'song'],
-                                                          ['Evankeliumi',evankeliumi,'header'],
-                                                          ['Saarna',false,'header'],
-                                                          ['Synnintunnustus',false,'header'],
-                                                          ['Uskontunnustus',new SongContent('', allsongs["uskontunnustus"].content),'song']]),
-                  new Section(this, 'Ylistys ja rukous', worshipsongs),
-                  new Section(this, 'Ehtoollisen asetus', [['Pyhä',this.songs['Pyhä-hymni'][0],'song'], 
-                                                          ['Ehtoollisrukous',false,'header'],
-                                                          ['Isä meidän',new SongContent('', allsongs["isä meidän"].content),'song'],
-                                                          ['Ehtoollisinfo', ehtoollisinfo, 'info'],
-                                                          ['Jumalan karitsa',this.songs['Jumalan karitsa'][0],'song']]),
-                  new Section(this, 'Ehtoollisen vietto',   communionsongs),
-                  new Section(this, 'Siunaus ja lähettäminen',  [['Herran siunaus',false,'heading'],
-                                                         ['Loppusanat',false,'heading'],
-                                                         ['Loppulaulu',this.songs['Loppulaulu'][0],'song']
-                                                          ])
-                    ];
-                      //TODO ^^ liittyen ehkä mieti, että näkyviin tulisi sanailijan nimi siihen,
-                      //missä tavallisesti laulun nimi. Muista myös ajatella laulun tekijänoikeuksia.
+        //2. Combine all the sections
+        this.items = [new Section(this, 'Johdanto',           [['Krediitit1',credits1,'info'],
+                                                              ['Alkulaulu',this.songs['Alkulaulu'][0],'song'],
+                                                              ['Alkusanat',false,'header'],
+                                                              ['Seurakuntalaisen sana',false,'header'],
+                                                              ['Pyhisinfo',info1,'info']
+                                                              ]),
+                      new Section(this, 'Sana',               [['Päivän laulu',this.songs['Päivän laulu'][0],'song'],
+                                                              ['Evankeliumi',evankeliumi,'header'],
+                                                              ['Saarna',false,'header'],
+                                                              ['Synnintunnustus',false,'header'],
+                                                              ['Uskontunnustus',new SongContent('', allsongs["uskontunnustus"].content),'song']]),
+                      new Section(this, 'Ylistys ja rukous', worshipsongs),
+                      new Section(this, 'Ehtoollisen asetus', [['Pyhä',this.songs['Pyhä-hymni'][0],'song'], 
+                                                              ['Ehtoollisrukous',false,'header'],
+                                                              ['Isä meidän',new SongContent('', allsongs["isä meidän"].content),'song'],
+                                                              ['Ehtoollisinfo', ehtoollisinfo, 'info'],
+                                                              ['Jumalan karitsa',this.songs['Jumalan karitsa'][0],'song']]),
+                      new Section(this, 'Ehtoollisen vietto',   communionsongs),
+                      new Section(this, 'Siunaus ja lähettäminen',  [['Herran siunaus',false,'heading'],
+                                                             ['Loppusanat',false,'heading'],
+                                                             ['Loppulaulu',this.songs['Loppulaulu'][0],'song']
+                                                              ])
+                        ];
+                          //TODO ^^ liittyen ehkä mieti, että näkyviin tulisi sanailijan nimi siihen,
+                          //missä tavallisesti laulun nimi. Muista myös ajatella laulun tekijänoikeuksia.
+    }
+    else if(showtype=="parkki"){
+        //In the simple case, just insert the songs directly as items
+        var ohjeet = ["1. Raahaa tämä ikkuna esitysnäyttöön (varmista ensin, ettei näyttöjä ole peilattu, vaan että projektori on oma näyttönsä ja tietokoneen näyttö omansa)",
+                       "2. Aseta tämä ikkuna koko näytön tilaan (useimmissa selaimissa F11-näppäin)",
+                       "3. Paina nuolta oikealle tai klikkaa jotakin alkuperäisessä ikkunassa näkyvistä laulujen nimistä, niin esitys käynnistyy",
+                       "4. Esityksessä liikutaan eteenpäin ja taaksepäin joko nuolinäppäimillä TAI sitten voit klikata laulujen nimiä ja niiden säkeistöjä"];
+        this.items = [new InfoContent('Ohjeita laulujen näyttämiseen', ohjeet, 'Ohjeet diojen näyttäjälle')];
+        for(idx in this.songs["song"]){
+            var thissong = this.songs["song"][[idx]];
+            thissong.items.unshift(thissong.titleslide.items[0]);
+            thissong.pointer.max += 1;
+            this.items.push(thissong);
+        }
+    }
+
+
     //mark the section idx for each of the sections TODO find a better way
     for(var sec_idx in this.items){
         this.items[sec_idx].sec_idx = sec_idx;
@@ -445,8 +485,8 @@ function MajakkaMessu(doc){
     this.GetContentChain();
 }
 
-MajakkaMessu.prototype = new Presentation();
-MajakkaMessu.prototype.constructor = MajakkaMessu;
+StructuredPresentation.prototype = new Presentation();
+StructuredPresentation.prototype.constructor = StructuredPresentation;
 
 
 /**
@@ -689,46 +729,60 @@ function Section(mypresentation, name, items, sec_idx){
  *
  **/
 function Mover(evt){
-    var sectiontarget = evt.target.getAttribute('sectionidx');
-    //The latter is for songs, speeches etc i.e. subitems of sections
-    var secitemtarget = evt.target.getAttribute('secitemidx');
+
+    //Change the active presentation 
     if (evt.target.parentNode.id=='addedcontent_sectionlist' & Presentations.current=='default'){
         SwitchToSpontaneous();
     }
     else if(evt.target.parentNode.id!='addedcontent_sectionlist' & Presentations.current!='default'){
         SwitchToDefault();
     }
-
-    //TODO: abstract this!
     var currentpres = Presentations[Presentations.current];
-    var targetcontent = undefined;
 
-    //TODO make this not specific to majakka presentations
+    //-------------
+    var targetcontent = undefined;
+    //Mark the parent section of the target
+    var sectiontarget = evt.target.getAttribute('sectionidx');
+
     currentpres.current = currentpres.items[sectiontarget];
     currentpres.pointer.started = true;
+    currentpres.pointer.position = parseInt(sectiontarget);
+
 
     if (currentpres.showtype == 'majakka'){
-                currentpres.pointer.position = parseInt(sectiontarget);
-                //TODO some more abstraction to this 
-                for (var section_idx in currentpres.items) {
-                    var thissection = currentpres.items[section_idx];
-                    if (section_idx < sectiontarget){
-                        AdjustPointersFromSectionDown(thissection, 'max', undefined);
-                    }
-                    else if (section_idx == sectiontarget){
-                        var targetcontent = AdjustPointersFromSectionDown(thissection, 'min', secitemtarget);
-                    }
-                    else if (section_idx > sectiontarget){
-                        AdjustPointersFromSectionDown(thissection, 'min', undefined);
-                    }
-                }
+        var secitemtarget = evt.target.getAttribute('secitemidx');
     }
-    else{
-        //If this is a flat presentations, just set the pointers right away
-        //TODO: songs
-        targetcontent = currentpres.current;
-        currentpres.pointer.position = secitemtarget;
+
+    for (var section_idx in currentpres.items) {
+        var thissection = currentpres.items[section_idx];
+        if (section_idx < sectiontarget){
+            if (currentpres.showtype=='majakka'){
+                AdjustPointersFromSectionDown(thissection, 'max', undefined);
+            }
+            else{
+                UpdatePointers(thissection, 'max');
+            }
+        }
+        else if (section_idx == sectiontarget){
+            if (currentpres.showtype=='majakka'){
+                var targetcontent = AdjustPointersFromSectionDown(thissection, 'min', secitemtarget);
+            }
+            else{
+                var targetcontent = thissection;
+                //Flate presentations: always reset the song to its beginning
+                UpdatePointers(thissection, 'min');
+            }
+        }
+        else if (section_idx > sectiontarget){
+            if (currentpres.showtype=='majakka'){
+                AdjustPointersFromSectionDown(thissection, 'min', undefined);
+            }
+            else{
+                UpdatePointers(thissection, 'min');
+            }
+        }
     }
+
     currentpres.GetContentChain();
     targetcontent.Show();
 }
@@ -749,8 +803,8 @@ function VerseMover(evt){
     var thispres = Presentations[Presentations.current];
     //Find the current song on display
     thispres.GetContentChain();
-    if(Presentations.current == 'spontaneous'){
-        //Songs in the spontaneous moed have no section titles
+    if(Presentations.current == 'spontaneous' || Presentations.default.showtype !== "majakka"){
+        //Songs in the spontaneous mode have no section titles
         var thissong = thispres.chain[thispres.chain.length-1];
     }
     else if (thispres.current.current.current.content_type=='sectiontitle'){
@@ -804,13 +858,13 @@ function ScreenContent(){
 
             switch (this.content_type){ 
                 case "song":
-                    PresScreen.UpdateContent('textcontent',this.items[this.pointer.position]);
+                    PresScreen.UpdateContent('textcontent',this.items[this.pointer.position],'song');
                     //Set what's seen in the navigator screen
                     break;
                 case "sectiontitle":
                     sitem = this.mysection.current;
-                    PresScreen.UpdateContent('sections',this.mysection.PrintSectionName());
-                    PresScreen.UpdateContent('sitems',this.mysection.CreateLeftbanner(this.mysection.pointer.position));
+                    PresScreen.UpdateContent('sections',this.mysection.PrintSectionName(),'headers');
+                    PresScreen.UpdateContent('sitems',this.mysection.CreateLeftbanner(this.mysection.pointer.position),'headers');
                     if (sitem.itemtype=='song'){
                         //Consider removing the itemtype prop!
                         //Insert the song's title as a content on the right of the screen
@@ -837,20 +891,23 @@ function ScreenContent(){
                     break;
                 case "info":
                     //Think about songtitles also as not part of a special sectioned service
-                    PresScreen.UpdateContent('infobox',this.items[this.pointer.position]);
+                    PresScreen.UpdateContent('infobox',this.items[this.pointer.position],'info');
                     break;
                 case "credits":
                     //Think about songtitles also as not part of a special sectioned service
-                    PresScreen.UpdateContent('creditbox',this.items[this.pointer.position]);
+                    PresScreen.UpdateContent('creditbox',this.items[this.pointer.position],'info');
+                    break;
+                case "bibletime":
+                    PresScreen.UpdateContent('textcontent',this.items[this.pointer.position],'bible');
                     break;
                 default:
-                    PresScreen.UpdateContent('textcontent',this.items[this.pointer.position]);
+                    PresScreen.UpdateContent('textcontent',this.items[this.pointer.position],'info');
                     break;
             }
             //Add or remove content from te navigator
             this.UpdatePreview();
             //Make sure the presentation is the screen that is currently visible
-            Presentations.screen.preswindow.focus();
+            //Presentations.screen.preswindow.focus();
 
             if(Presentations.screen.blankscreenactive){
                 //Make sure that the blank screen stays active if turned on
@@ -914,7 +971,7 @@ function ScreenContent(){
         //Remove existing (verse etc) content
         ClearContent(prevsec);
         //prevsec.appendChild(AddFunctionalitySection());
-        AddFunctionalitySection();
+        //AddFunctionalitySection();
         if(!this.hasOwnProperty("mysection")){
             var content_type = this.content_type;
         }
@@ -1279,29 +1336,63 @@ function CreateUid(){
  *
  **/
 function Screen(newwindow){
-    var thisdocument = newwindow.document;
-    this.preswindow = newwindow;
-    this.prescont = CreateTag("div", "prescont", thisdocument);
-    this.navwrapper = CreateTag("section", "navwrapper", thisdocument,"",this.prescont);
-    this.navcontainer = CreateTag("section", "navcontainer", thisdocument,"",this.navwrapper);
-    this.textcontent = CreateTag("div", "textcontent", thisdocument);
-    this.heading = CreateTag("nav", "heading", thisdocument);
-    this.infobox = CreateTag("div", "infobox", thisdocument);
-    this.creditbox = CreateTag("div", "creditbox", thisdocument);
-    var heading = CreateTag("h2", "", thisdocument, "",this.heading);
-    //TODO: Avoid the global variable!
-    heading.textContent = "Majakkamessu";
-    var subheading = CreateTag("h3", "", thisdocument, "",this.heading);
-    subheading.textContent = Presentations["default"].title;
-    this.sections = CreateTag("nav", "sections", thisdocument);
-    this.sitems = CreateTag("nav", "sitems", thisdocument);
-    this.itemtitle = CreateTag("div", "itemtitle", thisdocument);
-    this.doc = thisdocument;
-    this.blankscreenactive = false;
 
-    //For the navigation window
-    this.sectionlinks = CreateTag("div", "sectionlinks", thisdocument);
-    thisdocument.body.appendChild(this.prescont);
+    /**
+     *
+     * Use the structure-containing html document to retrieve information
+     * about styles the user has chosen
+     *
+     */
+    this.GetStyles = function(){
+        this.backgrounds = {"headers":{"url":"images/pp_logo_400.png","position":"top right"},
+                            "info":{"url":"images/pp_logo_400.png","position":"top right"},
+                            "song":{"url":"images/pp-stripe_1800.png","position":"top left"},
+                            "bible":{"url":"images/sulka_300.png","position":"bottom right"}};
+    }
+
+    /**
+     *
+     * Applies presentation specific styles, such as the background of the show
+     * etc.
+     *
+     * @param {string} styletype - Whether the screen will contain lyrics, info etc..
+     *
+     **/
+    this.SetStyles = function(styletype){
+        //background: url('images/lh_2.png') no-repeat center center fixed;
+        this.doc.body.style.color="black";
+        this.prescont.style.backgroundImage = "url('" +  this.backgrounds[styletype].url + "')";
+        this.prescont.style.backgroundPosition = this.backgrounds[styletype].position;
+        this.prescont.style.backgroundSize = "auto";
+        this.prescont.style.backgroundSize = "inherit";
+        if(styletype=="song"){
+            this.prescont.style.paddingTop = "156px";
+        }
+        else{
+            this.prescont.style.paddingTop = "0px";
+        }
+
+        if(this.backgrounds[styletype].url.indexOf("pp_logo_400")>-1){
+            //this.prescont.style.backgroundPosition = this.backgrounds[styletype].position;
+
+            //Determine maximum size for background
+            
+            //1. Determine, which element present
+            var possibleboxes = [this.sitems, this.creditbox, this.infobox];
+            for(i=0; i<possibleboxes.length;i++){
+                var thisbox = possibleboxes[i];
+                var rect = thisbox.getBoundingClientRect();
+                if(rect.right>0){
+                    break;
+                }
+            }
+            var spaceforlogo = this.doc.body.offsetWidth-rect.right;
+            if (spaceforlogo < 410){
+                this.prescont.style.backgroundSize = (spaceforlogo - 10) + "px " + (spaceforlogo - 10) + "px";
+            }
+            //commentdiv.style.top = rect.top + 5 + "px";
+        }
+    }
 
     /**
      *
@@ -1330,7 +1421,7 @@ function Screen(newwindow){
      * @param {html DOM object} contentitem - the content to be shown. This can be a verse, the text of an info slide etc. The elements are HTML nodes.
      *
      **/
-    this.UpdateContent = function(divname, contentitem){
+    this.UpdateContent = function(divname, contentitem, styletype){
         this[divname].appendChild(contentitem);
         if(divname != "textcontent"){
             //upadting the navigation
@@ -1352,7 +1443,44 @@ function Screen(newwindow){
         else{
             this.prescont.appendChild(this[divname]);
         }
+        this.SetStyles(styletype);
     }
+
+
+
+    var thisdocument = newwindow.document;
+    this.preswindow = newwindow;
+
+    this.bgdiv = CreateTag("div", "bgdiv", thisdocument);
+
+    this.prescont = CreateTag("div", "prescont", thisdocument);
+    this.navwrapper = CreateTag("section", "navwrapper", thisdocument,"",this.prescont);
+    this.navcontainer = CreateTag("section", "navcontainer", thisdocument,"",this.navwrapper);
+    this.textcontent = CreateTag("div", "textcontent", thisdocument);
+    this.heading = CreateTag("nav", "heading", thisdocument);
+    this.infobox = CreateTag("div", "infobox", thisdocument);
+    this.creditbox = CreateTag("div", "creditbox", thisdocument);
+
+    var heading = CreateTag("h2", "", thisdocument, "",this.heading);
+    heading.textContent = Presentations.default.maintitle;
+    var subheading = CreateTag("h3", "", thisdocument, "",this.heading);
+    subheading.textContent = Presentations.default.title;
+
+    this.sections = CreateTag("nav", "sections", thisdocument);
+    this.sitems = CreateTag("nav", "sitems", thisdocument);
+    this.itemtitle = CreateTag("div", "itemtitle", thisdocument);
+    this.doc = thisdocument;
+    this.blankscreenactive = false;
+
+    //For the navigation window
+    this.sectionlinks = CreateTag("div", "sectionlinks", thisdocument);
+
+    thisdocument.body.appendChild(this.bgdiv);
+    thisdocument.body.appendChild(this.prescont);
+
+    this.GetStyles();
+    this.SetStyles("headers");
+
 }
 
 function UpdatePointers(item, updatetype){
@@ -1436,12 +1564,14 @@ function ClosePres(pres){
 
 function OpenPres(pres){
     preswindow = window.open('','_blank', 'toolbar=0,location=0,menubar=0');
-    preswindow.document.write('<html lang="fi" style="background:black;" ><head><link href="https://fonts.googleapis.com/css?family=Nothing+You+Could+Do|Quicksand" rel="stylesheet"> <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"><link id="stylesetter" rel="stylesheet" type="text/css" href="tyylit2.css"/></head><body></body>');
+    preswindow.document.write('<html lang="fi" style="background:black;" ><head><link href="https://fonts.googleapis.com/css?family=Nothing+You+Could+Do|Quicksand" rel="stylesheet"> <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"><link id="stylesetter" rel="stylesheet" type="text/css" href="styles.css?id=asdasd98798"/></head><body></body>');
     ClearContent(preswindow.document.body);
     ////TODO:this is the key to make separate screen working!
     Presentations.screen = new Screen(preswindow);
     preswindow.onkeydown = checkKey;
     document.onkeydown = checkKey;
+    //Move to the first actual slide
+    Presentations.default.Move('increment');
 }
 
 
@@ -1472,10 +1602,10 @@ function SwitchToSpontaneous(){
 function ApplyStyles(){
     var stylesetter = Presentations.screen.preswindow.document.getElementById("stylesetter");
     if (stylesetter.href!=='tyylit.css'){
-        stylesetter.href = "tyylit2.css";
+        stylesetter.href = "styles.css";
     }
     else{
-        stylesetter.href = "tyylit2.css";
+        stylesetter.href = "styles.css";
     }
 
 }
@@ -1647,7 +1777,7 @@ function GetUpdatedStructure(){
     var newdoc = document.getElementById('updaterframe').contentWindow.document;
     //Update the list of songs...
     allsongs = GetSongs(newdoc);
-    Presentations.default = new MajakkaMessu(newdoc);
+    Presentations.default = new StructuredPresentation(newdoc, "majakka");
     Presentations.default.GetContentChain();
     //Remove the old navigation elements
     ClearContent(document.getElementById("section_nav"));
