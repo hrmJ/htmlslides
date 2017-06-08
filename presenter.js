@@ -151,7 +151,8 @@ function Presentation(){
                         vastuu.id = "Seurakuntalaisen sana";
                     
                     }
-                    if (vastuu.id !== 'Saarnateksti' && vastuu.textContent !== "" && vastuu.textContent !== " "){
+                    //if (vastuu.id !== 'Saarnateksti' && vastuu.textContent !== "" && vastuu.textContent !== " "){
+                    if (vastuu.id !== 'Saarnateksti'){
                         vastuulist.push(vastuu.id + ": " + vastuu.textContent);
                         this.credits[vastuu.id] = vastuu.textContent;
                     }
@@ -1158,9 +1159,12 @@ function CreditContent(headertext, infotext, content_name){
     var body = document.createElement('ul');
     body.className = "infolist";
     for (var info_id in infotext){
-        var this_li = document.createElement('li');
-        this_li.textContent = infotext[info_id];
-        body.appendChild(this_li);
+        if(info_id.trim() !==""){
+            // Jos asetettu
+            var this_li = document.createElement('li');
+            this_li.textContent = infotext[info_id];
+            body.appendChild(this_li);
+        }
     }
 
     div.className='creditcontent';
