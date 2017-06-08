@@ -12,6 +12,12 @@ body {
 }
 
 
+#timerdiv{
+    font-size: 320%;
+    font-family:'Quicksand';
+    color:white;
+}
+
 #structure,#evankeliumi,#vastuut,#songs,#messutitle, #messuheader, #messutype{
     display: block;
     line-height:0;

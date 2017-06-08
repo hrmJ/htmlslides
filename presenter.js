@@ -151,7 +151,7 @@ function Presentation(){
                         vastuu.id = "Seurakuntalaisen sana";
                     
                     }
-                    if (vastuu.id !== 'Saarnateksti'){
+                    if (vastuu.id !== 'Saarnateksti' && vastuu.textContent !== "" && vastuu.textContent !== " "){
                         vastuulist.push(vastuu.id + ": " + vastuu.textContent);
                         this.credits[vastuu.id] = vastuu.textContent;
                     }
@@ -422,25 +422,32 @@ function StructuredPresentation(doc, showtype){
         //TODO: make creating these sections simpler
         //1. Collect all worship songs and make them into a section
         var communionsongs = this.MultiSong("Ehtoollislauluja");
-        var lapsicredits = "Pyhistä vetää tänään " + this.credits["Pyhis"] + ", klubissa " + this.credits["Klubi"];
-        var info1 = new InfoContent('Lapsille ja lapsiperheille', ['Päivän laulun aikana 3-6-vuotiaat lapset voivat siirtyä pyhikseen ja yli 6-vuotiaat klubiin.', 'Seuraa vetäjiä - tunnistat heidät lyhdyistä!', lapsicredits]);
-        var ehtoollisinfo  = new InfoContent('Ehtoolliskäytännöistä', ['Voit tulla ehtoolliselle jo Jumalan karitsa -hymnin aikana', 'Halutessasi voit jättää kolehdin ehtoolliselle tullessasi oikealla olevaan koriin.']);
+        var ehtoollisinfo  = new InfoContent('Ehtoolliskäytännöistä', ['Voit tulla ehtoolliselle jo Jumalan karitsa -hymnin aikana', 
+                                                                       'Halutessasi voit jättää kolehdin ehtoolliselle tullessasi oikealla olevaan koriin.',
+                                                                       'Ehtoollisavustajana tänään ' + this.credits["Ehtoollisavustaja"]]);
 
         var rukouscredits = "Rukouspalvelijana tänään " + this.credits["Rukouspalvelu"] + ". ";
         //TODO: Hae esirukoilijatieto autom.
         var wsinfo  = new InfoContent('Ylistys- ja rukousosio', ['Ylistys- ja rukouslaulujen aikana voit kirjoittaa omia  rukousaiheitasi ja hiljentyä sivualttarin luona.', ' Rukouspalvelu hiljaisessa huoneessa. ' + rukouscredits]);
-        var worshipsongs = this.MultiSong("Ylistys- ja rukouslauluja", ['rukousinfo', wsinfo, 'info']);
+        //var worshipsongs = this.MultiSong("Ylistys- ja rukouslauluja", ['rukousinfo', wsinfo, 'info']);
+        var worshipsongs = this.MultiSong("Ylistys- ja rukouslauluja", wsinfo);
         worshipsongs.push(['Esirukous',false,'header']);
         worshipsongs.unshift(['rukousinfo', wsinfo, 'info']);
 
+        var johdanto = [['Krediitit1',credits1,'info'], ['Alkulaulu',this.songs['Alkulaulu'][0],'song'], ['Alkusanat',false,'header'], ['Seurakuntalaisen sana',false,'header']]
+
+        this.credits["Pyhis"] = this.credits["Pyhis"].replace(" ","");
+        if(this.credits["Pyhis"].toLowerCase()!=="ei"){
+            //Jos on pyhis, lisää siitä infot
+            var lapsicredits = "Pyhistä vetää tänään " + this.credits["Pyhis"] + ", klubissa " + this.credits["Klubi"];
+            var info1 = new InfoContent('Lapsille ja lapsiperheille', ['Päivän laulun aikana 3-6-vuotiaat lapset voivat siirtyä pyhikseen ja yli 6-vuotiaat klubiin.', 'Seuraa vetäjiä - tunnistat heidät lyhdyistä!', lapsicredits]);
+            johdanto.push(['Pyhisinfo',info1,'info']);
+        }
+
+
 
         //2. Combine all the sections
-        this.items = [new Section(this, 'Johdanto',           [['Krediitit1',credits1,'info'],
-                                                              ['Alkulaulu',this.songs['Alkulaulu'][0],'song'],
-                                                              ['Alkusanat',false,'header'],
-                                                              ['Seurakuntalaisen sana',false,'header'],
-                                                              ['Pyhisinfo',info1,'info']
-                                                              ]),
+        this.items = [new Section(this, 'Johdanto', johdanto),
                       new Section(this, 'Sana',               [['Päivän laulu',this.songs['Päivän laulu'][0],'song'],
                                                               ['Evankeliumi',evankeliumi,'header'],
                                                               ['Saarna',false,'header'],
@@ -871,7 +878,6 @@ function ScreenContent(){
                         //Songs as sectionitems are always of the format:
                         //[sectiiontitle, song]
                         //this is why items[1]
-                        //PresScreen.UpdateContent('itemtitle',sitem.items[1].titleslide.items[0]);
                         //TODO: lyrics by, music by...
                     }
                     //Adjust the Section headings to the center
@@ -1344,10 +1350,16 @@ function Screen(newwindow){
      *
      */
     this.GetStyles = function(){
-        this.backgrounds = {"headers":{"url":"images/pp_logo_400.png","position":"top right"},
-                            "info":{"url":"images/pp_logo_400.png","position":"top right"},
-                            "song":{"url":"images/pp-stripe_1800.png","position":"top left"},
-                            "bible":{"url":"images/sulka_300.png","position":"bottom right"}};
+        //this.backgrounds = {"headers":{"url":"images/pp_logo_400.png","position":"top right"},
+        //                    "info":{"url":"images/pp_logo_400.png","position":"top right"},
+        //                    "song":{"url":"images/pp-stripe_1800.png","position":"top left"},
+        //                    "bible":{"url":"images/sulka_300.png","position":"bottom right"}};
+        var imgurl ="images/lh_2.png";
+        //var imgurl ="images/lh_2_dark.png";
+        this.backgrounds = {"headers":{"url":imgurl,"position":"center center fixed"},
+                            "info":{"url":imgurl,"position":"center center fixed"},
+                            "song":{"url":imgurl,"position":"center center fixed"},
+                            "bible":{"url":imgurl,"position":"center center fixed"}};
     }
 
     /**
@@ -1361,12 +1373,18 @@ function Screen(newwindow){
     this.SetStyles = function(styletype){
         //background: url('images/lh_2.png') no-repeat center center fixed;
         this.doc.body.style.color="black";
-        this.prescont.style.backgroundImage = "url('" +  this.backgrounds[styletype].url + "')";
+        var bbsetter = document.getElementById("useblackbg");
+        if (bbsetter.checked==true){
+            this.prescont.style.backgroundImage = "none";
+        }
+        else{
+            this.prescont.style.backgroundImage = "url('" +  this.backgrounds[styletype].url + "')";
+        }
         this.prescont.style.backgroundPosition = this.backgrounds[styletype].position;
         this.prescont.style.backgroundSize = "auto";
         this.prescont.style.backgroundSize = "inherit";
         if(styletype=="song"){
-            this.prescont.style.paddingTop = "156px";
+            //this.prescont.style.paddingTop = "156px";
         }
         else{
             this.prescont.style.paddingTop = "0px";
@@ -1564,14 +1582,14 @@ function ClosePres(pres){
 
 function OpenPres(pres){
     preswindow = window.open('','_blank', 'toolbar=0,location=0,menubar=0');
-    preswindow.document.write('<html lang="fi" style="background:black;" ><head><link href="https://fonts.googleapis.com/css?family=Nothing+You+Could+Do|Quicksand" rel="stylesheet"> <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"><link id="stylesetter" rel="stylesheet" type="text/css" href="styles.css?id=asdasd98798"/></head><body></body>');
+    preswindow.document.write('<html lang="fi" style="background:black;" ><head><link href="https://fonts.googleapis.com/css?family=Nothing+You+Could+Do|Quicksand" rel="stylesheet"> <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"><link id="stylesetter" rel="stylesheet" type="text/css" href="tyylit2.css?id=assdsd22sdsd22dasd98798"/></head><body></body>');
     ClearContent(preswindow.document.body);
     ////TODO:this is the key to make separate screen working!
     Presentations.screen = new Screen(preswindow);
     preswindow.onkeydown = checkKey;
     document.onkeydown = checkKey;
     //Move to the first actual slide
-    Presentations.default.Move('increment');
+    //Presentations.default.Move('increment');
 }
 
 
@@ -1601,11 +1619,11 @@ function SwitchToSpontaneous(){
 
 function ApplyStyles(){
     var stylesetter = Presentations.screen.preswindow.document.getElementById("stylesetter");
-    if (stylesetter.href!=='tyylit.css'){
-        stylesetter.href = "styles.css";
+    if (stylesetter.href!=='tyylit.css?id=2e2e'){
+        stylesetter.href = "tyylit2.css?id=2e2e";
     }
     else{
-        stylesetter.href = "styles.css";
+        stylesetter.href = "tyylit2.css?id=2e2e";
     }
 
 }
@@ -1673,6 +1691,26 @@ function AddFunctionalitySection(){
     bslink.addEventListener('click', AddSecondBrowser, false);
     var browsersec = TagParent("section",[bsurl, bslink, TagWithText("p","(palaa esitykseen klikkaamalla mitä tahansa otsikkoa)")],"functionalsection","browsersec");
 
+    var blackbox = TagWithText("input","Käytä täysin mustaa taustaa","");
+    blackbox.id="useblackbg";
+    blackbox.type="checkbox";
+    var bbsec = TagParent("section",[blackbox,TagWithText("span","Kätä täysin mustaa taustaa")],"functionalsection","bbsec");
+
+    var timerbox = TagWithText("input","","");
+    timerbox.id="timerval";
+    timerbox.type="text";
+    var timerbut = TagWithText("button","Aloita ajastin","");
+    timerbut.id="timerbut";
+    timerbut.addEventListener('click', ControlTimer, false);
+    var timerbut2 = TagWithText("button","Nollaa ajastin","");
+    timerbut2.id="timerreset";
+    timerbut2.addEventListener('click', ResetTimer, false);
+
+    var timerlink = TagWithText("a","Lisää","");
+    timerlink.addEventListener('click', AddTimer, false);
+    var timersec = TagParent("section",[TagWithText("span","Ajastin"),timerbox,timerbut,timerbut2,timerlink],"functionalsection","timersec");
+
+
     //var blink = TagWithText("a","Blank screen");
     //var utilities = TagParent("section",[blink],"functionalsection","utsection");
     //utilities.addEventListener('click', BlankScreen, false);
@@ -1709,7 +1747,7 @@ function AddFunctionalitySection(){
     biblenavi.id = 'biblenavi';
     document.body.appendChild(biblenavi);
 
-    var hiddenfunctions = TagParent("section",[textcontsec, songcontsec, bibcontsec, embcontsec, browsersec],"functions_section");
+    var hiddenfunctions = TagParent("section",[textcontsec, songcontsec, bibcontsec, embcontsec, browsersec, bbsec, timersec],"functions_section");
     hiddenfunctions.id = "hiddenfunctions";
     document.getElementById("functionalmenu").appendChild(hiddenfunctions);
     //return TagParent("section",[utilities],"functions_section");
@@ -1870,6 +1908,16 @@ function AddSongSlide(){
     song.items.unshift(div);
     SetPointers(song,false);
     Presentations.spontaneous.AddContent(song);
+}
+
+function AddTimer(){
+    var sp1 = TagWithText("span","00","");
+    sp1.id = "min";
+    var sp2 = TagWithText("span","00","");
+    sp2.id = "sec";
+    var timerdiv = TagParent("div",[sp1,TagWithText("span",":",""),sp2]);
+    timerdiv.id="timerdiv";
+    Presentations.spontaneous.AddContent(new EmbeddedContent(timerdiv, "Ajastin"));
 }
 
 function AddTextSlide(){
@@ -2142,6 +2190,57 @@ function UpdateStructure(){
     checkUpdaterframeLoaded();
 }
 
+
+function ResetTimer(evt){
+    document.getElementById("timerbut").textContent = "Aloita ajastin";
+    document.getElementById("timerval").value = "0";
+}
+
+function ControlTimer(evt){
+        switch(evt.target.textContent){
+            case "Aloita ajastin":
+                var val = document.getElementById('timerval');
+                timer = new Clock(val.value * 1);
+                timer.start();
+            case "Jatka ajastinta":
+                evt.target.textContent = "Pysäytä ajastin";
+                timer.resume();
+                break;
+            case "Pysäytä ajastin":
+                evt.target.textContent = "Jatka ajastinta";
+                timer.pause();
+                break;
+        }
+}
+
+Clock = function (mins){
+    this.totalSeconds = mins * 60;
+    this.start = function(){
+            var self = this;
+            var min = Presentations.screen.doc.getElementById('min');
+            var sec = Presentations.screen.doc.getElementById('sec');
+            min.textContent = Math.floor(self.totalSeconds / 60 % 60);
+            sec.textContent = parseInt(self.totalSeconds % 60);
+            this.interval = setInterval(function(){
+                self.totalSeconds-=1;
+                if(self.totalSeconds>-1){
+                    var min = Presentations.screen.doc.getElementById('min');
+                    var sec = Presentations.screen.doc.getElementById('sec');
+                    min.textContent = Math.floor(self.totalSeconds / 60 % 60);
+                    sec.textContent = parseInt(self.totalSeconds % 60);
+                }
+                }, 1000);
+    } 
+
+    this.pause = function () {
+        clearInterval(this.interval);
+        delete this.interval;
+    }
+
+    this.resume = function () {
+        if (!this.interval) this.start();
+    }
+}
 
 //========================================
 
