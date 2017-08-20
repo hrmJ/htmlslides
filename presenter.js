@@ -377,7 +377,7 @@ function Presentation(){
             if(constantinfo!==undefined){
                 if (songidx < this.songs[songrole].length -1 ){
                     //Don't add the info after the last song
-                    songs.push(constantinfo);
+                    songs.push(['infodia', constantinfo, 'info']);
                 }
             }
             wscounter++;
