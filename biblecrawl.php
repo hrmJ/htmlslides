@@ -54,10 +54,15 @@ function FetchBibleContent($chapteraddress, $verseaddress,$onbackground){
         return "Raamatuntekstiä ei löytynyt. Sori siitä! (niin kuin sanonta kuuluu).";
     }
     $pageDom = GetHtml("http://raamattu.fi/1992/" . $chapteraddress . ".html");
+    //$pageDom = GetHtml("luuk4.html");
     $headertexts = GetHeaders($pageDom);
     foreach ($pageDom->childNodes as $item){
         $text = $item->textContent;
         //FIX!^^
+    }
+
+    foreach($headertexts as $ht){
+        $text = str_replace($ht,"",$text);
     }
 
     $textcont="";
@@ -69,10 +74,16 @@ function FetchBibleContent($chapteraddress, $verseaddress,$onbackground){
 
     $currentverse=0;
     $verses = Array();
-    foreach(preg_split("/((\r?\n)|(\r\n?))/", $textcont) as $line){
+    $lines = preg_split("/((\r?\n)|(\r\n?))/", $textcont);
+    foreach($lines as $line){
         $wantednum = ($currentverse + 1);
         $matchbeginning = "/(.*)\\b($wantednum)(\\s+)(.*)/u";
         preg_match($matchbeginning, trim($line), $groups);
+        if(sizeof($groups)==0){
+            //Jos ei löytynyt säenumeroa, joka on sanarajalla, etsi vielä sellaista, joka on minkä tahansa ei-numeron perässä
+            $matchbeginning = "/(.*)[^\\d]($wantednum)(\\s+)(.*)/u";
+            preg_match($matchbeginning, trim($line), $groups);
+        }
         while(sizeof($groups)>0){
             #Jos jaesisältöä löytyi
             $currentverse++;
@@ -122,6 +133,7 @@ function FetchBibleContent($chapteraddress, $verseaddress,$onbackground){
 if(!isset($embed)){
 
     $selectedverses = FetchBibleContent($_GET["chap"], $_GET["verses"]);
+    //$selectedverses = FetchBibleContent("Luuk.4","");
 
     ?>
 
