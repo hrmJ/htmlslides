@@ -1354,12 +1354,12 @@ function Screen(newwindow){
      *
      */
     this.GetStyles = function(){
-        //this.backgrounds = {"headers":{"url":"images/pp_logo_400.png","position":"top right"},
-        //                    "info":{"url":"images/pp_logo_400.png","position":"top right"},
-        //                    "song":{"url":"images/pp-stripe_1800.png","position":"top left"},
-        //                    "bible":{"url":"images/sulka_300.png","position":"bottom right"}};
-        var imgurl ="images/lh_2.png";
-        //var imgurl ="images/lh_2_dark.png";
+        //this.backgrounds = {"headers":{"url":"htmlslides/images/pp_logo_400.png","position":"top right"},
+        //                    "info":{"url":"htmlslides/images/pp_logo_400.png","position":"top right"},
+        //                    "song":{"url":"htmlslides/images/pp-stripe_1800.png","position":"top left"},
+        //                    "bible":{"url":"htmlslides/images/sulka_300.png","position":"bottom right"}};
+        var imgurl ="htmlslides/images/lh_2.png";
+        //var imgurl ="htmlslides/images/lh_2_dark.png";
         this.backgrounds = {"headers":{"url":imgurl,"position":"center center fixed"},
                             "info":{"url":imgurl,"position":"center center fixed"},
                             "song":{"url":imgurl,"position":"center center fixed"},
@@ -1375,7 +1375,7 @@ function Screen(newwindow){
      *
      **/
     this.SetStyles = function(styletype){
-        //background: url('images/lh_2.png') no-repeat center center fixed;
+        //background: url('htmlslides/images/lh_2.png') no-repeat center center fixed;
         this.doc.body.style.color="black";
         var bbsetter = document.getElementById("useblackbg");
         if (bbsetter.checked==true){
@@ -1586,7 +1586,7 @@ function ClosePres(pres){
 
 function OpenPres(pres){
     preswindow = window.open('','_blank', 'toolbar=0,location=0,menubar=0');
-    preswindow.document.write('<html lang="fi" style="background:black;" ><head><link href="https://fonts.googleapis.com/css?family=Nothing+You+Could+Do|Quicksand" rel="stylesheet"> <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"><link id="stylesetter" rel="stylesheet" type="text/css" href="tyylit2.css?id=assdsd22sdsd22dasd98798"/></head><body></body>');
+    preswindow.document.write('<html lang="fi" style="background:black;" ><head><link href="https://fonts.googleapis.com/css?family=Nothing+You+Could+Do|Quicksand" rel="stylesheet"> <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"><link id="stylesetter" rel="stylesheet" type="text/css" href="htmlslides/tyylit2.css?id=assdsd22sdsd22dasd98798"/></head><body></body>');
     ClearContent(preswindow.document.body);
     ////TODO:this is the key to make separate screen working!
     Presentations.screen = new Screen(preswindow);
@@ -1623,11 +1623,11 @@ function SwitchToSpontaneous(){
 
 function ApplyStyles(){
     var stylesetter = Presentations.screen.preswindow.document.getElementById("stylesetter");
-    if (stylesetter.href!=='tyylit.css?id=2e2e'){
-        stylesetter.href = "tyylit2.css?id=2e2e";
+    if (stylesetter.href!=='htmlslides/tyylit.css?id=2e2e'){
+        stylesetter.href = "htmlslides/tyylit2.css?id=2e2e";
     }
     else{
-        stylesetter.href = "tyylit2.css?id=2e2e";
+        stylesetter.href = "htmlslides/tyylit2.css?id=2e2e";
     }
 
 }
