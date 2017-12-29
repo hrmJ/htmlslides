@@ -384,6 +384,13 @@ function Presentation(){
         }
         return songs
     }
+
+    this.CreateKolehtiSlide = function(){
+    
+        this.kolehtislide =  new InfoContent('Tämän viikon kolehtikohde', ['Voit tulla ehtoolliselle jo Jumalan karitsa -hymnin aikana', 
+                                                                       'Halutessasi voit jättää kolehdin ehtoolliselle tullessasi oikealla olevaan koriin.']);
+    }
+
 }
 
 /**
@@ -445,7 +452,8 @@ function StructuredPresentation(doc, showtype){
             johdanto.push(['Pyhisinfo',info1,'info']);
         }
 
-
+        this.CreateKolehtiSlide();
+        var self = this;
 
         //2. Combine all the sections
         this.items = [new Section(this, 'Johdanto', johdanto),
@@ -455,7 +463,8 @@ function StructuredPresentation(doc, showtype){
                                                               ['Synnintunnustus',false,'header'],
                                                               ['Uskontunnustus',new SongContent('', allsongs["uskontunnustus"].content),'song']]),
                       new Section(this, 'Ylistys ja rukous', worshipsongs),
-                      new Section(this, 'Ehtoollisen asetus', [['Pyhä',this.songs['Pyhä-hymni'][0],'song'], 
+                      new Section(this, 'Ehtoollisen asetus', [['Ehtoollisrukous2',self.kolehtislide,'info'],
+                                                              ['Pyhä',this.songs['Pyhä-hymni'][0],'song'], 
                                                               ['Ehtoollisrukous',false,'header'],
                                                               ['Isä meidän',new SongContent('', allsongs["isä meidän"].content),'song'],
                                                               ['Ehtoollisinfo', ehtoollisinfo, 'info'],
@@ -491,6 +500,7 @@ function StructuredPresentation(doc, showtype){
     }
     SetPointers(this, true);
     this.GetContentChain();
+
 }
 
 StructuredPresentation.prototype = new Presentation();
