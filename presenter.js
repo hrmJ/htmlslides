@@ -386,9 +386,9 @@ function Presentation(){
     }
 
     this.CreateKolehtiSlide = function(){
-    
-        this.kolehtislide =  new InfoContent('Tämän viikon kolehtikohde', ['Voit tulla ehtoolliselle jo Jumalan karitsa -hymnin aikana', 
-                                                                       'Halutessasi voit jättää kolehdin ehtoolliselle tullessasi oikealla olevaan koriin.']);
+        this.kolehtislide =  new InfoContent(`Tämän viikon kolehtikohde : ${this.kolehtidata.kolehtikohde}`, 
+            [`Tavoitteenamme on ${this.kolehtidata.kolehtitavoite} 
+                (yhteensä ${this.kolehtidata.tavoitemaara})`]);
     }
 
 }
@@ -427,6 +427,17 @@ function StructuredPresentation(doc, showtype){
         //TODO: import this from structure html
         var credits1 = new CreditContent('', this.GetCredits(doc));
         var evankeliumi = new BibleContent(document.getElementById('evankeliumi').getAttribute('address'), document.getElementById('evankeliumi').textContent );
+
+        //Haetaan tiedot kolehdin ilmoittamista varten
+        var kolehti_params = document.querySelectorAll("#kolehti span");
+        var kolehtidata = {};
+        this.kolehtidata = {};
+        for(i=0;i<kolehti_params.length;i++){
+            this.kolehtidata[kolehti_params[i].className] = kolehti_params[i].textContent;
+        }
+
+        this.CreateKolehtiSlide();
+
         //TODO: make creating these sections simpler
         //1. Collect all worship songs and make them into a section
         var communionsongs = this.MultiSong("Ehtoollislauluja");
@@ -452,7 +463,6 @@ function StructuredPresentation(doc, showtype){
             johdanto.push(['Pyhisinfo',info1,'info']);
         }
 
-        this.CreateKolehtiSlide();
         var self = this;
 
         //2. Combine all the sections
@@ -463,7 +473,7 @@ function StructuredPresentation(doc, showtype){
                                                               ['Synnintunnustus',false,'header'],
                                                               ['Uskontunnustus',new SongContent('', allsongs["uskontunnustus"].content),'song']]),
                       new Section(this, 'Ylistys ja rukous', worshipsongs),
-                      new Section(this, 'Ehtoollisen asetus', [['Ehtoollisrukous2',self.kolehtislide,'info'],
+                      new Section(this, 'Ehtoollisen asetus', [['Kolehtidia',self.kolehtislide,'info'],
                                                               ['Pyhä',this.songs['Pyhä-hymni'][0],'song'], 
                                                               ['Ehtoollisrukous',false,'header'],
                                                               ['Isä meidän',new SongContent('', allsongs["isä meidän"].content),'song'],
