@@ -387,8 +387,49 @@ function Presentation(){
 
     this.CreateKolehtiSlide = function(){
         this.kolehtislide =  new InfoContent(`Tämän viikon kolehtikohde : ${this.kolehtidata.kolehtikohde}`, 
-            [`Tavoitteenamme on ${this.kolehtidata.kolehtitavoite} 
-                (yhteensä ${this.kolehtidata.tavoitemaara})`]);
+            [`Tämänhetkinen tavoite on ${this.kolehtidata.kolehtitavoite}, 
+                ja tähän tarkoitukseen on toistaiseksi
+                kerätty ${this.kolehtidata.kerattymaara} euroa. Puuttuu siis vielä ${this.kolehtidata.tavoitemaara - this.kolehtidata.kerattymaara} euroa.`]);
+        var supercontainer = document.createElement("div");
+        var barcontainer = document.createElement("div");
+        barcontainer.className = "barcontainer";
+        var bar = document.createElement("div");
+        bar.className = "bar_inside";
+        bar.style.width = (this.kolehtidata.kerattymaara*1 / this.kolehtidata.tavoitemaara*1) * 100 + "%";
+        barcontainer.appendChild(bar);
+        var margincontainer = document.createElement("div");
+        margincontainer.className = "margincontainer";
+        var zero = document.createElement("div");
+        zero.textContent = "0€";
+        var max = document.createElement("max");
+        max.textContent = this.kolehtidata.tavoitemaara + "€";
+        margincontainer.appendChild(zero);
+        margincontainer.appendChild(max);
+
+        supercontainer.appendChild(barcontainer);
+        supercontainer.appendChild(margincontainer);
+
+        this.kolehtislide.items[0].appendChild(supercontainer);
+
+        //Tarkempi kuvaus omaksi diakseen
+
+        this.kolehtislide_kuvaus =  new InfoContent(`${this.kolehtidata.kolehtitavoite}`, "",'kolehtislide_kuvaus');
+        var icont = document.createElement("div");
+        icont.className = "imgcont";
+        var icleft = document.createElement("div");
+        icleft.textContent = this.kolehtidata.tavoitekuvaus;
+        if(this.kolehtidata.tavoitekuva){
+            var imgdiv = document.createElement("div");
+            imgdiv.className = "imgdiv";
+            var img = document.createElement("img");
+            icont.appendChild(icleft);
+            img.setAttribute("src","htmlslides/images/" + this.kolehtidata.tavoitekuva);
+            img.setAttribute("contain","object-fit");
+            img.className = "kolehti_kuvaus_img";
+            imgdiv.appendChild(img);
+            icont.appendChild(imgdiv);
+        }
+        this.kolehtislide_kuvaus.items[0].appendChild(icont);
     }
 
 }
@@ -473,7 +514,8 @@ function StructuredPresentation(doc, showtype){
                                                               ['Synnintunnustus',false,'header'],
                                                               ['Uskontunnustus',new SongContent('', allsongs["uskontunnustus"].content),'song']]),
                       new Section(this, 'Ylistys ja rukous', worshipsongs),
-                      new Section(this, 'Ehtoollisen asetus', [['Kolehtidia',self.kolehtislide,'info'],
+                      new Section(this, 'Ehtoollisen asetus', [['Kolehtitilanne',self.kolehtislide,'info'],
+                                                              ['Kolehtikohteen kuvaus',self.kolehtislide_kuvaus,'info'],
                                                               ['Pyhä',this.songs['Pyhä-hymni'][0],'song'], 
                                                               ['Ehtoollisrukous',false,'header'],
                                                               ['Isä meidän',new SongContent('', allsongs["isä meidän"].content),'song'],
@@ -1235,9 +1277,7 @@ BibleContent.prototype.constructor = BibleContent;
  **/
 function InfoContent(headertext, infotext, content_name){
     this.content_type="info";
-    if (content_name!==undefined){
-        this.name = content_name;
-    }
+    this.name = content_name || "";
 
     var div = document.createElement('div');
     var header = document.createElement('h3');
@@ -1606,7 +1646,7 @@ function ClosePres(pres){
 
 function OpenPres(pres){
     preswindow = window.open('','_blank', 'toolbar=0,location=0,menubar=0');
-    preswindow.document.write('<html lang="fi" style="background:black;" ><head><link href="https://fonts.googleapis.com/css?family=Nothing+You+Could+Do|Quicksand" rel="stylesheet"> <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"><link id="stylesetter" rel="stylesheet" type="text/css" href="htmlslides/tyylit2.css?id=assdsd22sdsd22dasd98798"/></head><body></body>');
+    preswindow.document.write('<html lang="fi" style="background:black;" ><head><link href="https://fonts.googleapis.com/css?family=Nothing+You+Could+Do|Quicksand" rel="stylesheet"> <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"><link id="stylesetter" rel="stylesheet" type="text/css" href="htmlslides/tyylit2.css?id=a9aslkdjsad798"/></head><body></body>');
     ClearContent(preswindow.document.body);
     ////TODO:this is the key to make separate screen working!
     Presentations.screen = new Screen(preswindow);
