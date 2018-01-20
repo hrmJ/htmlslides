@@ -737,6 +737,7 @@ function StructuredPresentation(doc, showtype){
 
     this.GetSongs(doc);
     var self = this;
+    this.showtype = showtype;
     self.CreateKolehtiSlide();
 
     var credits1 = new CreditContent('', this.GetCredits(doc));
