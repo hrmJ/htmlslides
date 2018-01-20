@@ -498,6 +498,7 @@ function Presentation(){
      *
      */
     this.CreateNavigation = function(prestype){
+        console.log("lkj");
         var updated = false;
         if(prestype=='default'){
             //Create links in the secondary screen for jumping from one section to another
@@ -776,7 +777,7 @@ function StructuredPresentation(doc, showtype){
             //2. Combine all the sections
             self.items = [new Section(self, 'Johdanto', johdanto),
                           new Section(self, 'Sana',               [['Päivän laulu',self.songs['Päivän laulu'][0],'song'],
-                                                                  ['Evankeliumi',self.evankeliumi,'header'],
+                                                                  ['Evankeliumi',self.bibletool.loaded_content,'header'],
                                                                   ['Saarna',false,'header'],
                                                                   ['Synnintunnustus',false,'header'],
                                                                   ['Uskontunnustus',new SongContent('', allsongs["uskontunnustus"].content),'song']]),
@@ -799,9 +800,9 @@ function StructuredPresentation(doc, showtype){
                         for(var sec_idx in self.items){
                             self.items[sec_idx].sec_idx = sec_idx;
                         }
-            console.log("whatt...");
                         SetPointers(self, true);
                         self.GetContentChain();
+                        self.CreateNavigation("default");
                 
                 }); //THen ends...
 
@@ -2628,13 +2629,5 @@ var allsongs = GetSongs(document);
 //the blueprints of this presentation including the spontaneous content
 //
 var Presentations = new PresentationContainer();
-
-
-
-//Finally, remove all used data from html (structure, html)
-//ClearContent(document.body);
-
-Presentations.default.CreateNavigation('default');
-
 
 //========================================
