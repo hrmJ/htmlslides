@@ -2,6 +2,32 @@
 //just crudely pasted here
 //
 
+
+/**
+ *
+ * Skrollaa jokin elementti keskelle ruutua
+ *
+ * @param object $el jquery-olio, joka halutaan keskelle
+ *
+ */
+function ScrollToCenter($el, $parent_el){
+  //https://stackoverflow.com/questions/18150090/jquery-scroll-element-to-the-middle-of-the-screen-instead-of-to-the-top-with-a
+  var elOffset = $el.offset().top;
+  var elHeight = $el.height();
+  var windowHeight = $parent_el.height();
+  var offset;
+  if (elHeight < windowHeight) {
+    offset = elOffset - ((windowHeight / 2) - (elHeight / 2));
+  }
+  else {
+    offset = elOffset;
+  }
+  console.log(offset);
+  var speed = 0;
+  $parent_el.animate({scrollTop:offset}, speed);
+
+}
+
 /**
  * Periytymisen järjestämistä helpottava funktio.
  * https://stackoverflow.com/questions/4152931/javascript-inheritance-call-super-constructor-or-use-prototype-chain
@@ -133,9 +159,6 @@ BibleContentAdder.prototype = {
                 if($launcher.hasClass("verse")){ 
                     self.ShowVersePreview($selectparent, data);
                     self.CreateTitle();
-                    if (insert_content) {
-                        self.LoadContent();
-                    }
                 }
                 else{
                     $.each(data, function(idx,chapter){$("<option></option>").text(chapter).appendTo($subselect) });
@@ -155,16 +178,23 @@ BibleContentAdder.prototype = {
     ShowVersePreview: function($selectparent,data){
             //Näytä jakeen esikatselu ja tee siitä klikkauksella poistettava
             $selectparent.find(".versepreview").text(data[0]).fadeIn().click(function(){$(this).fadeOut()});
+            setTimeout(function(){
+                $selectparent.find(".versepreview").fadeOut();
+            },3000);
+            var self = this;
             if($selectparent.hasClass("startverse") && $selectparent.find(".between-verse-selectors").is(":hidden")){
                 $selectparent.find(".between-verse-selectors").slideDown("slow");
                 $selectparent.find(".verseselector").text(data[0]).fadeIn().click(function(){$(this).fadeOut()});
                 //Lisää viimeisen jakeen valitsin
                 var $endverseselectors = $selectparent.clone(true).insertAfter($selectparent);
+                $("<button class='adderbutton'>Lisää</button>")
+                    .click(function(){ self.LoadContent() })
+                    .insertAfter($endverseselectors)
+                    .css({"margin-top":"1em"});
                 $endverseselectors.find(".between-verse-selectors").remove();
                 //Kopioi lähtöjakeen osoite loppujakeeseen
                 $selectparent.find("select").each(function(){
-                    if($(this).attr("class") !== "verse") 
-                        $endverseselectors.find("." + $(this).attr("class")).val($(this).val());
+                    $endverseselectors.find("." + $(this).attr("class")).val($(this).val());
                 })
                 $(".verseselector:eq(1)").removeClass("startverse").addClass("endverse");
             }
@@ -725,7 +755,7 @@ function Presentation(){
  * @extends Presentation
  *
  */
-function StructuredPresentation(doc, showtype){
+function StructuredPresentation(doc, showtype, isupdate){
     /** 
      *
      * Retrieves the names of the people involved in making this service from
@@ -735,6 +765,7 @@ function StructuredPresentation(doc, showtype){
      *
      */
 
+    var isupdate = isupdate || false;
     this.GetSongs(doc);
     var self = this;
     this.showtype = showtype;
@@ -764,10 +795,10 @@ function StructuredPresentation(doc, showtype){
 
     //Lataa evankeliumi omasta tietokannasta
     this.bibletool = new BibleContentAdder();
-    this.bibletool.address.start.book = this.bibletool.address.end.book = this.bibletool.TrabslateBookName($("#evankeliumi").attr("book"),"fi","en");
-    this.bibletool.address.start.chapter  = $("#evankeliumi").attr("chapter");
-    this.bibletool.address.end.chapter  = $("#evankeliumi").attr("chapter");
-    var verses = $("#evankeliumi").attr("verses").match(/(\d+) *-? *(\d+)*/);
+    var bib = doc.querySelector("#evankeliumi");
+    this.bibletool.address.start.book = this.bibletool.address.end.book = this.bibletool.TrabslateBookName(bib.getAttribute("book"),"fi","en");
+    this.bibletool.address.start.chapter  = this.bibletool.address.end.chapter  = bib.getAttribute("chapter");
+    var verses = bib.getAttribute("verses").match(/(\d+) *-? *(\d+)*/);
     this.bibletool.address.start.verse = verses[1];
     this.bibletool.address.end.verse = verses[2] || verses[1];
     this.bibletool.LoadContent(true).then(
@@ -804,6 +835,18 @@ function StructuredPresentation(doc, showtype){
                         SetPointers(self, true);
                         self.GetContentChain();
                         self.CreateNavigation("default");
+                        if(isupdate){
+                            //Jos sisältö vian päivitetty päivittämättä ikkunaa
+                            console.log("IS update");
+                            //Start the presentation again from the start
+                            thisobject = self;
+                            while(typeof thisobject.Show === 'undefined'){
+                                //Iterating down to first showable content
+                                thisobject = thisobject.current;
+                            }
+                            console.log("lklkjlkjlkj");
+                            thisobject.Show();
+                        }
                 
                 }); //THen ends...
 
@@ -1318,6 +1361,7 @@ function ScreenContent(){
                 for (var verse_idx in song.items){
                     var thisverse = song.items[verse_idx].cloneNode(true);
                     thisverse.setAttribute('pointerpos',verse_idx);
+                    console.log(thisverse);
                     thisverse.addEventListener('click',VerseMover,false);
                     //ListToLink(this_li, section_idx, 0);
                     //highlight the current:
@@ -1338,6 +1382,13 @@ function ScreenContent(){
             break;
         }
         //document.body.style.overflow="auto";
+        //HACKY: centering vertically
+        if($(".hlverse").length>0){
+            ScrollToCenter($(".hlverse:eq(0)"),$(".previewedverses:eq(0)"));
+        }
+        else{
+            ScrollToCenter($(".subsectionnavhl"),$("#navigator_sectionlist"));
+        }
     };
 }
 
@@ -2113,7 +2164,7 @@ function AddFunctionalitySection(){
     //Poista loppujae, jos määritelty uusi alkujakeen kirja /  luku / testamentti
     $("[value='ot'],[value='nt'],.book,.chapter").click(function(){
         if($(this).parents(".endverse").length==0){
-             $(".endverse").remove();
+             $(".endverse, .adderbutton").remove();
              $(".between-verse-selectors, .versepreview").hide();
         }
     });
@@ -2161,6 +2212,7 @@ function CreateBookSelect(){
 
 function checkUpdaterframeLoaded() {
     //http://stackoverflow.com/questions/9249680/how-to-check-if-iframe-is-loaded-or-it-has-a-content
+    console.log("2192....");
     var iframe = document.getElementById('updaterframe');
     var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
     if (  iframeDoc.getElementById('updatecompleted')  !== null) {
@@ -2184,23 +2236,13 @@ function GetUpdatedStructure(){
     var newdoc = document.getElementById('updaterframe').contentWindow.document;
     //Update the list of songs...
     allsongs = GetSongs(newdoc);
-    Presentations.default = new StructuredPresentation(newdoc, "majakka");
-    Presentations.default.GetContentChain();
     //Remove the old navigation elements
     ClearContent(document.getElementById("section_nav"));
-    Presentations.default.CreateNavigation("default");
     ClearContent(document.getElementById("previewer"));
     //empty the contents to make further updates possible:
     var frame = document.getElementById("updaterframe");
     frame.src = 'empty.html' ;
-    //Start the presentation again from the start
-    thisobject = Presentations.default;
-    while(typeof thisobject.Show === 'undefined'){
-        //Iterating down to first showable content
-        thisobject = thisobject.current;
-    }
-    thisobject.Show();
-    Presentations.default.GetContentChain();
+    Presentations.default = new StructuredPresentation(newdoc, "majakka", true);
 }
 
 function checkIframeLoaded() {
@@ -2551,10 +2593,12 @@ function UpdateTracker(identifier){
  *
  **/
 function UpdateStructure(){
+    console.log(" the very beginning... ");
     var frame = document.getElementById("updaterframe");
     frame.src="";
     //ClearContent(frame.contentWindow.document);
     var id = window.location.search.substring(window.location.search.search("id=")+3);
+    console.log(id);
     frame.src = 'updatestructure.php?id=' + id;
     checkUpdaterframeLoaded();
 }
