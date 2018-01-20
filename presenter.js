@@ -209,11 +209,15 @@ BibleContentAdder.prototype = {
 
     /**
      * Lataa varsinainen raamattusisältö
+     *
+     * @param return_result palautetaanko ladattu sisältö vai siirretäänkö esitykseen (oletus: false)
+     *
      */
-    LoadContent: function(){
+    LoadContent: function(return_result){
         var self = this;
+        var return_result = return_result || false;
         $(".biblecontentadder .addtoprescontrols").hide()
-        var params = {"testament": $("[name='testament']:checked").val(),
+        var params = {"testament": $("[name='testament']:checked").val() || self.testament,
                       "startbook": this.address.start.book,
                       "endbook": this.address.end.book,
                       "startchapter": this.address.start.chapter,
@@ -221,25 +225,37 @@ BibleContentAdder.prototype = {
                       "startverse": this.address.start.verse,
                       "endverse": this.address.end.verse};
 
-        $.getJSON("loadbibleverses.php",params, function(verses){
-            var address = `${self.TrabslateBookName(params.startbook)} ${params.startchapter} : ${params.startverse} - ` + 
-                          `${self.TrabslateBookName(params.endbook)}  ${params.endchapter} : ${params.endverse}`
-            Presentations.spontaneous.AddContent(new BibleContent(address, verses));
+        return $.getJSON("loadbibleverses.php",params, function(verses){
+            var address = `${self.TrabslateBookName(params.startbook, "en", "fi")} ${params.startchapter} : ${params.startverse} - ` + 
+                          `${self.TrabslateBookName(params.endbook, "en", "fi")}  ${params.endchapter} : ${params.endverse}`;
+            var content = new BibleContent(address, verses);
+            if(return_result){
+                self.loaded_content = content;
+            }
+            else{
+                Presentations.spontaneous.AddContent(content);
+            }
         });
     },
 
     /**
      *
      * Hacking... Hakee englanninkielistä lyhennettä vastaavan suomenkielisen lyhenteen
-     * Raamatun kirjoille
+     * Raamatun kirjoille tai toisin päin
      *
      * @param thisbook englanninkielinen kirjan lyhenne
+     * @param from mistä kielestä käännetään
+     * @param to mihin kieleen käännetään
      *
      */
-    TrabslateBookName: function(thisbook){
-        books_en = ["Gen", "Exod", "Lev", "Num", "Deut", "Josh", "Judg", "Ruth", "1Sam", "2Sam", "1Kgs", "2Kgs", "1Chr", "2Chr", "Ezra", "Neh", "Esth", "Job", "Ps", "Prov", "Eccl", "Song", "Isa", "Jer", "Lam", "Ezek", "Dan", "Hos", "Joel", "Amos", "Obad", "Jonah", "Mic", "Nah", "Hab", "Zeph", "Hag", "Zech", "Mal", "Matt", "Mark", "Luke", "John", "Acts", "Rom", "1Cor", "2Cor", "Gal", "Eph", "Phil", "Col", "1Thess", "2Thess", "1Tim", "2Tim", "Titus", "Phlm", "Heb", "Jas", "1Pet", "2Pet", "1John", "2John", "3John", "Jude", "Rev"];
-        books_fi = ['1Moos', '2Moos', '3Moos', '4Moos', '5Moos', 'Joos', 'Tuom', 'Ruut', '1Sam', '2Sam', '1Kun', '2Kun', '1Aik', '2Aik', 'Esra', 'Neh', 'Est', 'Job', 'Ps', 'Sananl', 'Saarn', 'Laull', 'Jes', 'Jer', 'Valit', 'Hes', 'Dan', 'Hoos', 'Joel', 'Aam', 'Ob', 'Joona', 'Miika', 'Nah', 'Hab', 'Sef', 'Hagg', 'Sak', 'Mal', 'Matt', 'Mark', 'Luuk', 'Joh', 'Apt', 'Room', '1Kor', '2Kor', 'Gal', 'Ef', 'Fil', 'Kol', '1Tess', '2Tess', '1Tim', '2Tim', 'Tit', 'Filem', 'Hepr', 'Jaak', '1Piet', '2Piet', '1Joh', '2Joh', '3Joh', 'Juud', 'Ilm'];
-        return books_fi[books_en.indexOf(thisbook)];
+    TrabslateBookName: function(thisbook, from, to){
+        var books = {"en" :  [ "Gen", "Exod", "Lev", "Num", "Deut", "Josh", "Judg", "Ruth", "1Sam", "2Sam", "1Kgs", "2Kgs", "1Chr", "2Chr", "Ezra", "Neh", "Esth", "Job", "Ps", "Prov", "Eccl", "Song", "Isa", "Jer", "Lam", "Ezek", "Dan", "Hos", "Joel", "Amos", "Obad", "Jonah", "Mic", "Nah", "Hab", "Zeph", "Hag", "Zech", "Mal", "Matt", "Mark", "Luke", "John", "Acts", "Rom", "1Cor", "2Cor", "Gal", "Eph", "Phil", "Col", "1Thess", "2Thess", "1Tim", "2Tim", "Titus", "Phlm", "Heb", "Jas", "1Pet", "2Pet", "1John", "2John", "3John", "Jude", "Rev" ],
+                     "fi" :  [ '1Moos', '2Moos', '3Moos', '4Moos', '5Moos', 'Joos', 'Tuom', 'Ruut', '1Sam', '2Sam', '1Kun', '2Kun', '1Aik', '2Aik', 'Esra', 'Neh', 'Est', 'Job', 'Ps', 'Sananl', 'Saarn', 'Laull', 'Jes', 'Jer', 'Valit', 'Hes', 'Dan', 'Hoos', 'Joel', 'Aam', 'Ob', 'Joona', 'Miika', 'Nah', 'Hab', 'Sef', 'Hagg', 'Sak', 'Mal', 'Matt', 'Mark', 'Luuk', 'Joh', 'Apt', 'Room', '1Kor', '2Kor', 'Gal', 'Ef', 'Fil', 'Kol', '1Tess', '2Tess', '1Tim', '2Tim', 'Tit', 'Filem', 'Hepr', 'Jaak', '1Piet', '2Piet', '1Joh', '2Joh', '3Joh', 'Juud', 'Ilm' ]
+        }
+        var book_idx = books[from].indexOf(thisbook);
+        //Tallenna muistiin, kumpi testamentti (39 kirjaa vt:ssä)
+        this.testament = (book_idx > 38) ? "nt" : "ot";
+        return books[to][book_idx];
     },
 
 } 
@@ -635,6 +651,14 @@ function Presentation(){
     }
 
     this.CreateKolehtiSlide = function(){
+        //Haetaan tiedot kolehdin ilmoittamista varten
+        var self = this;
+        var kolehti_params = document.querySelectorAll("#kolehti span");
+        var kolehtidata = {};
+        self.kolehtidata = {};
+        for(i=0;i<kolehti_params.length;i++){
+            self.kolehtidata[kolehti_params[i].className] = kolehti_params[i].textContent;
+        }
         this.kolehtislide =  new InfoContent(`Tämän viikon kolehtikohde : ${this.kolehtidata.kolehtikohde}`, 
             [`Tämänhetkinen tavoite on ${this.kolehtidata.kolehtitavoite}, 
                 ja tähän tarkoitukseen on toistaiseksi
@@ -711,96 +735,76 @@ function StructuredPresentation(doc, showtype){
      */
 
     this.GetSongs(doc);
-    this.showtype = showtype;
+    var self = this;
+    self.CreateKolehtiSlide();
 
-    if(showtype=="majakka"){
-        //TODO: import this from structure html
-        var credits1 = new CreditContent('', this.GetCredits(doc));
-        var evankeliumi = new BibleContent(document.getElementById('evankeliumi').getAttribute('address'), document.getElementById('evankeliumi').textContent );
+    var credits1 = new CreditContent('', this.GetCredits(doc));
+    var communionsongs = self.MultiSong("Ehtoollislauluja");
+    var ehtoollisinfo  = new InfoContent('Ehtoolliskäytännöistä', ['Voit tulla ehtoolliselle jo Jumalan karitsa -hymnin aikana', 
+                                                                   'Halutessasi voit jättää kolehdin ehtoolliselle tullessasi oikealla olevaan koriin.',
+                                                                   'Ehtoollisavustajana tänään ' + self.credits["Ehtoollisavustaja"]]);
 
-        //Haetaan tiedot kolehdin ilmoittamista varten
-        var kolehti_params = document.querySelectorAll("#kolehti span");
-        var kolehtidata = {};
-        this.kolehtidata = {};
-        for(i=0;i<kolehti_params.length;i++){
-            this.kolehtidata[kolehti_params[i].className] = kolehti_params[i].textContent;
-        }
+    var rukouscredits = "Rukouspalvelijana tänään " + self.credits["Rukouspalvelu"] + ". ";
+    var wsinfo  = new InfoContent('Ylistys- ja rukousosio', ['Ylistys- ja rukouslaulujen aikana voit kirjoittaa omia  rukousaiheitasi ja hiljentyä sivualttarin luona.', ' Rukouspalvelu hiljaisessa huoneessa. ' + rukouscredits]);
+    var worshipsongs = self.MultiSong("Ylistys- ja rukouslauluja", wsinfo);
+    worshipsongs.push(['Esirukous',false,'header']);
+    worshipsongs.unshift(['rukousinfo', wsinfo, 'info']);
 
-        this.CreateKolehtiSlide();
+    var johdanto = [['Krediitit1',credits1,'info'], ['Alkulaulu',self.songs['Alkulaulu'][0],'song'], ['Alkusanat',false,'header'], ['Seurakuntalaisen sana',false,'header']]
 
-        //TODO: make creating these sections simpler
-        //1. Collect all worship songs and make them into a section
-        var communionsongs = this.MultiSong("Ehtoollislauluja");
-        var ehtoollisinfo  = new InfoContent('Ehtoolliskäytännöistä', ['Voit tulla ehtoolliselle jo Jumalan karitsa -hymnin aikana', 
-                                                                       'Halutessasi voit jättää kolehdin ehtoolliselle tullessasi oikealla olevaan koriin.',
-                                                                       'Ehtoollisavustajana tänään ' + this.credits["Ehtoollisavustaja"]]);
-
-        var rukouscredits = "Rukouspalvelijana tänään " + this.credits["Rukouspalvelu"] + ". ";
-        //TODO: Hae esirukoilijatieto autom.
-        var wsinfo  = new InfoContent('Ylistys- ja rukousosio', ['Ylistys- ja rukouslaulujen aikana voit kirjoittaa omia  rukousaiheitasi ja hiljentyä sivualttarin luona.', ' Rukouspalvelu hiljaisessa huoneessa. ' + rukouscredits]);
-        //var worshipsongs = this.MultiSong("Ylistys- ja rukouslauluja", ['rukousinfo', wsinfo, 'info']);
-        var worshipsongs = this.MultiSong("Ylistys- ja rukouslauluja", wsinfo);
-        worshipsongs.push(['Esirukous',false,'header']);
-        worshipsongs.unshift(['rukousinfo', wsinfo, 'info']);
-
-        var johdanto = [['Krediitit1',credits1,'info'], ['Alkulaulu',this.songs['Alkulaulu'][0],'song'], ['Alkusanat',false,'header'], ['Seurakuntalaisen sana',false,'header']]
-
-        this.credits["Pyhis"] = this.credits["Pyhis"].replace(" ","");
-        if(this.credits["Pyhis"].toLowerCase()!=="ei"){
-            //Jos on pyhis, lisää siitä infot
-            var lapsicredits = "Pyhistä vetää tänään " + this.credits["Pyhis"] + ", klubissa " + this.credits["Klubi"];
-            var info1 = new InfoContent('Lapsille ja lapsiperheille', ['Päivän laulun aikana 3-6-vuotiaat lapset voivat siirtyä pyhikseen ja yli 6-vuotiaat klubiin.', 'Seuraa vetäjiä - tunnistat heidät lyhdyistä!', lapsicredits]);
-            johdanto.push(['Pyhisinfo',info1,'info']);
-        }
-
-        var self = this;
-
-        //2. Combine all the sections
-        this.items = [new Section(this, 'Johdanto', johdanto),
-                      new Section(this, 'Sana',               [['Päivän laulu',this.songs['Päivän laulu'][0],'song'],
-                                                              ['Evankeliumi',evankeliumi,'header'],
-                                                              ['Saarna',false,'header'],
-                                                              ['Synnintunnustus',false,'header'],
-                                                              ['Uskontunnustus',new SongContent('', allsongs["uskontunnustus"].content),'song']]),
-                      new Section(this, 'Ylistys ja rukous', worshipsongs),
-                      new Section(this, 'Ehtoollisen asetus', [['Kolehtitilanne',self.kolehtislide,'info'],
-                                                              ['Kolehtikohteen kuvaus',self.kolehtislide_kuvaus,'info'],
-                                                              ['Pyhä',this.songs['Pyhä-hymni'][0],'song'], 
-                                                              ['Ehtoollisrukous',false,'header'],
-                                                              ['Isä meidän',new SongContent('', allsongs["isä meidän"].content),'song'],
-                                                              ['Ehtoollisinfo', ehtoollisinfo, 'info'],
-                                                              ['Jumalan karitsa',this.songs['Jumalan karitsa'][0],'song']]),
-                      new Section(this, 'Ehtoollisen vietto',   communionsongs),
-                      new Section(this, 'Siunaus ja lähettäminen',  [['Herran siunaus',false,'heading'],
-                                                             ['Loppusanat',false,'heading'],
-                                                             ['Loppulaulu',this.songs['Loppulaulu'][0],'song']
-                                                              ])
-                        ];
-                          //TODO ^^ liittyen ehkä mieti, että näkyviin tulisi sanailijan nimi siihen,
-                          //missä tavallisesti laulun nimi. Muista myös ajatella laulun tekijänoikeuksia.
-    }
-    else if(showtype=="parkki"){
-        //In the simple case, just insert the songs directly as items
-        var ohjeet = ["1. Raahaa tämä ikkuna esitysnäyttöön (varmista ensin, ettei näyttöjä ole peilattu, vaan että projektori on oma näyttönsä ja tietokoneen näyttö omansa)",
-                       "2. Aseta tämä ikkuna koko näytön tilaan (useimmissa selaimissa F11-näppäin)",
-                       "3. Paina nuolta oikealle tai klikkaa jotakin alkuperäisessä ikkunassa näkyvistä laulujen nimistä, niin esitys käynnistyy",
-                       "4. Esityksessä liikutaan eteenpäin ja taaksepäin joko nuolinäppäimillä TAI sitten voit klikata laulujen nimiä ja niiden säkeistöjä"];
-        this.items = [new InfoContent('Ohjeita laulujen näyttämiseen', ohjeet, 'Ohjeet diojen näyttäjälle')];
-        for(idx in this.songs["song"]){
-            var thissong = this.songs["song"][[idx]];
-            thissong.items.unshift(thissong.titleslide.items[0]);
-            thissong.pointer.max += 1;
-            this.items.push(thissong);
-        }
+    self.credits["Pyhis"] = self.credits["Pyhis"].replace(" ","");
+    if(self.credits["Pyhis"].toLowerCase()!=="ei"){
+        //Jos on pyhis, lisää siitä infot
+        var lapsicredits = "Pyhistä vetää tänään " + self.credits["Pyhis"] + ", klubissa " + self.credits["Klubi"];
+        var info1 = new InfoContent('Lapsille ja lapsiperheille', ['Päivän laulun aikana 3-6-vuotiaat lapset voivat siirtyä pyhikseen ja yli 6-vuotiaat klubiin.', 'Seuraa vetäjiä - tunnistat heidät lyhdyistä!', lapsicredits]);
+        johdanto.push(['Pyhisinfo',info1,'info']);
     }
 
+    //Lataa evankeliumi omasta tietokannasta
+    this.bibletool = new BibleContentAdder();
+    this.bibletool.address.start.book = this.bibletool.address.end.book = this.bibletool.TrabslateBookName($("#evankeliumi").attr("book"),"fi","en");
+    this.bibletool.address.start.chapter  = $("#evankeliumi").attr("chapter");
+    this.bibletool.address.end.chapter  = $("#evankeliumi").attr("chapter");
+    var verses = $("#evankeliumi").attr("verses").match(/(\d+) *-? *(\d+)*/);
+    this.bibletool.address.start.verse = verses[1];
+    this.bibletool.address.end.verse = verses[2] || verses[1];
+    this.bibletool.LoadContent(true).then(
+        //Lataa evankeliumi, ja kun lataus valmis:
+        function(){
+            $("#previewer").text("Lataus valmis.");
+            //$("#previewer").text("");
+            //2. Combine all the sections
+            self.items = [new Section(self, 'Johdanto', johdanto),
+                          new Section(self, 'Sana',               [['Päivän laulu',self.songs['Päivän laulu'][0],'song'],
+                                                                  ['Evankeliumi',self.evankeliumi,'header'],
+                                                                  ['Saarna',false,'header'],
+                                                                  ['Synnintunnustus',false,'header'],
+                                                                  ['Uskontunnustus',new SongContent('', allsongs["uskontunnustus"].content),'song']]),
+                          new Section(self, 'Ylistys ja rukous', worshipsongs),
+                          new Section(self, 'Ehtoollisen asetus', [['Kolehtitilanne',self.kolehtislide,'info'],
+                                                                  ['Kolehtikohteen kuvaus',self.kolehtislide_kuvaus,'info'],
+                                                                  ['Pyhä',self.songs['Pyhä-hymni'][0],'song'], 
+                                                                  ['Ehtoollisrukous',false,'header'],
+                                                                  ['Isä meidän',new SongContent('', allsongs["isä meidän"].content),'song'],
+                                                                  ['Ehtoollisinfo', ehtoollisinfo, 'info'],
+                                                                  ['Jumalan karitsa',self.songs['Jumalan karitsa'][0],'song']]),
+                          new Section(self, 'Ehtoollisen vietto',   communionsongs),
+                          new Section(self, 'Siunaus ja lähettäminen',  [['Herran siunaus',false,'heading'],
+                                                                 ['Loppusanat',false,'heading'],
+                                                                 ['Loppulaulu',self.songs['Loppulaulu'][0],'song']
+                                                                  ])
+                            ];
 
-    //mark the section idx for each of the sections TODO find a better way
-    for(var sec_idx in this.items){
-        this.items[sec_idx].sec_idx = sec_idx;
-    }
-    SetPointers(this, true);
-    this.GetContentChain();
+                        //mark the section idx for each of the sections TODO find a better way
+                        for(var sec_idx in self.items){
+                            self.items[sec_idx].sec_idx = sec_idx;
+                        }
+            console.log("whatt...");
+                        SetPointers(self, true);
+                        self.GetContentChain();
+                
+                }); //THen ends...
+
 
 }
 
