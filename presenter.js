@@ -1,3 +1,252 @@
+//First: stuff borrowed from the newer version with jquery
+//just crudely pasted here
+//
+
+/**
+ * Periytymisen järjestämistä helpottava funktio.
+ * https://stackoverflow.com/questions/4152931/javascript-inheritance-call-super-constructor-or-use-prototype-chain
+ *
+ * @param function base olio, joka peritään
+ * @param function sub olio, joka perii
+ *
+ */
+function extend(base, sub) {
+    var origProto = sub.prototype;
+    sub.prototype = Object.create(base.prototype);
+    for (var key in origProto)  {
+       sub.prototype[key] = origProto[key];
+    }
+    // The constructor property was set wrong, let's fix it
+    Object.defineProperty(sub.prototype, 'constructor', { 
+      enumerable: false, 
+      value: sub 
+    });
+}
+
+
+
+/**
+ * Olio, josta kaikki sisältöä lisäävät hallintawidgetit periytyvät.
+ *
+ * @param Presentation parent_presentation Esitys, johon widgetit liitetään.
+ *
+ */
+var ContentAdder = function(){
+};
+
+ContentAdder.prototype = {
+    /**
+     * Avaa näkyville tyyppikohtaisen sisällön lisäysvalikon
+     * @param object launcher otsikko, jota klikkaamalla laukaistiin
+     */
+    OpenWidget: function($launcher){
+        $(this.adderclass + " .contentadder-open:eq(0)").slideToggle();
+        //$launcher.
+    },
+
+
+
+};
+
+
+
+/**
+ *
+ * Raamattusisällöt lisäävä widget
+ *
+ * @param Presentation parent_presentation Esitys, johon widgetit liitetään.
+ * @param adderclass string css-luokka, josta widgetin sijainnin sivulla tunnistaa
+ *
+ */
+var BibleContentAdder = function(){
+    ContentAdder.call(this);
+    return this;
+}
+
+/**
+ * @param string adderclass sisällön lisävän widgetin css-luokka
+ * @param string addedclass itse sisällön css-luokka
+ * @param string address mistä raamatun kohdasta alkaen ja mihin asti sisältö on otettu
+ *
+ */
+BibleContentAdder.prototype = {
+    adderclass: ".biblecontentadder",
+    addedclass: "bibletext",
+    address: {"start":{},"end":{}},
+
+    /**
+     * Luo tekstidia käyttäjän antaman inputin pohjalta
+     */
+    CreateContent: function(){
+        return "";
+    },
+
+
+    /**
+     *
+     * Lataa kirjojen nimet tietokannasta (joka vanhasta tai uudesta testamentista)
+     *
+     * @param object $launcher jquery-elementti, joka tapahtuman laukaisi (joko radiobuttonit tai lista)
+     *
+     */
+    LoadBooknames: function($launcher){
+        if($launcher.get(0).tagName=="SELECT" && $(".book:eq(0)").children().length<5){
+            alert("Valitse ensin vanha tai uusi testamentti.");
+        }
+        else if($launcher.attr("name")=="testament"){
+            //Lataa kirjojen nimet select-elementtiin
+            $(".book option:gt(0)").remove();
+            $.getJSON("loadbibleverses.php",{"testament":$("[name='testament']:checked").val()},
+                function(data){
+                    $.each(data, function(idx,bookname){$("<option></option>").text(bookname).appendTo(".book") } )});
+            //Poista vanhat luvut ja jakeet
+            $(".book, .chapter, .verse").find("option:gt(0)").remove();
+        }
+    },
+
+    /**
+     * Lataa kappaleiden tai jakeiden lukumäärä valitun kirjan nimen / kappaleen perusteella
+     *
+     *
+     * @param object launcher toiminnon laukaissut kirjanvalitsin
+     *
+     */
+    PreLoad: function($launcher){
+        //etsi seuraava select-elementti
+        var self = this;
+        //Tarkista, onko kyseessä pelkkä alkujae vai jo päätösjae
+        var insert_content =  ( $(".verse").length>1 ) ? true : false;
+        var $selectparent = $launcher.parents(".verseselector");
+        var $subselect = $launcher.parent().next().find("select")
+        if($subselect.length>0) $subselect.find("option:gt(0)").remove();
+
+        var params = {"testament": $("[name='testament']:checked").val(),
+                      "book": $selectparent.find(".book").val(),
+                      "chapter": $selectparent.find(".chapter").val(),
+                      "verse": $selectparent.find(".verse").val()};
+
+        //Jos haetaan ylemmän tason elementtejä, poista oliosta alemman tason muuttujat
+        if($launcher.hasClass("book") || $launcher.hasClass("chapter")) delete params.verse;
+        if($launcher.hasClass("book")) delete params.chapter;
+
+        $.getJSON("loadbibleverses.php",params, function(data){
+                if($launcher.hasClass("verse")){ 
+                    self.ShowVersePreview($selectparent, data);
+                    self.CreateTitle();
+                    if (insert_content) {
+                        self.LoadContent();
+                    }
+                }
+                else{
+                    $.each(data, function(idx,chapter){$("<option></option>").text(chapter).appendTo($subselect) });
+                    $subselect.parent().next().find("select option:gt(0)").remove();
+                }
+        });
+
+    },
+
+    /**
+     * Näyttää pienen esikatseluikkunan siitä Raamatun jakeesta, joka valittu
+     *
+     * @param  object $selectparent se elementti, jonka lapsena käytetty jakeen valitsin on
+     * @param  array data ajax-kyselyn palauttama taulukko jakeista
+     *
+     */
+    ShowVersePreview: function($selectparent,data){
+            //Näytä jakeen esikatselu ja tee siitä klikkauksella poistettava
+            $selectparent.find(".versepreview").text(data[0]).fadeIn().click(function(){$(this).fadeOut()});
+            if($selectparent.hasClass("startverse") && $selectparent.find(".between-verse-selectors").is(":hidden")){
+                $selectparent.find(".between-verse-selectors").slideDown("slow");
+                $selectparent.find(".verseselector").text(data[0]).fadeIn().click(function(){$(this).fadeOut()});
+                //Lisää viimeisen jakeen valitsin
+                var $endverseselectors = $selectparent.clone(true).insertAfter($selectparent);
+                $endverseselectors.find(".between-verse-selectors").remove();
+                //Kopioi lähtöjakeen osoite loppujakeeseen
+                $selectparent.find("select").each(function(){
+                    if($(this).attr("class") !== "verse") 
+                        $endverseselectors.find("." + $(this).attr("class")).val($(this).val());
+                })
+                $(".verseselector:eq(1)").removeClass("startverse").addClass("endverse");
+            }
+    },
+
+    /**
+     * Merkitse muistiin Raamatunkohdan alku- ja loppukohta
+     */
+    UpdateAddress: function(){
+        var self = this;
+        $(".startverse select").each(function(){ self.address.start[$(this).attr("class")] = $(this).val()});
+        $(".endverse select").each(function(){ self.address.end[$(this).attr("class")] = $(this).val()});
+    },
+
+    /**
+     * Luo jquery-elementti, joka syötetään Raamatunkohdan otsikoksi
+     */
+    CreateTitle: function(){
+        var self = this;
+        var addresstext = "";
+        this.UpdateAddress();
+        $.each(this.address.start, function(key,val){
+            var sep = key == "chapter" ? ":" : " ";
+            addresstext += val + sep; });
+        addresstext = addresstext.trim();
+
+        if (!(self.address.start.book == self.address.end.book && 
+            self.address.start.chapter == self.address.end.chapter && 
+            self.address.start.verse == self.address.end.verse)){
+                //Jos ei sama alku- ja loppujae
+                if (self.address.start.chapter == self.address.end.chapter){
+                    //Jos sama luku
+                    addresstext += "-" + self.address.end.verse;
+                }
+                else{
+                    //Jos eri luku
+                    addresstext += "-" + self.address.end.chapter  + ":"  + self.address.end.verse;
+                }
+            }
+        this.$title = $("<h2></h2>").text(addresstext);
+        },
+
+    /**
+     * Lataa varsinainen raamattusisältö
+     */
+    LoadContent: function(){
+        var self = this;
+        $(".biblecontentadder .addtoprescontrols").hide()
+        var params = {"testament": $("[name='testament']:checked").val(),
+                      "startbook": this.address.start.book,
+                      "endbook": this.address.end.book,
+                      "startchapter": this.address.start.chapter,
+                      "endchapter": this.address.end.chapter,
+                      "startverse": this.address.start.verse,
+                      "endverse": this.address.end.verse};
+
+        $.getJSON("loadbibleverses.php",params, function(verses){
+            var address = `${self.TrabslateBookName(params.startbook)} ${params.startchapter} : ${params.startverse} - ` + 
+                          `${self.TrabslateBookName(params.endbook)}  ${params.endchapter} : ${params.endverse}`
+            Presentations.spontaneous.AddContent(new BibleContent(address, verses));
+        });
+    },
+
+    /**
+     *
+     * Hacking... Hakee englanninkielistä lyhennettä vastaavan suomenkielisen lyhenteen
+     * Raamatun kirjoille
+     *
+     * @param thisbook englanninkielinen kirjan lyhenne
+     *
+     */
+    TrabslateBookName: function(thisbook){
+        books_en = ["Gen", "Exod", "Lev", "Num", "Deut", "Josh", "Judg", "Ruth", "1Sam", "2Sam", "1Kgs", "2Kgs", "1Chr", "2Chr", "Ezra", "Neh", "Esth", "Job", "Ps", "Prov", "Eccl", "Song", "Isa", "Jer", "Lam", "Ezek", "Dan", "Hos", "Joel", "Amos", "Obad", "Jonah", "Mic", "Nah", "Hab", "Zeph", "Hag", "Zech", "Mal", "Matt", "Mark", "Luke", "John", "Acts", "Rom", "1Cor", "2Cor", "Gal", "Eph", "Phil", "Col", "1Thess", "2Thess", "1Tim", "2Tim", "Titus", "Phlm", "Heb", "Jas", "1Pet", "2Pet", "1John", "2John", "3John", "Jude", "Rev"];
+        books_fi = ['1Moos', '2Moos', '3Moos', '4Moos', '5Moos', 'Joos', 'Tuom', 'Ruut', '1Sam', '2Sam', '1Kun', '2Kun', '1Aik', '2Aik', 'Esra', 'Neh', 'Est', 'Job', 'Ps', 'Sananl', 'Saarn', 'Laull', 'Jes', 'Jer', 'Valit', 'Hes', 'Dan', 'Hoos', 'Joel', 'Aam', 'Ob', 'Joona', 'Miika', 'Nah', 'Hab', 'Sef', 'Hagg', 'Sak', 'Mal', 'Matt', 'Mark', 'Luuk', 'Joh', 'Apt', 'Room', '1Kor', '2Kor', 'Gal', 'Ef', 'Fil', 'Kol', '1Tess', '2Tess', '1Tim', '2Tim', 'Tit', 'Filem', 'Hepr', 'Jaak', '1Piet', '2Piet', '1Joh', '2Joh', '3Joh', 'Juud', 'Ilm'];
+        return books_fi[books_en.indexOf(thisbook)];
+    },
+
+} 
+
+extend(ContentAdder, BibleContentAdder);
+
+
 /**
  *
  * Represents a container for the two parallel slide shows that each
@@ -1249,7 +1498,7 @@ function BibleContent(address, content, content_name){
     }
     this.items = [];
     var div = TagParent('div',[TagWithText('h3',address,'bibleheader')])
-    verses = content.split(/¤/m);
+    verses = (content.constructor === Array ? content : content.split(/¤/m));
     for (verseid in verses){
         div.appendChild(TagWithText('p', verses[verseid], 'bibleverse'));
         if ( (parseInt(verseid) + 1) % 2 == 0 ){
@@ -1803,8 +2052,42 @@ function AddFunctionalitySection(){
     var verseinput = document.createElement("input");
     verseinput.id = 'verse';
     verseinput.value = 'jae/jakeet';
-
-    var bibcontsec = TagParent("section",[TagWithText("h4","Lisää Raamatunteksti",""),logger, TagParent("div",[select, chapinput, verseinput],'bibaddress'),TagParent('p',[link])],"functionalsection","bibcontsec");
+    var bibleaddercont = TagParent("div",[],'side-menu-left');
+    bibleaddercont.innerHTML = `
+            <div class="contentadder biblecontentadder">
+                <div class="contentadder-heading">Raamatunkohta</div>
+                <div class="contentadder-open" style="display:block"> 
+                    <div>
+                        <input type="radio" name="testament" value="ot">Vanha testamentti</input>
+                        <input type="radio" name="testament" value="nt">Uusi testamentti</input>
+                    </div>
+                    <div class="verseselector startverse">
+                        <div class="selector-wrapper">
+                            <div>
+                                <select class="book">
+                                    <option>Valitse kirja</option>
+                                </select>
+                            </div>
+                            <div>
+                                <select class="chapter">
+                                    <option>Valitse luku</option>
+                                </select>
+                            </div>
+                            <div>
+                                <select class="verse">
+                                    <option>Valitse jae</option>
+                                </select>
+                                <div class="versepreview"></div>
+                            </div>
+                        </div>
+                        <div>
+                        <div class="arrow_box between-verse-selectors">Mihin asti?</div>
+                    </div>
+                </div>
+            </div>
+            </div>
+    `
+    var bibcontsec = TagParent("section",[TagWithText("h4","Lisää Raamatunteksti",""), bibleaddercont, logger],"functionalsection","bibcontsec");
 
     //Make a container for the iframe doing the bible loading
     var biblenavi = TagWithText("iframe","","biblenavi");
@@ -1814,6 +2097,22 @@ function AddFunctionalitySection(){
     var hiddenfunctions = TagParent("section",[textcontsec, songcontsec, bibcontsec, embcontsec, browsersec, bbsec, timersec],"functions_section");
     hiddenfunctions.id = "hiddenfunctions";
     document.getElementById("functionalmenu").appendChild(hiddenfunctions);
+
+    var bibletool = new BibleContentAdder();
+    $("[value='ot'],[value='nt']").prop({"checked":false});
+    $("[name='testament']").click(function(){bibletool.LoadBooknames($(this))});
+    $(".book, .chapter, .verse")
+        .click(function(){bibletool.LoadBooknames($(this))})
+        .change(function(){bibletool.PreLoad($(this))});
+    //Poista loppujae, jos määritelty uusi alkujakeen kirja /  luku / testamentti
+    $("[value='ot'],[value='nt'],.book,.chapter").click(function(){
+        if($(this).parents(".endverse").length==0){
+             $(".endverse").remove();
+             $(".between-verse-selectors, .versepreview").hide();
+        }
+    });
+
+
     //return TagParent("section",[utilities],"functions_section");
 }
 
@@ -1927,7 +2226,7 @@ function AddBibleContent(){
         address = book.options[book.selectedIndex].textContent + "." + chapter.value;
         var biblenavi = document.getElementById("biblenavi");
         ClearContent(biblenavi.contentWindow.document);
-        biblenavi.src = 'biblecrawl.php?chap=' + address + '&verses=' + verse.value;
+        biblenavi.src = 'htmlslides/biblecrawl.php?chap=' + address + '&verses=' + verse.value;
         checkIframeLoaded();
 //    catch (error) {
 //      alert("Raamattusisällön lisääminen toimii vain palvelimelta ajattuna (vähintään localhost)");
