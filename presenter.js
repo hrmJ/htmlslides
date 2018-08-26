@@ -693,7 +693,8 @@ function Presentation(){
         this.kolehtislide =  new InfoContent(`Tämän viikon kolehtikohde : ${this.kolehtidata.kolehtikohde}`, 
             [`Tämänhetkinen tavoite on ${this.kolehtidata.kolehtitavoite}, 
                 ja tähän tarkoitukseen on toistaiseksi
-                kerätty ${this.kolehtidata.kerattymaara} euroa. Puuttuu siis vielä ${this.kolehtidata.tavoitemaara - this.kolehtidata.kerattymaara} euroa.`]);
+                kerätty ${this.kolehtidata.kerattymaara} euroa. 
+                Puuttuu siis vielä ${Math.round((this.kolehtidata.tavoitemaara - this.kolehtidata.kerattymaara)*100)/100} euroa.`]);
         var supercontainer = document.createElement("div");
         var barcontainer = document.createElement("div");
         barcontainer.className = "barcontainer";
